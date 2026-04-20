@@ -30,7 +30,9 @@ window.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    alert("Login successful → " + data.school_page);
+    alert("Login successful");
+
+    window.location.href = data.school_page;
 
     // NEXT STEP (we will enable redirect later)
     // window.location.href = data.school_page;
