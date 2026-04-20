@@ -1,0 +1,15 @@
+{
+  "name": "TupsTechnologies School System",
+  "short_name": "TupsSchool",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000066",
+  "theme_color": "#800000",
+  "icons": [
+    {
+      "src": "logo.JPG",
+      "sizes": "192x192",
+      "type": "image/jpeg"
+    }
+  ]
+}
