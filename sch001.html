@@ -1,22 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  ...
+  <meta charset="UTF-8">
+  <title>Tender Lilies Royal Academy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="school.css">
+
+  <!-- SUPABASE -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
   <div class="container">
+
     <h1>Tender Lilies Royal Academy</h1>
 
     <form id="subjectForm">
-      <select id="cadre">...</select>
-      <input id="subject">
-      <input id="subjectPassword">
-      <button>Access Subject</button>
+
+      <!-- CADRE -->
+      <label>Access Type</label>
+      <select id="cadre" required>
+        <option value="Teacher">Teacher</option>
+        <option value="Admin">Admin</option>
+      </select>
+
+      <!-- SUBJECT -->
+      <label>Subject</label>
+      <input 
+        type="text" 
+        id="subject" 
+        placeholder="Enter Subject (e.g Mathematics)" 
+        required
+      >
+
+      <!-- PASSWORD -->
+      <label>Subject Password</label>
+
+      <div class="password-box">
+        <input 
+          type="password" 
+          id="subjectPassword" 
+          placeholder="Enter Subject Password" 
+          required
+        >
+        <span class="eye" onclick="togglePassword()">👁</span>
+      </div>
+
+      <button type="submit">Access Subject</button>
+
     </form>
+
   </div>
 
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <!-- JS -->
   <script src="school.js"></script>
 
 </body>
+</html>

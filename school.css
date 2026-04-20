@@ -63,3 +63,29 @@ button {
 button:hover {
   opacity: 0.85;
 }
+label {
+  display: block;
+  text-align: left;
+  margin-top: 10px;
+  font-size: 13px;
+  color: white;
+  opacity: 0.9;
+}
+
+.password-box {
+  position: relative;
+}
+
+.password-box input {
+  padding-right: 40px;
+}
+
+.eye {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #333;
+  font-size: 18px;
+}
