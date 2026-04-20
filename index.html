@@ -72,9 +72,9 @@
 
 <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js')
-  .then(() => console.log("SW Registered"))
-  .catch(err => console.log("SW Failed", err));
+  navigator.serviceWorker.register('./service-worker.js')
+    .then(reg => console.log("SW Registered:", reg.scope))
+    .catch(err => console.log("SW Failed:", err));
 }
 </script>
 </body>
