@@ -1,77 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>School Dashboard</title>
+  ...
+  <link rel="stylesheet" href="school.css">
 </head>
+
 <body>
 
-  <h1 id="schoolName">TENDER LILIES ROYAL ACADEMY</h1>
+  <div class="container">
+    <h1>Tender Lilies Royal Academy</h1>
 
-  <form id="subjectForm">
-    <select id="cadre">
-      <option value="Teacher">Teacher</option>
-      <option value="Admin">Admin</option>
-    </select>
-
-    <input type="text" id="subject" placeholder="Enter Subject" required>
-    <input type="password" id="subjectPassword" placeholder="Subject Password" required>
-
-    <button type="submit">Access Subject</button>
-  </form>
+    <form id="subjectForm">
+      <select id="cadre">...</select>
+      <input id="subject">
+      <input id="subjectPassword">
+      <button>Access Subject</button>
+    </form>
+  </div>
 
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
-<script>
-  // 🔴 REPLACE WITH YOUR REAL VALUES
-  const supabaseUrl = "https://sgdrncpiqingjwxmkqij.supabase.co";
-  const supabaseKey = "sb_publishable_CFLKvoqepTX4UqzG5XjumQ_TJ2T2hFj";
-
-  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-  // 👁 TOGGLE PASSWORD
-  function togglePassword() {
-    const input = document.getElementById("subjectPassword");
-    input.type = input.type === "password" ? "text" : "password";
-  }
-
-  // FORM SUBMIT
-  document.getElementById("subjectForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
-
-    const subject = document.getElementById("subject").value.trim();
-    const password = document.getElementById("subjectPassword").value.trim();
-    const cadre = document.getElementById("cadre").value;
-
-    // 🔍 FETCH SUBJECT
-    const { data, error } = await supabaseClient
-      .from("subjects")
-      .select("*")
-      .eq("school_code", "SCH001")
-      .ilike("subject", subject)
-      .single();
-
-    if (error || !data) {
-      alert("Subject not found");
-      return;
-    }
-
-    // 👨‍💼 ADMIN ACCESS
-    if (cadre === "Admin" && password === data.admin_password) {
-      window.location.href = data.sheet_url;
-      return;
-    }
-
-    // 👨‍🏫 TEACHER ACCESS
-    if (password === data.subject_password) {
-      window.location.href = data.sheet_url;
-      return;
-    }
-
-    alert("Invalid password");
-  });
-</script>
+  <script src="school.js"></script>
 
 </body>
-</html>
-

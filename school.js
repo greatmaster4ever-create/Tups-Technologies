@@ -13,7 +13,8 @@ document.getElementById("subjectForm").addEventListener("submit", async (e) => {
   const { data, error } = await supabaseClient
     .from("subjects")
     .select("*")
-    .eq("subject", subject)
+    .eq("school_code", "SCH001")
+    .ilike("subject", subject)
     .single();
 
   if (error || !data) {
@@ -21,13 +22,11 @@ document.getElementById("subjectForm").addEventListener("submit", async (e) => {
     return;
   }
 
-  // Admin access
   if (cadre === "Admin" && password === data.admin_password) {
     window.location.href = data.sheet_url;
     return;
   }
 
-  // Teacher access
   if (password === data.subject_password) {
     window.location.href = data.sheet_url;
     return;
