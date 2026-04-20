@@ -1,160 +1,77 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Tender Lilies Royal Academy</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Font -->
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Poppins', sans-serif;
-    }
-
-    body {
-      height: 100vh;
-      background: linear-gradient(rgba(0,0,50,0.6), rgba(0,0,50,0.6)),
-                  url('https://images.unsplash.com/photo-1580587771525-78b9dba3b914') no-repeat center/cover;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-    }
-
-    .container {
-      width: 90%;
-      max-width: 400px;
-      background: rgba(255, 255, 255, 0.08);
-      backdrop-filter: blur(12px);
-      border-radius: 20px;
-      padding: 30px;
-      text-align: center;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-    }
-
-    .logo {
-      width: 80px;
-      margin-bottom: 10px;
-    }
-
-    h1 {
-      font-size: 20px;
-      margin-bottom: 20px;
-      color: #fff;
-    }
-
-    select, input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      font-size: 14px;
-    }
-
-    select {
-      background: #800000;
-      color: white;
-    }
-
-    input {
-      background: rgba(255,255,255,0.9);
-    }
-
-    .password-container {
-      position: relative;
-    }
-
-    .eye {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: #333;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 10px;
-      background: linear-gradient(45deg, #800000, #000080);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      opacity: 0.85;
-    }
-
-    .footer {
-      margin-top: 15px;
-      font-size: 12px;
-      opacity: 0.8;
-    }
-  </style>
-
+  <title>School Dashboard</title>
 </head>
-
 <body>
 
-  <div class="container">
-    <!-- LOGO -->
-    <img src="logo.JPG" class="logo" alt="School Logo">
+  <h1 id="schoolName">TENDER LILIES ROYAL ACADEMY</h1>
 
-```
-<!-- SCHOOL NAME -->
-<h1>Tender Lilies Royal Academy</h1>
+  <form id="subjectForm">
+    <select id="cadre">
+      <option value="Teacher">Teacher</option>
+      <option value="Admin">Admin</option>
+    </select>
 
-<!-- FORM -->
-<form id="subjectForm">
-  <select id="cadre">
-    <option value="Teacher">Teacher</option>
-    <option value="Admin">Admin</option>
-  </select>
+    <input type="text" id="subject" placeholder="Enter Subject" required>
+    <input type="password" id="subjectPassword" placeholder="Subject Password" required>
 
-  <input type="text" id="subject" placeholder="Enter Subject" required>
+    <button type="submit">Access Subject</button>
+  </form>
 
-  <div class="password-container">
-    <input type="password" id="subjectPassword" placeholder="Enter Password" required>
-    <span class="eye" onclick="togglePassword()">👁</span>
-  </div>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
-  <button type="submit">Access Subject</button>
-</form>
+<script>
+  // 🔴 REPLACE WITH YOUR REAL VALUES
+  const supabaseUrl = "https://sgdrncpiqingjwxmkqij.supabase.co";
+  const supabaseKey = "sb_publishable_CFLKvoqepTX4UqzG5XjumQ_TJ2T2hFj";
 
-<div class="footer">
-  Powered by TupsTechnologies
-</div>
-```
+  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-  </div>
+  // 👁 TOGGLE PASSWORD
+  function togglePassword() {
+    const input = document.getElementById("subjectPassword");
+    input.type = input.type === "password" ? "text" : "password";
+  }
 
-  <script>
-    // 👁 TOGGLE PASSWORD
-    function togglePassword() {
-      const input = document.getElementById("subjectPassword");
-      input.type = input.type === "password" ? "text" : "password";
+  // FORM SUBMIT
+  document.getElementById("subjectForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const subject = document.getElementById("subject").value.trim();
+    const password = document.getElementById("subjectPassword").value.trim();
+    const cadre = document.getElementById("cadre").value;
+
+    // 🔍 FETCH SUBJECT
+    const { data, error } = await supabaseClient
+      .from("subjects")
+      .select("*")
+      .eq("school_code", "SCH001")
+      .ilike("subject", subject)
+      .single();
+
+    if (error || !data) {
+      alert("Subject not found");
+      return;
     }
 
-    // FORM TEST (we will connect Supabase next)
-    document.getElementById("subjectForm").addEventListener("submit", function(e){
-      e.preventDefault();
-      alert("Form ready — Supabase connection next");
-    });
-  </script>
+    // 👨‍💼 ADMIN ACCESS
+    if (cadre === "Admin" && password === data.admin_password) {
+      window.location.href = data.sheet_url;
+      return;
+    }
+
+    // 👨‍🏫 TEACHER ACCESS
+    if (password === data.subject_password) {
+      window.location.href = data.sheet_url;
+      return;
+    }
+
+    alert("Invalid password");
+  });
+</script>
 
 </body>
 </html>
+
