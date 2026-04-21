@@ -19,7 +19,7 @@ body {
             ),
             url('background.png') no-repeat center center / cover;
 
-  font-family: 'Poppins', sans-serif;
+  
 }
 
 h1 {
@@ -95,9 +95,7 @@ label {
   opacity: 0.9;
 }
 
-.password-box {
-  position: relative;
-}
+
 
 .password-box input {
   padding-right: 40px;
@@ -120,4 +118,37 @@ label {
 .password-box input {
   width: 100%;
   padding-right: 40px;
+}
+
+/* HEADER ROW */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  gap: 10px;
+}
+
+/* TITLE (LEFT) */
+.school-title {
+  color: white;
+  font-size: 20px;
+  margin: 0;
+}
+
+/* LOGO (RIGHT) */
+.school-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+@media (max-width: 480px) {
+  .school-title {
+    font-size: 16px;
+  }
+
+  .school-logo {
+    width: 45px;
+    height: 45px;
+  }
 }
