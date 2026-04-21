@@ -41,7 +41,7 @@ form {
 
 .form-row input,
 .form-row select {
-  width: 40%;
+  width: 60%;
   padding: 10px;
   border-radius: 8px;
   border: none;
@@ -56,15 +56,6 @@ form {
   background: rgba(255,255,255,0.1);
   backdrop-filter: blur(15px);
   text-align: center;
-}
-
-input, select {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 10px;
-  border: none;
-  outline: none;
 }
 
 select {
@@ -110,6 +101,15 @@ label {
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  color: #333;
-  font-size: 18px;
+  color: #000;
+  font-size: 16px;
+}
+.password-box {
+  position: relative;
+  width: 60%;
+}
+
+.password-box input {
+  width: 100%;
+  padding-right: 40px;
 }

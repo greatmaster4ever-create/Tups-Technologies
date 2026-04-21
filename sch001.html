@@ -25,38 +25,51 @@
 
     <form id="subjectForm">
 
-      <!-- CADRE -->
-      <label>Access Type</label>
-      <select id="cadre" required>
-        <option value="Teacher">Teacher</option>
-        <option value="Admin">Admin</option>
-      </select>
+  <!-- CADRE -->
+  <div class="form-row">
+    <label>Access Type</label>
+    <select id="cadre" required>
+      <option value="Teacher">Teacher</option>
+      <option value="Admin">Admin</option>
+    </select>
+  </div>
 
-      <!-- SUBJECT -->
-      <label>Subject</label>
+  <!-- SUBJECT -->
+  <div class="form-row">
+    <label>Subject</label>
+    <input 
+      list="subjectsList"
+      id="subject"
+      placeholder="Search subject..."
+      required
+    >
+    <datalist id="subjectsList">
+      <option value="Mathematics">
+      <option value="English">
+      <option value="Physics">
+      <option value="Chemistry">
+      <option value="Biology">
+    </datalist>
+  </div>
+
+  <!-- PASSWORD -->
+  <div class="form-row">
+    <label>Password</label>
+
+    <div class="password-box">
       <input 
-        type="text" 
-        id="subject" 
-        placeholder="Enter Subject (e.g Mathematics)" 
+        type="password" 
+        id="subjectPassword" 
+        placeholder="Enter Password" 
         required
       >
+      <span class="eye" onclick="togglePassword()">👁</span>
+    </div>
+  </div>
 
-      <!-- PASSWORD -->
-      <label>Subject Password</label>
+  <button type="submit">Access Subject</button>
 
-      <div class="password-box">
-        <input 
-          type="password" 
-          id="subjectPassword" 
-          placeholder="Enter Subject Password" 
-          required
-        >
-        <span class="eye" onclick="togglePassword()">👁</span>
-      </div>
-
-      <button type="submit">Access Subject</button>
-
-    </form>
+</form>
 
   </div>
 
