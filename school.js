@@ -34,3 +34,8 @@ document.getElementById("subjectForm").addEventListener("submit", async (e) => {
 
   alert("Invalid subject password");
 });
+
+window.togglePassword = function () {
+  const input = document.getElementById("subjectPassword");
+  input.type = input.type === "password" ? "text" : "password";
+};
