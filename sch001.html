@@ -13,8 +13,6 @@
   <!-- CSS -->
   <link rel="stylesheet" href="school.css">
 
-  <!-- SUPABASE -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
@@ -46,11 +44,7 @@
       required
     >
     <datalist id="subjectsList">
-      <option value="Mathematics">
-      <option value="English">
-      <option value="Physics">
-      <option value="Chemistry">
-      <option value="Biology">
+      
     </datalist>
   </div>
 
@@ -63,7 +57,8 @@
         type="password" 
         id="subjectPassword" 
         placeholder="Enter Password" 
-        required
+         autocomplete="current-password"
+	 required
       >
       <span class="eye" onclick="togglePassword()">👁</span>
     </div>
@@ -75,7 +70,10 @@
 
   </div>
 
-  <!-- JS -->
+<!-- SUPABASE -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  
+<!-- JS -->
   <script src="school.js"></script>
   
 <script>
