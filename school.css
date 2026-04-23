@@ -7,8 +7,6 @@
 
 body {
   height: 100vh;
-  margin: 0;
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -18,42 +16,6 @@ body {
               rgba(0,0,0,0.75)
             ),
             url('background.png') no-repeat center center / cover;
-
-  
-}
-
-h1 {
-  color: white;
-  text-align: center;
-  margin-bottom: 20px;
-}
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.form-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 15px;
-}
-
-.form-row label {
-  width: 40%;
-  color: white;
-  font-size: 13px;
-  text-align: left;
-}
-
-.form-row input,
-.form-row select {
-  width: 60%;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  outline: none;
 }
 
 .container {
@@ -63,116 +25,75 @@ form {
   border-radius: 20px;
   background: rgba(255,255,255,0.1);
   backdrop-filter: blur(15px);
-  text-align: center;
 }
 
-select {
-  background: #800000;
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.school-title {
   color: white;
+  font-size: 18px;
+}
+
+.school-logo {
+  width: 50px;
+  height: 50px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+label {
+  color: white;
+  font-size: 13px;
+  width: 40%;
+}
+
+input, select {
+  width: 60%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+}
+
+.password-box {
+  width: 60%;
+  position: relative;
+}
+
+.password-box input {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
 }
 
 button {
-  width: 100%;
   padding: 12px;
   border: none;
   border-radius: 10px;
   background: linear-gradient(45deg, #800000, #000080);
   color: white;
   font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:hover {
-  opacity: 0.85;
-}
-label {
-  display: block;
-  text-align: left;
-  margin-top: 10px;
-  font-size: 13px;
-  color: white;
-  opacity: 0.9;
-}
-
-
-
-.password-box input {
-  padding-right: 40px;
-}
-
-.eye {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  color: #000;
-  font-size: 16px;
-}
-.password-box {
-  position: relative;
-  width: 60%;
-}
-
-.password-box input {
-  width: 100%;
-  padding-right: 40px;
-}
-
-/* HEADER ROW */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-  gap: 10px;
-}
-
-/* TITLE (LEFT) */
-.school-title {
-  color: white;
-  font-size: 20px;
-  margin: 0;
-}
-
-/* LOGO (RIGHT) */
-.school-logo {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-}
-@media (max-width: 480px) {
-  .school-title {
-    font-size: 16px;
-  }
-
-  .school-logo {
-    width: 45px;
-    height: 45px;
-  }
-}
-
-/* SUBJECT GRID */
-.subjects-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-/* SUBJECT CARD */
-.subject-card {
-  padding: 12px;
-  background: rgba(255,255,255,0.15);
-  border-radius: 10px;
-  text-align: center;
-  cursor: pointer;
-  transition: 0.3s;
-  color: white;
-  font-size: 14px;
-}
-
-.subject-card:hover {
-  background: linear-gradient(45deg, #800000, #000080);
 }

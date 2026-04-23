@@ -7,82 +7,65 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000066">
 
-  <!-- FONT -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
-  <!-- CSS -->
   <link rel="stylesheet" href="school.css">
-
 </head>
 
 <body>
 
   <div class="container">
-<div class="header">
-  <h1 class="school-title">Tender Lilies Royal Academy</h1>
-  <img src="schlogo.png" alt="School Logo" class="school-logo">
-</div>
 
-<div id="subjectsContainer" class="subjects-grid"></div>
+    <div class="header">
+      <h1 class="school-title">Tender Lilies Royal Academy</h1>
+      <img src="schlogo.png" class="school-logo" alt="Logo">
+    </div>
+
     <form id="subjectForm">
 
-  <!-- CADRE -->
-  <div class="form-row">
-    <label>Access Type</label>
-    <select id="cadre" required>
-      <option value="Teacher">Teacher</option>
-      <option value="Admin">Admin</option>
-    </select>
-  </div>
+      <!-- ACCESS TYPE -->
+      <div class="form-row">
+        <label>Access Type</label>
+        <select id="cadre" required>
+          <option value="Teacher">Teacher</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
 
-  <!-- SUBJECT -->
-  <div class="form-row">
-    <label>Subject</label>
-    <input 
-      list="subjectsList"
-      id="subject"
-      placeholder="Search subject..."
-      required
-    >
-    <datalist id="subjectsList">
-      
-    </datalist>
-  </div>
+      <!-- SUBJECT (SEARCH + DROPDOWN) -->
+      <div class="form-row">
+        <label>Subject</label>
+        <input 
+          list="subjectsList"
+          id="subject"
+          placeholder="Search subject..."
+          required
+        >
+        <datalist id="subjectsList"></datalist>
+      </div>
 
-  <!-- PASSWORD -->
-  <div class="form-row">
-    <label>Password</label>
+      <!-- PASSWORD -->
+      <div class="form-row">
+        <label>Password</label>
 
-    <div class="password-box">
-      <input 
-        type="password" 
-        id="subjectPassword" 
-        placeholder="Enter Password" 
-         autocomplete="current-password"
-	 required
-      >
-      <span class="eye" onclick="togglePassword()">👁</span>
-    </div>
-  </div>
+        <div class="password-box">
+          <input 
+            type="password" 
+            id="subjectPassword" 
+            placeholder="Enter Password" 
+            required
+          >
+          <span class="eye" onclick="togglePassword()">👁</span>
+        </div>
+      </div>
 
-  <button type="submit">Access Subject</button>
+      <button type="submit">Access Subject</button>
 
-</form>
+    </form>
 
   </div>
 
-<!-- SUPABASE -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  
-<!-- JS -->
   <script src="school.js"></script>
-  
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./service-worker.js')
-    .then(reg => console.log("SW Registered:", reg.scope))
-    .catch(err => console.log("SW Failed:", err));
-}
-</script>
+
 </body>
 </html>

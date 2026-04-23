@@ -4,20 +4,13 @@ const supabaseKey = "sb_publishable_CFLKvoqepTX4UqzG5XjumQ_TJ2T2hFj";
 
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-
-// 👁 PASSWORD TOGGLE (GLOBAL)
+// 👁 PASSWORD TOGGLE
 window.togglePassword = function () {
   const input = document.getElementById("subjectPassword");
-
-  if (input.type === "password") {
-    input.type = "text";
-  } else {
-    input.type = "password";
-  }
+  input.type = input.type === "password" ? "text" : "password";
 };
 
-
-// 🔽 LOAD SUBJECTS FROM SUPABASE
+// 🔽 LOAD SUBJECTS INTO DROPDOWN
 async function loadSubjects() {
   const datalist = document.getElementById("subjectsList");
 
@@ -31,10 +24,8 @@ async function loadSubjects() {
     return;
   }
 
-  // Clear old options
   datalist.innerHTML = "";
 
-  // Add new options
   data.forEach(item => {
     const option = document.createElement("option");
     option.value = item.subject;
@@ -42,53 +33,12 @@ async function loadSubjects() {
   });
 }
 
-
-// 🚀 RUN AFTER PAGE LOAD
+// 🚀 INIT
 document.addEventListener("DOMContentLoaded", () => {
+  loadSubjects();
 
-  // 🔽 Load subjects into dropdown
-
-  async function loadSubjects() {
-  const datalist = document.getElementById("subjectsList");
-  const container = document.getElementById("subjectsContainer");
-
-  const { data, error } = await supabaseClient
-    .from("subjects")
-    .select("subject")
-    .eq("school_code", "SCH001");
-
-  if (error) {
-    console.error("Error loading subjects:", error);
-    return;
-  }
-
-  datalist.innerHTML = "";
-  container.innerHTML = "";
-
-  data.forEach(item => {
-    // 🔽 Add to datalist (for typing fallback)
-    const option = document.createElement("option");
-    option.value = item.subject;
-    datalist.appendChild(option);
-
-    // 🔽 Create card
-    const card = document.createElement("div");
-    card.className = "subject-card";
-    card.textContent = item.subject;
-
-    // 🔽 Click to select
-    card.addEventListener("click", () => {
-      document.getElementById("subject").value = item.subject;
-    });
-
-    container.appendChild(card);
-  });
-}
-
-  // 🔽 FORM SUBMISSION
-  const form = document.getElementById("subjectForm");
-
-  form.addEventListener("submit", async (e) => {
+  // FORM LOGIN
+  document.getElementById("subjectForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const subject = document.getElementById("subject").value.trim();
@@ -100,20 +50,20 @@ document.addEventListener("DOMContentLoaded", () => {
       .select("*")
       .eq("school_code", "SCH001")
       .ilike("subject", subject)
-      .single();
+      .maybeSingle();
 
     if (error || !data) {
       alert("Subject not found");
       return;
     }
 
-    // 👨‍💼 ADMIN ACCESS
+    // Admin login
     if (cadre === "Admin" && password === data.admin_password) {
       window.location.href = data.sheet_url;
       return;
     }
 
-    // 👨‍🏫 TEACHER ACCESS
+    // Teacher login
     if (password === data.subject_password) {
       window.location.href = data.sheet_url;
       return;
@@ -121,5 +71,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
     alert("Invalid subject password");
   });
-
 });
