@@ -47,7 +47,43 @@ async function loadSubjects() {
 document.addEventListener("DOMContentLoaded", () => {
 
   // 🔽 Load subjects into dropdown
-  loadSubjects();
+
+  async function loadSubjects() {
+  const datalist = document.getElementById("subjectsList");
+  const container = document.getElementById("subjectsContainer");
+
+  const { data, error } = await supabaseClient
+    .from("subjects")
+    .select("subject")
+    .eq("school_code", "SCH001");
+
+  if (error) {
+    console.error("Error loading subjects:", error);
+    return;
+  }
+
+  datalist.innerHTML = "";
+  container.innerHTML = "";
+
+  data.forEach(item => {
+    // 🔽 Add to datalist (for typing fallback)
+    const option = document.createElement("option");
+    option.value = item.subject;
+    datalist.appendChild(option);
+
+    // 🔽 Create card
+    const card = document.createElement("div");
+    card.className = "subject-card";
+    card.textContent = item.subject;
+
+    // 🔽 Click to select
+    card.addEventListener("click", () => {
+      document.getElementById("subject").value = item.subject;
+    });
+
+    container.appendChild(card);
+  });
+}
 
   // 🔽 FORM SUBMISSION
   const form = document.getElementById("subjectForm");

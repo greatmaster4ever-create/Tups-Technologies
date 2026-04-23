@@ -152,3 +152,27 @@ label {
     height: 45px;
   }
 }
+
+/* SUBJECT GRID */
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* SUBJECT CARD */
+.subject-card {
+  padding: 12px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.3s;
+  color: white;
+  font-size: 14px;
+}
+
+.subject-card:hover {
+  background: linear-gradient(45deg, #800000, #000080);
+}
