@@ -4,6 +4,9 @@ const supabaseKey = "sb_publishable_CFLKvoqepTX4UqzG5XjumQ_TJ2T2hFj";
 
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
+// 🏫 GET SCHOOL CODE FROM HTML
+const SCHOOL_CODE = document.body.dataset.school;
+
 // 👁 PASSWORD TOGGLE
 window.togglePassword = function () {
   const input = document.getElementById("subjectPassword");
@@ -17,7 +20,7 @@ async function loadSubjects() {
   const { data, error } = await supabaseClient
     .from("subjects")
     .select("subject")
-    .eq("school_code", "SCH001");
+    .eq("school_code", SCHOOL_CODE);
 
   if (error) {
     console.error("Error loading subjects:", error);
@@ -35,6 +38,14 @@ async function loadSubjects() {
 
 // 🚀 INIT
 document.addEventListener("DOMContentLoaded", () => {
+
+  // ⚠️ SAFETY CHECK
+  if (!SCHOOL_CODE) {
+    console.error("No school code found in HTML (data-school)");
+    alert("School configuration error");
+    return;
+  }
+
   loadSubjects();
 
   // FORM LOGIN
@@ -48,7 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const { data, error } = await supabaseClient
       .from("subjects")
       .select("*")
-      .eq("school_code", "SCH001")
+      .eq("school_code", SCHOOL_CODE)
       .ilike("subject", subject)
       .maybeSingle();
 
@@ -57,13 +68,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Admin login
+    // 👨‍💼 ADMIN LOGIN
     if (cadre === "Admin" && password === data.admin_password) {
       window.location.href = data.sheet_url;
       return;
     }
 
-    // Teacher login
+    // 👨‍🏫 TEACHER LOGIN
     if (password === data.subject_password) {
       window.location.href = data.sheet_url;
       return;
