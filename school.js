@@ -68,13 +68,23 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 👨‍💼 ADMIN LOGIN
+    // 🔐 ADMIN PORTAL OVERRIDE (NEW FEATURE)
+    if (
+      cadre === "Admin" &&
+      subject.toUpperCase() === "ADMIN PORTAL" &&
+      password === data.admin_password
+    ) {
+      window.location.href = data.sheet_url;
+      return;
+    }
+
+    // 👨‍💼 NORMAL ADMIN SUBJECT ACCESS
     if (cadre === "Admin" && password === data.admin_password) {
       window.location.href = data.sheet_url;
       return;
     }
 
-    // 👨‍🏫 TEACHER LOGIN
+    // 👨‍🏫 TEACHER ACCESS
     if (password === data.subject_password) {
       window.location.href = data.sheet_url;
       return;
