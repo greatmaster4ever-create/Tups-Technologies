@@ -3,12 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <title>Tender Lilies Royal Academy</title>
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 🔥 CACHE CONTROL (PREVENT OLD FILES) -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#000066">
 
+  <!-- FONT -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="school.css">
+
+  <!-- CSS (CACHE BUSTED) -->
+  <link rel="stylesheet" href="school.css?v=1">
+
 </head>
 
 <body data-school="SCH001">
@@ -31,7 +43,7 @@
         </select>
       </div>
 
-      <!-- ✅ NEW: DEPARTMENT -->
+      <!-- DEPARTMENT -->
       <div class="form-row">
         <label>Department</label>
         <select id="department" required>
@@ -43,7 +55,7 @@
         </select>
       </div>
 
-      <!-- SUBJECT (SEARCH + DROPDOWN) -->
+      <!-- SUBJECT -->
       <div class="form-row">
         <label>Subject</label>
         <input 
@@ -76,8 +88,11 @@
 
   </div>
 
+  <!-- SUPABASE -->
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script src="school.js"></script>
+
+  <!-- JS (CACHE BUSTED) -->
+  <script src="school.js?v=1"></script>
 
 </body>
 </html>
