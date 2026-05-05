@@ -18,6 +18,7 @@ body {
             url('background.png') no-repeat center center / cover;
 }
 
+/* CONTAINER */
 .container {
   width: 90%;
   max-width: 420px;
@@ -27,11 +28,12 @@ body {
   backdrop-filter: blur(15px);
 }
 
+/* HEADER */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .school-title {
@@ -44,25 +46,30 @@ body {
   height: 50px;
 }
 
+/* FORM */
 form {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
+/* ROW */
 .form-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+  margin-bottom: 5px; /* 🔥 improved spacing */
 }
 
+/* LABEL */
 label {
   color: white;
   font-size: 13px;
   width: 40%;
 }
 
+/* INPUT + SELECT */
 input, select {
   width: 60%;
   padding: 10px;
@@ -71,6 +78,7 @@ input, select {
   outline: none;
 }
 
+/* PASSWORD BOX */
 .password-box {
   width: 60%;
   position: relative;
@@ -81,6 +89,7 @@ input, select {
   padding-right: 40px;
 }
 
+/* EYE ICON */
 .eye {
   position: absolute;
   right: 10px;
@@ -89,6 +98,7 @@ input, select {
   cursor: pointer;
 }
 
+/* BUTTON */
 button {
   padding: 12px;
   border: none;
@@ -96,4 +106,34 @@ button {
   background: linear-gradient(45deg, #800000, #000080);
   color: white;
   font-weight: bold;
+  cursor: pointer;
+}
+
+/* 🔥 MOBILE RESPONSIVENESS (IMPORTANT UPGRADE) */
+@media (max-width: 480px) {
+
+  .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  label {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+
+  input,
+  select,
+  .password-box {
+    width: 100%;
+  }
+
+  .school-title {
+    font-size: 16px;
+  }
+
+  .school-logo {
+    width: 40px;
+    height: 40px;
+  }
 }

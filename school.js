@@ -13,14 +13,21 @@ window.togglePassword = function () {
   input.type = input.type === "password" ? "text" : "password";
 };
 
-// 🔽 LOAD SUBJECTS INTO DROPDOWN
-async function loadSubjects() {
+// 🔽 LOAD SUBJECTS BASED ON DEPARTMENT
+async function loadSubjects(department) {
   const datalist = document.getElementById("subjectsList");
+
+  // Clear if no department selected
+  if (!department) {
+    datalist.innerHTML = "";
+    return;
+  }
 
   const { data, error } = await supabaseClient
     .from("subjects")
     .select("subject")
-    .eq("school_code", SCHOOL_CODE);
+    .eq("school_code", SCHOOL_CODE)
+    .eq("department", department);
 
   if (error) {
     console.error("Error loading subjects:", error);
@@ -46,29 +53,50 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  loadSubjects();
+  const departmentSelect = document.getElementById("department");
+  const subjectInput = document.getElementById("subject");
+
+  // 🔁 LOAD SUBJECTS ON DEPARTMENT CHANGE
+  departmentSelect.addEventListener("change", () => {
+    const selectedDept = departmentSelect.value;
+
+    subjectInput.value = "";
+    loadSubjects(selectedDept);
+  });
 
   // FORM LOGIN
   document.getElementById("subjectForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const subject = document.getElementById("subject").value.trim();
+    const subject = subjectInput.value.trim();
     const password = document.getElementById("subjectPassword").value.trim();
     const cadre = document.getElementById("cadre").value;
+    const department = departmentSelect.value;
 
-    const { data, error } = await supabaseClient
+    if (!department) {
+      alert("Please select a department");
+      return;
+    }
+
+    let query = supabaseClient
       .from("subjects")
       .select("*")
       .eq("school_code", SCHOOL_CODE)
-      .ilike("subject", subject)
-      .maybeSingle();
+      .ilike("subject", subject);
+
+    // 🔥 SPECIAL CASE: ADMIN PORTAL (NO DEPARTMENT FILTER)
+    if (subject.toUpperCase() !== "ADMIN PORTAL") {
+      query = query.eq("department", department);
+    }
+
+    const { data, error } = await query.maybeSingle();
 
     if (error || !data) {
       alert("Subject not found");
       return;
     }
 
-    // 🔐 ADMIN PORTAL OVERRIDE (NEW FEATURE)
+    // 🔐 ADMIN PORTAL OVERRIDE (GLOBAL ACCESS)
     if (
       cadre === "Admin" &&
       subject.toUpperCase() === "ADMIN PORTAL" &&
@@ -78,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 👨‍💼 NORMAL ADMIN SUBJECT ACCESS
+    // 👨‍💼 NORMAL ADMIN ACCESS
     if (cadre === "Admin" && password === data.admin_password) {
       window.location.href = data.sheet_url;
       return;
