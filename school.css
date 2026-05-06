@@ -5,11 +5,11 @@
   font-family: 'Poppins', sans-serif;
 }
 
+/* 🔥 FIXED LAYOUT (IMPORTANT FOR FOOTER) */
 body {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
 
   background: linear-gradient(
               rgba(0,0,0,0.75),
@@ -26,6 +26,9 @@ body {
   border-radius: 20px;
   background: rgba(255,255,255,0.1);
   backdrop-filter: blur(15px);
+
+  /* 🔥 centers form properly but allows footer space */
+  margin: auto;
 }
 
 /* HEADER */
@@ -59,7 +62,7 @@ form {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
-  margin-bottom: 5px; /* 🔥 improved spacing */
+  margin-bottom: 5px;
 }
 
 /* LABEL */
@@ -109,7 +112,7 @@ button {
   cursor: pointer;
 }
 
-/* 🔥 MOBILE RESPONSIVENESS (IMPORTANT UPGRADE) */
+/* 🔥 MOBILE RESPONSIVENESS */
 @media (max-width: 480px) {
 
   .form-row {
@@ -137,9 +140,9 @@ button {
     height: 40px;
   }
 }
+
+/* 🔥 FIXED FOOTER (NO STICKY) */
 .global-footer {
-  position: sticky;
-  bottom: 0;
   width: 100%;
   text-align: center;
   padding: 10px 0;
@@ -147,5 +150,7 @@ button {
   color: rgba(255, 255, 255, 0.75);
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(10px);
-  z-index: 999;
+
+  /* ensures it always stays at bottom naturally */
+  margin-top: auto;
 }
