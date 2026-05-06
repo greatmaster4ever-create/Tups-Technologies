@@ -13,34 +13,31 @@ window.togglePassword = function () {
   input.type = input.type === "password" ? "text" : "password";
 };
 
-// 🔽 LOAD SUBJECTS BASED ON DEPARTMENT
-async function loadSubjects(department) {
+// 🔽 LOAD SUBJECTS (ADMIN = ALL, TEACHER = FILTERED)
+async function loadSubjects(department, isAdmin = false) {
   const datalist = document.getElementById("subjectsList");
 
-  if (!department) {
-    datalist.innerHTML = "";
-    return;
+  datalist.innerHTML = "";
+
+  let query = supabaseClient
+    .from("subjects")
+    .select("subject")
+    .eq("school_code", SCHOOL_CODE);
+
+  // 👇 ONLY FILTER FOR TEACHERS
+  if (!isAdmin && department) {
+    query = query.ilike("department", department);
   }
 
-  console.log("Selected Department:", department);
-
-  const { data, error } = await supabaseClient
-    .from("subjects")
-    .select("subject, department")
-    .eq("school_code", SCHOOL_CODE)
-    .ilike("department", department); // ✅ FIXED (case-insensitive)
+  const { data, error } = await query;
 
   if (error) {
     console.error("Error loading subjects:", error);
     return;
   }
 
-  console.log("Subjects from DB:", data);
-
-  datalist.innerHTML = "";
-
   if (!data || data.length === 0) {
-    console.warn("No subjects found for this department");
+    console.warn("No subjects found");
     return;
   }
 
@@ -54,7 +51,6 @@ async function loadSubjects(department) {
 // 🚀 INIT
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ⚠️ SAFETY CHECK
   if (!SCHOOL_CODE) {
     console.error("No school code found in HTML (data-school)");
     alert("School configuration error");
@@ -63,19 +59,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const departmentSelect = document.getElementById("department");
   const subjectInput = document.getElementById("subject");
+  const cadreSelect = document.getElementById("cadre");
 
-  // 🔁 LOAD SUBJECTS ON DEPARTMENT CHANGE
-  departmentSelect.addEventListener("change", () => {
-    const selectedDept = departmentSelect.value;
+  // 🔁 HANDLE ROLE CHANGE (ADMIN vs TEACHER)
+  cadreSelect.addEventListener("change", () => {
 
-    subjectInput.value = "";
-    loadSubjects(selectedDept);
+    const isAdmin = cadreSelect.value === "Admin";
+
+    // disable department for admin
+    departmentSelect.disabled = isAdmin;
+
+    if (isAdmin) {
+      departmentSelect.value = "";
+
+      // load ALL subjects for admin
+      loadSubjects(null, true);
+    } else {
+      // clear + require department for teachers
+      subjectInput.value = "";
+      document.getElementById("subjectsList").innerHTML = "";
+    }
   });
 
-  // 🔁 OPTIONAL: auto-load if already selected (useful later)
-  if (departmentSelect.value) {
-    loadSubjects(departmentSelect.value);
-  }
+  // 🔁 LOAD SUBJECTS WHEN DEPARTMENT CHANGES (TEACHER ONLY)
+  departmentSelect.addEventListener("change", () => {
+    if (cadreSelect.value !== "Admin") {
+      subjectInput.value = "";
+      loadSubjects(departmentSelect.value, false);
+    }
+  });
 
   // FORM LOGIN
   document.getElementById("subjectForm").addEventListener("submit", async (e) => {
@@ -83,10 +95,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const subject = subjectInput.value.trim();
     const password = document.getElementById("subjectPassword").value.trim();
-    const cadre = document.getElementById("cadre").value;
+    const cadre = cadreSelect.value;
     const department = departmentSelect.value;
 
-    if (!department) {
+    // ⚠️ Teacher must pick department
+    if (cadre !== "Admin" && !department) {
       alert("Please select a department");
       return;
     }
@@ -97,9 +110,9 @@ document.addEventListener("DOMContentLoaded", () => {
       .eq("school_code", SCHOOL_CODE)
       .ilike("subject", subject);
 
-    // 🔥 ADMIN PORTAL BYPASS (NO DEPARTMENT FILTER)
-    if (subject.toUpperCase() !== "ADMIN PORTAL") {
-      query = query.ilike("department", department); // ✅ FIXED HERE TOO
+    // 👇 APPLY FILTER ONLY FOR TEACHERS
+    if (cadre !== "Admin") {
+      query = query.ilike("department", department);
     }
 
     const { data, error } = await query.maybeSingle();
