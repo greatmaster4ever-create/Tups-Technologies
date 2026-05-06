@@ -17,24 +17,32 @@ window.togglePassword = function () {
 async function loadSubjects(department) {
   const datalist = document.getElementById("subjectsList");
 
-  // Clear if no department selected
   if (!department) {
     datalist.innerHTML = "";
     return;
   }
 
+  console.log("Selected Department:", department);
+
   const { data, error } = await supabaseClient
     .from("subjects")
-    .select("subject")
+    .select("subject, department")
     .eq("school_code", SCHOOL_CODE)
-    .eq("department", department);
+    .ilike("department", department); // ✅ FIXED (case-insensitive)
 
   if (error) {
     console.error("Error loading subjects:", error);
     return;
   }
 
+  console.log("Subjects from DB:", data);
+
   datalist.innerHTML = "";
+
+  if (!data || data.length === 0) {
+    console.warn("No subjects found for this department");
+    return;
+  }
 
   data.forEach(item => {
     const option = document.createElement("option");
@@ -64,6 +72,11 @@ document.addEventListener("DOMContentLoaded", () => {
     loadSubjects(selectedDept);
   });
 
+  // 🔁 OPTIONAL: auto-load if already selected (useful later)
+  if (departmentSelect.value) {
+    loadSubjects(departmentSelect.value);
+  }
+
   // FORM LOGIN
   document.getElementById("subjectForm").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -84,19 +97,20 @@ document.addEventListener("DOMContentLoaded", () => {
       .eq("school_code", SCHOOL_CODE)
       .ilike("subject", subject);
 
-    // 🔥 SPECIAL CASE: ADMIN PORTAL (NO DEPARTMENT FILTER)
+    // 🔥 ADMIN PORTAL BYPASS (NO DEPARTMENT FILTER)
     if (subject.toUpperCase() !== "ADMIN PORTAL") {
-      query = query.eq("department", department);
+      query = query.ilike("department", department); // ✅ FIXED HERE TOO
     }
 
     const { data, error } = await query.maybeSingle();
 
     if (error || !data) {
       alert("Subject not found");
+      console.warn("Query result:", data, error);
       return;
     }
 
-    // 🔐 ADMIN PORTAL OVERRIDE (GLOBAL ACCESS)
+    // 🔐 ADMIN PORTAL
     if (
       cadre === "Admin" &&
       subject.toUpperCase() === "ADMIN PORTAL" &&
@@ -106,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // 👨‍💼 NORMAL ADMIN ACCESS
+    // 👨‍💼 ADMIN ACCESS
     if (cadre === "Admin" && password === data.admin_password) {
       window.location.href = data.sheet_url;
       return;
