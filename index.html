@@ -77,5 +77,13 @@ if ('serviceWorker' in navigator) {
     .catch(err => console.log("SW Failed:", err));
 }
 </script>
+
+<footer class="global-footer">
+  Powered by TupsTechnologies © <span id="year"></span>. All Rights Reserved.
+</footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
