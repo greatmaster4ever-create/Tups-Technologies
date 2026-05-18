@@ -19,7 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-  <link rel="stylesheet" href="school.css?v=2">
+  <link rel="stylesheet" href="school.css?v=3">
 </head>
 
 <body data-school="SCH001">
@@ -37,6 +37,7 @@
       <!-- ACCESS TYPE -->
       <div class="form-row">
         <label>Access Type</label>
+
         <select id="cadre" required>
           <option value="Teacher">Teacher</option>
           <option value="Admin">Admin</option>
@@ -46,6 +47,7 @@
       <!-- DEPARTMENT -->
       <div class="form-row">
         <label>Department</label>
+
         <select id="department" required>
           <option value="">Select Department</option>
           <option value="KG">KG</option>
@@ -74,6 +76,7 @@
         <label>Password</label>
 
         <div class="password-box">
+
           <input 
             type="password" 
             id="subjectPassword" 
@@ -82,22 +85,28 @@
           >
 
           <span class="eye" onclick="togglePassword()">👁</span>
+
         </div>
       </div>
 
       <!-- BUTTON ROW -->
       <div class="button-row">
+
+        <!-- ACCESS -->
         <button type="submit" class="access-btn">
           Access Subject
         </button>
 
-        <button 
+        <!-- CHANGE PASSWORD -->
+        <button
           type="button"
+          id="changePasswordBtn"
           class="change-btn"
-          onclick="openPasswordModal()"
+          onclick="openChangePasswordModal()"
         >
           Change Password
         </button>
+
       </div>
 
     </form>
@@ -109,7 +118,12 @@
 
     <div class="modal-content">
 
-      <span class="close-modal" onclick="closePasswordModal()">
+      <!-- CLOSE -->
+      <span
+        class="close-modal"
+        id="closeModal"
+        onclick="closeChangePasswordModal()"
+      >
         &times;
       </span>
 
@@ -119,15 +133,18 @@
 
         <!-- SUBJECT -->
         <div class="modal-row">
+
           <label>Subject</label>
 
           <select id="changeSubject" required>
             <option value="">Select Subject</option>
           </select>
+
         </div>
 
         <!-- ADMIN PASSWORD -->
         <div class="modal-row">
+
           <label>Admin Password</label>
 
           <input
@@ -136,21 +153,36 @@
             placeholder="Enter Admin Password"
             required
           >
+
         </div>
 
         <!-- NEW PASSWORD -->
         <div class="modal-row">
+
           <label>New Password</label>
 
-          <input
-            type="text"
-            id="newPassword"
-            placeholder="Enter New Password"
-            required
-          >
+          <div class="password-box">
+
+            <input
+              type="password"
+              id="newSubjectPassword"
+              placeholder="Enter New Password"
+              required
+            >
+
+            <span
+              class="eye"
+              onclick="toggleChangePassword()"
+            >
+              👁
+            </span>
+
+          </div>
+
         </div>
 
-        <button type="submit">
+        <!-- SUBMIT -->
+        <button type="submit" class="update-btn">
           Update Password
         </button>
 
@@ -164,11 +196,13 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <!-- JS -->
-  <script src="school.js?v=2"></script>
+  <script src="school.js?v=3"></script>
 
   <!-- FOOTER -->
   <footer class="global-footer">
-    Powered by TupsTechnologies © <span id="year"></span>. All Rights Reserved.
+    Powered by TupsTechnologies ©
+    <span id="year"></span>.
+    All Rights Reserved.
   </footer>
 
   <script>
