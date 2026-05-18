@@ -191,31 +191,35 @@ button:hover {
 .modal-form-row {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   margin-bottom: 15px;
+  width: 100%;
 }
 
 /* 🔥 MODAL LABELS */
 .modal-form-row label {
-  width: 100%;
-  display: block;
-  color: #333 !important;
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 6px;
+  display: block !important;
+  width: 100% !important;
+  color: #000066 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  margin-bottom: 6px !important;
+  text-align: left;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 /* 🔥 MODAL INPUTS */
 .modal-form-row input,
 .modal-form-row select {
-  width: 100%;
+  width: 100% !important;
   padding: 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
   outline: none;
-  color: #333;
   background: white;
+  color: #333;
 }
-
 /* MODAL PASSWORD BOX */
 .modal-password-box {
   position: relative;
