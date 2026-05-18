@@ -6,7 +6,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- 🔥 CACHE CONTROL -->
+  <!-- CACHE CONTROL -->
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -19,7 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
   <!-- CSS -->
-  <link rel="stylesheet" href="school.css?v=1">
+  <link rel="stylesheet" href="school.css?v=2">
 </head>
 
 <body data-school="SCH001">
@@ -58,12 +58,14 @@
       <!-- SUBJECT -->
       <div class="form-row">
         <label>Subject</label>
+
         <input 
           list="subjectsList"
           id="subject"
           placeholder="Search subject..."
           required
         >
+
         <datalist id="subjectsList"></datalist>
       </div>
 
@@ -78,13 +80,83 @@
             placeholder="Enter Password" 
             required
           >
+
           <span class="eye" onclick="togglePassword()">👁</span>
         </div>
       </div>
 
-      <button type="submit">Access Subject</button>
+      <!-- BUTTON ROW -->
+      <div class="button-row">
+        <button type="submit" class="access-btn">
+          Access Subject
+        </button>
+
+        <button 
+          type="button"
+          class="change-btn"
+          onclick="openPasswordModal()"
+        >
+          Change Password
+        </button>
+      </div>
 
     </form>
+
+  </div>
+
+  <!-- 🔥 PASSWORD CHANGE MODAL -->
+  <div id="passwordModal" class="modal">
+
+    <div class="modal-content">
+
+      <span class="close-modal" onclick="closePasswordModal()">
+        &times;
+      </span>
+
+      <h2>Change Subject Password</h2>
+
+      <form id="changePasswordForm">
+
+        <!-- SUBJECT -->
+        <div class="modal-row">
+          <label>Subject</label>
+
+          <select id="changeSubject" required>
+            <option value="">Select Subject</option>
+          </select>
+        </div>
+
+        <!-- ADMIN PASSWORD -->
+        <div class="modal-row">
+          <label>Admin Password</label>
+
+          <input
+            type="password"
+            id="adminPassword"
+            placeholder="Enter Admin Password"
+            required
+          >
+        </div>
+
+        <!-- NEW PASSWORD -->
+        <div class="modal-row">
+          <label>New Password</label>
+
+          <input
+            type="text"
+            id="newPassword"
+            placeholder="Enter New Password"
+            required
+          >
+        </div>
+
+        <button type="submit">
+          Update Password
+        </button>
+
+      </form>
+
+    </div>
 
   </div>
 
@@ -92,15 +164,16 @@
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 
   <!-- JS -->
-  <script src="school.js?v=1"></script>
+  <script src="school.js?v=2"></script>
 
-  <!-- FOOTER (MOVED OUTSIDE CONTAINER) -->
+  <!-- FOOTER -->
   <footer class="global-footer">
     Powered by TupsTechnologies © <span id="year"></span>. All Rights Reserved.
   </footer>
 
   <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
+    document.getElementById("year").textContent =
+      new Date().getFullYear();
   </script>
 
 </body>

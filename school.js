@@ -13,6 +13,12 @@ window.togglePassword = function () {
   input.type = input.type === "password" ? "text" : "password";
 };
 
+// 👁 CHANGE PASSWORD TOGGLE
+window.toggleChangePassword = function () {
+  const input = document.getElementById("newSubjectPassword");
+  input.type = input.type === "password" ? "text" : "password";
+};
+
 // 🔽 LOAD SUBJECTS (ADMIN = ALL, TEACHER = FILTERED)
 async function loadSubjects(department, isAdmin = false) {
   const datalist = document.getElementById("subjectsList");
@@ -48,6 +54,44 @@ async function loadSubjects(department, isAdmin = false) {
   });
 }
 
+// 🔽 LOAD ALL SUBJECTS INTO CHANGE PASSWORD DROPDOWN
+async function loadChangePasswordSubjects() {
+
+  const select = document.getElementById("changeSubject");
+
+  const { data, error } = await supabaseClient
+    .from("subjects")
+    .select("subject")
+    .eq("school_code", SCHOOL_CODE)
+    .order("subject", { ascending: true });
+
+  if (error) {
+    console.error("Error loading subjects:", error);
+    return;
+  }
+
+  select.innerHTML = '<option value="">Select Subject</option>';
+
+  data.forEach(item => {
+    const option = document.createElement("option");
+    option.value = item.subject;
+    option.textContent = item.subject;
+    select.appendChild(option);
+  });
+}
+
+// 🚪 OPEN POPUP
+window.openChangePasswordModal = function () {
+  document.getElementById("passwordModal").style.display = "flex";
+};
+
+// ❌ CLOSE POPUP
+window.closeChangePasswordModal = function () {
+  document.getElementById("passwordModal").style.display = "none";
+
+  document.getElementById("changePasswordForm").reset();
+};
+
 // 🚀 INIT
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -61,6 +105,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const subjectInput = document.getElementById("subject");
   const cadreSelect = document.getElementById("cadre");
 
+  // LOAD CHANGE PASSWORD SUBJECTS
+  loadChangePasswordSubjects();
+
   // 🔁 HANDLE ROLE CHANGE (ADMIN vs TEACHER)
   cadreSelect.addEventListener("change", () => {
 
@@ -70,11 +117,14 @@ document.addEventListener("DOMContentLoaded", () => {
     departmentSelect.disabled = isAdmin;
 
     if (isAdmin) {
+
       departmentSelect.value = "";
 
       // load ALL subjects for admin
       loadSubjects(null, true);
+
     } else {
+
       // clear + require department for teachers
       subjectInput.value = "";
       document.getElementById("subjectsList").innerHTML = "";
@@ -83,14 +133,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 🔁 LOAD SUBJECTS WHEN DEPARTMENT CHANGES (TEACHER ONLY)
   departmentSelect.addEventListener("change", () => {
+
     if (cadreSelect.value !== "Admin") {
+
       subjectInput.value = "";
       loadSubjects(departmentSelect.value, false);
     }
   });
 
-  // FORM LOGIN
+  // =========================
+  // 🔐 LOGIN FORM
+  // =========================
   document.getElementById("subjectForm").addEventListener("submit", async (e) => {
+
     e.preventDefault();
 
     const subject = subjectInput.value.trim();
@@ -129,22 +184,79 @@ document.addEventListener("DOMContentLoaded", () => {
       subject.toUpperCase() === "ADMIN PORTAL" &&
       password === data.admin_password
     ) {
-      window.location.href = data.sheet_url;
+      window.open(data.sheet_url, "_blank");
       return;
     }
 
     // 👨‍💼 ADMIN ACCESS
     if (cadre === "Admin" && password === data.admin_password) {
-      window.location.href = data.sheet_url;
+      window.open(data.sheet_url, "_blank");
       return;
     }
 
     // 👨‍🏫 TEACHER ACCESS
     if (password === data.subject_password) {
-      window.location.href = data.sheet_url;
+      window.open(data.sheet_url, "_blank");
       return;
     }
 
     alert("Invalid subject password");
   });
+
+  // =========================
+  // 🔄 CHANGE PASSWORD FORM
+  // =========================
+  document.getElementById("changePasswordForm").addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const subject = document.getElementById("changeSubject").value;
+    const adminPassword = document.getElementById("adminPassword").value.trim();
+    const newPassword = document.getElementById("newSubjectPassword").value.trim();
+
+    if (!subject || !adminPassword || !newPassword) {
+      alert("Please complete all fields");
+      return;
+    }
+
+    // 🔍 VERIFY ADMIN PASSWORD
+    const { data, error } = await supabaseClient
+      .from("subjects")
+      .select("*")
+      .eq("school_code", SCHOOL_CODE)
+      .ilike("subject", subject)
+      .maybeSingle();
+
+    if (error || !data) {
+      alert("Subject not found");
+      return;
+    }
+
+    // ❌ WRONG ADMIN PASSWORD
+    if (adminPassword !== data.admin_password) {
+      alert("Wrong admin password");
+      return;
+    }
+
+    // ✅ UPDATE PASSWORD
+    const { error: updateError } = await supabaseClient
+      .from("subjects")
+      .update({
+        subject_password: newPassword
+      })
+      .eq("school_code", SCHOOL_CODE)
+      .ilike("subject", subject);
+
+    if (updateError) {
+      console.error(updateError);
+      alert("Failed to update password");
+      return;
+    }
+
+    alert("Subject password updated");
+
+    // CLOSE POPUP
+    closeChangePasswordModal();
+  });
+
 });
