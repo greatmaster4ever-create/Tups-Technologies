@@ -15,7 +15,7 @@ body{
 
 .sidebar{
   width:250px;
-  background:#000080;
+  background:#00CFFF;
   color:white;
   padding:20px;
   display:flex;
@@ -42,7 +42,7 @@ body{
 .nav-btn:hover,
 .nav-btn.active{
   background:white;
-  color:#000080;
+  color:#00CFFF;
 }
 
 /* Main */
@@ -110,7 +110,7 @@ body{
 
 .action-btn,
 .logout-btn{
-  background:#000080;
+  background:#00CFFF;
   color:white;
   border:none;
   padding:10px 15px;
@@ -137,7 +137,7 @@ body{
 
   .menu-btn{
     display:block;
-    background:#000080;
+    background:#00CFFF;
     color:white;
     border:none;
     padding:12px;
