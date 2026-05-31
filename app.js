@@ -31,12 +31,15 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     alert("Login successful");
-
-    // Store login session information
-    sessionStorage.setItem("school_code", data.school_code);
-    sessionStorage.setItem("school_page", data.school_page);
-    sessionStorage.setItem("school_name", data.school_name);
+    
+  sessionStorage.setItem(
+  "school_code",
+  data.school_code
+);
 
     window.location.href = data.school_page;
+
+    // NEXT STEP (we will enable redirect later)
+    // window.location.href = data.school_page;
   });
 });
