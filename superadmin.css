@@ -160,3 +160,31 @@ body{
   }
 
 }
+.table-wrapper{
+  margin-top:20px;
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+th{
+  background:#800000;
+  color:white;
+  padding:12px;
+  text-align:left;
+}
+
+td{
+  padding:12px;
+  border-bottom:1px solid #ddd;
+}
+
+tr:hover{
+  background:#f5f5f5;
+}

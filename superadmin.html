@@ -96,19 +96,34 @@
     </section>
 
     <!-- SCHOOLS -->
-    <section id="schools" class="tab-content">
+   <section id="schools" class="tab-content">
 
-      <h2>Schools Management</h2>
+  <h2>Schools Management</h2>
 
-      <button class="action-btn">
-        + Add School
-      </button>
+  <button class="action-btn">
+    + Add School
+  </button>
 
-      <div id="schoolsContainer">
-        School records will appear here.
-      </div>
+  <div class="table-wrapper">
 
-    </section>
+    <table id="schoolsTable">
+
+      <thead>
+        <tr>
+          <th>School Code</th>
+          <th>School Name</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody id="schoolsTableBody">
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
 
     <!-- SUBJECTS -->
     <section id="subjects" class="tab-content">

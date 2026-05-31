@@ -1,4 +1,15 @@
 console.log("SUPER ADMIN LOADED");
+const supabaseUrl =
+  "https://sgdrncpiqingjwxmkqij.supabase.co";
+
+const supabaseKey =
+  "sb_publishable_CFLKvoqepTX4UqzG5XjumQ_TJ2T2hFj";
+
+const supabaseClient =
+  supabase.createClient(
+    supabaseUrl,
+    supabaseKey
+  );
 
 /* ==========================
    SESSION PROTECTION
@@ -123,4 +134,117 @@ function resetTimer() {
 
 });
 
+async function loadDashboardStats() {
+
+  try {
+
+    const { count: totalSchools } =
+      await supabaseClient
+      .from("schools")
+      .select("*", {
+        count: "exact",
+        head: true
+      });
+
+    const { count: activeSchools } =
+      await supabaseClient
+      .from("schools")
+      .select("*", {
+        count: "exact",
+        head: true
+      })
+      .eq("status", "Active");
+
+    const { count: inactiveSchools } =
+      await supabaseClient
+      .from("schools")
+      .select("*", {
+        count: "exact",
+        head: true
+      })
+      .eq("status", "Inactive");
+
+    const { count: totalSubjects } =
+      await supabaseClient
+      .from("subjects")
+      .select("*", {
+        count: "exact",
+        head: true
+      });
+
+    document.getElementById(
+      "totalSchools"
+    ).textContent =
+      totalSchools || 0;
+
+    document.getElementById(
+      "activeSchools"
+    ).textContent =
+      activeSchools || 0;
+
+    document.getElementById(
+      "inactiveSchools"
+    ).textContent =
+      inactiveSchools || 0;
+
+    document.getElementById(
+      "totalSubjects"
+    ).textContent =
+      totalSubjects || 0;
+
+  } catch (err) {
+
+    console.error(
+      "Dashboard Error:",
+      err
+    );
+
+  }
+
+}
+
+async function loadSchools() {
+
+  try {
+
+    const { data, error } =
+      await supabaseClient
+      .from("schools")
+      .select("*")
+      .order("school_code");
+
+    if (error) throw error;
+
+    const tbody =
+      document.getElementById(
+        "schoolsTableBody"
+      );
+
+    tbody.innerHTML = "";
+
+    data.forEach(row => {
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${row.school_code}</td>
+          <td>${row.School_name}</td>
+          <td>${row.status}</td>
+        </tr>
+      `;
+
+    });
+
+  } catch (err) {
+
+    console.error(
+      "Schools Load Error:",
+      err
+    );
+
+  }
+
+}
+
 resetTimer();
+loadDashboardStats();
+loadSchools();
