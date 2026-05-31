@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TupsTechnologies Super Admin</title>
+
+  <link rel="stylesheet" href="superadmin.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <!-- Mobile Menu Button -->
+  <button id="menuBtn" class="menu-btn">☰</button>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-title">
+      TUPS ADMIN
+    </div>
+
+    <button class="nav-btn active" data-tab="dashboard">
+      Dashboard
+    </button>
+
+    <button class="nav-btn" data-tab="schools">
+      Schools
+    </button>
+
+    <button class="nav-btn" data-tab="subjects">
+      Subjects
+    </button>
+
+    <button class="nav-btn" data-tab="sheets">
+      Google Sheets
+    </button>
+
+    <button class="nav-btn" data-tab="settings">
+      Settings
+    </button>
+
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- Header -->
+    <header class="topbar">
+
+      <div>
+        <h1>TUPSTECHNOLOGIES SUPER ADMIN</h1>
+        <p id="welcomeText">Welcome Kelvin... Super Administrator</p>
+      </div>
+
+      <div class="admin-profile">
+
+        <img
+          src="admin-passport.jpeg"
+          alt="Admin Passport"
+          class="passport"
+        >
+
+      </div>
+
+    </header>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="tab-content active-tab">
+
+      <div class="cards">
+
+        <div class="card">
+          <h3>Total Schools</h3>
+          <p id="totalSchools">0</p>
+        </div>
+
+        <div class="card">
+          <h3>Active Schools</h3>
+          <p id="activeSchools">0</p>
+        </div>
+
+        <div class="card">
+          <h3>Inactive Schools</h3>
+          <p id="inactiveSchools">0</p>
+        </div>
+
+        <div class="card">
+          <h3>Total Subjects</h3>
+          <p id="totalSubjects">0</p>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- SCHOOLS -->
+    <section id="schools" class="tab-content">
+
+      <h2>Schools Management</h2>
+
+      <button class="action-btn">
+        + Add School
+      </button>
+
+      <div id="schoolsContainer">
+        School records will appear here.
+      </div>
+
+    </section>
+
+    <!-- SUBJECTS -->
+    <section id="subjects" class="tab-content">
+
+      <h2>Subjects Management</h2>
+
+      <button class="action-btn">
+        + Add Subject
+      </button>
+
+      <div id="subjectsContainer">
+        Subject records will appear here.
+      </div>
+
+    </section>
+
+    <!-- SHEETS -->
+    <section id="sheets" class="tab-content">
+
+      <h2>Google Sheets Management</h2>
+
+      <div id="sheetsContainer">
+        Sheet records will appear here.
+      </div>
+
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="settings" class="tab-content">
+
+      <h2>Settings</h2>
+
+      <button id="logoutBtn" class="logout-btn">
+        Logout
+      </button>
+
+      <p>
+        Auto logout after 1 minute of inactivity.
+      </p>
+
+    </section>
+
+  </main>
+
+  <script src="superadmin.js"></script>
+
+</body>
+</html>
