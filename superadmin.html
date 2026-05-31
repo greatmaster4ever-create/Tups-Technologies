@@ -109,11 +109,12 @@
     <table id="schoolsTable">
 
       <thead>
-        <tr>
-          <th>School Code</th>
-          <th>School Name</th>
-          <th>Status</th>
-        </tr>
+       <tr>
+  		<th>School Code</th>
+  		<th>School Name</th>
+  		<th>Status</th>
+  		<th>Actions</th>
+	</tr>
       </thead>
 
       <tbody id="schoolsTableBody">
@@ -221,6 +222,56 @@
 </div>
 
   </main>
+  <!-- EDIT SCHOOL MODAL -->
+
+<div id="editSchoolModal" class="modal">
+
+  <div class="modal-content">
+
+    <h2>Edit School</h2>
+
+    <input
+      type="hidden"
+      id="editSchoolId"
+    >
+
+    <input
+      type="text"
+      id="editSchoolName"
+      placeholder="School Name"
+    >
+
+    <select id="editSchoolStatus">
+
+      <option value="Active">
+        Active
+      </option>
+
+      <option value="Inactive">
+        Inactive
+      </option>
+
+    </select>
+
+    <div class="modal-buttons">
+
+      <button id="updateSchoolBtn">
+        Update School
+      </button>
+
+      <button
+        onclick="
+          document.getElementById('editSchoolModal').style.display='none'
+        "
+      >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
   <script src="superadmin.js"></script>
 

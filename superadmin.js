@@ -229,7 +229,18 @@ async function loadSchools() {
           <td>${row.school_code}</td>
           <td>${row.School_name}</td>
           <td>${row.status}</td>
-        </tr>
+	   <td>
+
+           <button
+            class="edit-btn"
+            onclick="openEditSchool('${row.id}')"
+             >
+      Edit
+           </button>
+
+          </td>
+
+       </tr>
       `;
 
     });
@@ -359,6 +370,100 @@ document
 
       schoolModal.style.display =
         "none";
+
+      loadDashboardStats();
+
+      loadSchools();
+
+    }
+  );
+   async function openEditSchool(id) {
+
+  const { data, error } =
+    await supabaseClient
+      .from("schools")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+  if (error) {
+
+    alert(error.message);
+
+    return;
+
+  }
+
+  document.getElementById(
+    "editSchoolId"
+  ).value = data.id;
+
+  document.getElementById(
+    "editSchoolName"
+  ).value = data.School_name;
+
+  document.getElementById(
+    "editSchoolStatus"
+  ).value = data.Status;
+
+  document.getElementById(
+    "editSchoolModal"
+  ).style.display = "flex";
+
+}
+
+document
+  .getElementById(
+    "updateSchoolBtn"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      const id =
+        document.getElementById(
+          "editSchoolId"
+        ).value;
+
+      const schoolName =
+        document.getElementById(
+          "editSchoolName"
+        ).value.trim();
+
+      const status =
+        document.getElementById(
+          "editSchoolStatus"
+        ).value;
+
+      const { error } =
+        await supabaseClient
+          .from("schools")
+          .update({
+
+            School_name:
+              schoolName,
+
+            Status:
+              status
+
+          })
+          .eq("id", id);
+
+      if (error) {
+
+        alert(error.message);
+
+        return;
+
+      }
+
+      alert(
+        "School Updated"
+      );
+
+      document.getElementById(
+        "editSchoolModal"
+      ).style.display = "none";
 
       loadDashboardStats();
 
