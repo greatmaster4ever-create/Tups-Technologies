@@ -246,5 +246,126 @@ async function loadSchools() {
 }
 
 resetTimer();
+const schoolModal =
+  document.getElementById(
+    "schoolModal"
+  );
+
+document
+  .getElementById("addSchoolBtn")
+  .addEventListener("click", () => {
+
+    schoolModal.style.display =
+      "flex";
+
+  });
+
+document
+  .getElementById(
+    "closeSchoolModal"
+  )
+  .addEventListener("click", () => {
+
+    schoolModal.style.display =
+      "none";
+
+  });
+
+document
+  .getElementById(
+    "saveSchoolBtn"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      const schoolCode =
+        document
+        .getElementById(
+          "schoolCodeInput"
+        )
+        .value.trim();
+
+      const schoolName =
+        document
+        .getElementById(
+          "schoolNameInput"
+        )
+        .value.trim();
+
+      const password =
+        document
+        .getElementById(
+          "schoolPasswordInput"
+        )
+        .value.trim();
+
+      const status =
+        document
+        .getElementById(
+          "schoolStatusInput"
+        )
+        .value;
+
+      if (
+        !schoolCode ||
+        !schoolName ||
+        !password
+      ) {
+
+        alert(
+          "Please complete all fields."
+        );
+
+        return;
+
+      }
+
+      const { error } =
+        await supabaseClient
+        .from("schools")
+        .insert([{
+
+          school_code:
+            schoolCode,
+
+          password:
+            password,
+
+          school_page:
+            "school-template.html",
+
+          School_name:
+            schoolName,
+
+          status:
+            status
+
+        }]);
+
+      if (error) {
+
+        alert(
+          error.message
+        );
+
+        return;
+
+      }
+
+      alert(
+        "School Added Successfully"
+      );
+
+      schoolModal.style.display =
+        "none";
+
+      loadDashboardStats();
+
+      loadSchools();
+
+    }
+  );
+
 loadDashboardStats();
 loadSchools();

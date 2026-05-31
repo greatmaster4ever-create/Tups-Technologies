@@ -100,9 +100,9 @@
 
   <h2>Schools Management</h2>
 
-  <button class="action-btn">
-    + Add School
-  </button>
+<button id="addSchoolBtn" class="action-btn">
+  + Add School
+</button>
 
   <div class="table-wrapper">
 
@@ -165,6 +165,60 @@
       </p>
 
     </section>
+
+<!-- ADD SCHOOL MODAL -->
+
+<div id="schoolModal" class="modal">
+
+  <div class="modal-content">
+
+    <h2>Add New School</h2>
+
+    <input
+      type="text"
+      id="schoolCodeInput"
+      placeholder="School Code"
+    >
+
+    <input
+      type="text"
+      id="schoolNameInput"
+      placeholder="School Name"
+    >
+
+    <input
+      type="text"
+      id="schoolPasswordInput"
+      placeholder="Password"
+    >
+
+    <select id="schoolStatusInput">
+
+      <option value="Active">
+        Active
+      </option>
+
+      <option value="Inactive">
+        Inactive
+      </option>
+
+    </select>
+
+    <div class="modal-buttons">
+
+      <button id="saveSchoolBtn">
+        Save School
+      </button>
+
+      <button id="closeSchoolModal">
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
 
   </main>
 
