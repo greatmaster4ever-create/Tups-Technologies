@@ -625,6 +625,48 @@ async function loadSubjects() {
   }
 
 }
+async function openEditSubject(id) {
+
+  const { data, error } =
+    await supabaseClient
+      .from("subjects")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+  if (error) {
+
+    alert(error.message);
+
+    return;
+
+  }
+
+  document.getElementById(
+    "editSubjectId"
+  ).value = data.id;
+
+  document.getElementById(
+    "editSubjectCadre"
+  ).value = data.cadre;
+
+  document.getElementById(
+    "editSubjectDepartment"
+  ).value = data.department;
+
+  document.getElementById(
+    "editSubjectName"
+  ).value = data.subject;
+
+  document.getElementById(
+    "editSheetUrl"
+  ).value = data.sheet_url;
+
+  document.getElementById(
+    "editSubjectModal"
+  ).style.display = "flex";
+
+}
 
 resetTimer();
 const schoolModal =
@@ -936,7 +978,83 @@ document
     }
   );
 	
-   
+ document
+  .getElementById(
+    "updateSubjectBtn"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      const id =
+        document.getElementById(
+          "editSubjectId"
+        ).value;
+
+      const cadre =
+        document.getElementById(
+          "editSubjectCadre"
+        ).value;
+
+      const department =
+        document.getElementById(
+          "editSubjectDepartment"
+        ).value.trim();
+
+      const subject =
+        document.getElementById(
+          "editSubjectName"
+        ).value.trim();
+
+      const sheetUrl =
+        document.getElementById(
+          "editSheetUrl"
+        ).value.trim();
+
+      const { error } =
+        await supabaseClient
+          .from("subjects")
+          .update({
+
+            cadre:
+              cadre,
+
+            department:
+              department,
+
+            subject:
+              subject,
+
+            sheet_url:
+              sheetUrl
+
+          })
+          .eq("id", id);
+
+      if (error) {
+
+        alert(
+          error.message
+        );
+
+        return;
+
+      }
+
+      alert(
+        "Subject Updated Successfully"
+      );
+
+      document.getElementById(
+        "editSubjectModal"
+      ).style.display = "none";
+
+      loadSubjects();
+
+      loadDashboardStats();
+
+    }
+  );  
 
 loadDashboardStats();
 loadSchools();
