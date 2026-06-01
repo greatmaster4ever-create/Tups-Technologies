@@ -476,6 +476,52 @@
 
 </div>
 
+<!-- SUBJECT PASSWORD MODAL -->
+
+<div
+  id="subjectPasswordModal"
+  class="modal"
+>
+
+  <div class="modal-content">
+
+    <h2>
+      Change Subject Password
+    </h2>
+
+    <input
+      type="hidden"
+      id="passwordSubjectId"
+    >
+
+    <input
+      type="text"
+      id="newSubjectPassword"
+      placeholder="New Subject Password"
+    >
+
+    <div class="modal-buttons">
+
+      <button
+        id="updateSubjectPasswordBtn"
+      >
+        Update Password
+      </button>
+
+      <button
+        onclick="
+          document.getElementById('subjectPasswordModal').style.display='none'
+        "
+      >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
   <script src="superadmin.js"></script>
 
 </body>
