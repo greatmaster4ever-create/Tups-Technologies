@@ -261,6 +261,79 @@ async function loadSchools() {
 
 }
 
+async function loadSubjects() {
+
+  try {
+
+    const { data, error } =
+      await supabaseClient
+        .from("subjects")
+        .select("*")
+        .order("school_code");
+
+    if (error) throw error;
+
+    const tbody =
+      document.getElementById(
+        "subjectsTableBody"
+      );
+
+    tbody.innerHTML = "";
+
+    data.forEach(row => {
+
+      tbody.innerHTML += `
+        <tr>
+
+          <td>${row.school_code}</td>
+
+          <td>${row.cadre}</td>
+
+          <td>${row.department}</td>
+
+          <td>${row.subject}</td>
+
+          <td>
+
+            <button
+              class="edit-btn"
+              onclick="openEditSubject('${row.id}')"
+            >
+              Edit
+            </button>
+
+            <button
+              class="password-btn"
+              onclick="openSubjectPasswordModal('${row.id}')"
+            >
+              Password
+            </button>
+
+            <button
+              class="delete-btn"
+              onclick="deleteSubject('${row.id}')"
+            >
+              Delete
+            </button>
+
+          </td>
+
+        </tr>
+      `;
+
+    });
+
+  } catch (err) {
+
+    console.error(
+      "Subjects Load Error:",
+      err
+    );
+
+  }
+
+}
+
 async function loadSchoolDropdown() {
 
   const { data, error } =
@@ -477,6 +550,79 @@ loadDashboardStats();
 
     }
   );
+
+async function loadSubjects() {
+
+  try {
+
+    const { data, error } =
+      await supabaseClient
+        .from("subjects")
+        .select("*")
+        .order("school_code");
+
+    if (error) throw error;
+
+    const tbody =
+      document.getElementById(
+        "subjectsTableBody"
+      );
+
+    tbody.innerHTML = "";
+
+    data.forEach(row => {
+
+      tbody.innerHTML += `
+        <tr>
+
+          <td>${row.school_code}</td>
+
+          <td>${row.cadre}</td>
+
+          <td>${row.department}</td>
+
+          <td>${row.subject}</td>
+
+          <td>
+
+            <button
+              class="edit-btn"
+              onclick="openEditSubject('${row.id}')"
+            >
+              Edit
+            </button>
+
+            <button
+              class="password-btn"
+              onclick="openSubjectPasswordModal('${row.id}')"
+            >
+              Password
+            </button>
+
+            <button
+              class="delete-btn"
+              onclick="deleteSubject('${row.id}')"
+            >
+              Delete
+            </button>
+
+          </td>
+
+        </tr>
+      `;
+
+    });
+
+  } catch (err) {
+
+    console.error(
+      "Subjects Load Error:",
+      err
+    );
+
+  }
+
+}
 
 resetTimer();
 const schoolModal =
@@ -792,3 +938,4 @@ document
 
 loadDashboardStats();
 loadSchools();
+loadSubjects();
