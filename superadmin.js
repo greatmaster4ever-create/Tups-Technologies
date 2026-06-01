@@ -591,6 +591,8 @@ async function loadSubjects() {
             >
               Edit
             </button>
+	    
+           </td>
 
             <button
               class="password-btn"

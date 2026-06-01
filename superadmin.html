@@ -413,6 +413,69 @@
 
 </div>
 
+<!-- EDIT SUBJECT MODAL -->
+
+<div id="editSubjectModal" class="modal">
+
+  <div class="modal-content">
+
+    <h2>Edit Subject</h2>
+
+    <input
+      type="hidden"
+      id="editSubjectId"
+    >
+
+    <select id="editSubjectCadre">
+
+      <option value="Teacher">
+        Teacher
+      </option>
+
+      <option value="Admin">
+        Admin
+      </option>
+
+    </select>
+
+    <input
+      type="text"
+      id="editSubjectDepartment"
+      placeholder="Department"
+    >
+
+    <input
+      type="text"
+      id="editSubjectName"
+      placeholder="Subject"
+    >
+
+    <input
+      type="text"
+      id="editSheetUrl"
+      placeholder="Google Sheet URL"
+    >
+
+    <div class="modal-buttons">
+
+      <button id="updateSubjectBtn">
+        Update Subject
+      </button>
+
+      <button
+        onclick="
+          document.getElementById('editSubjectModal').style.display='none'
+        "
+      >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
   <script src="superadmin.js"></script>
 
 </body>
