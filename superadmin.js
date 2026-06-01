@@ -599,8 +599,6 @@ async function loadSubjects() {
               Password
             </button>
 
-	     </td>
-
             <button
               class="delete-btn"
               onclick="deleteSubject('${row.id}')"
@@ -1133,6 +1131,41 @@ document
 
     }
   );
+
+async function deleteSubject(id) {
+
+  const confirmed =
+    confirm(
+      "Delete this subject permanently?"
+    );
+
+  if (!confirmed) return;
+
+  const { error } =
+    await supabaseClient
+      .from("subjects")
+      .delete()
+      .eq("id", id);
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+  alert(
+    "Subject Deleted"
+  );
+
+  loadSubjects();
+
+  loadDashboardStats();
+
+}
 
 loadDashboardStats();
 loadSchools();
