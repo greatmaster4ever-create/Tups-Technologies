@@ -591,8 +591,6 @@ async function loadSubjects() {
             >
               Edit
             </button>
-	    
-           </td>
 
             <button
               class="password-btn"
@@ -600,6 +598,8 @@ async function loadSubjects() {
             >
               Password
             </button>
+
+	     </td>
 
             <button
               class="delete-btn"
@@ -900,6 +900,22 @@ document
     }
   );
 
+async function openSubjectPasswordModal(id) {
+
+  document.getElementById(
+    "passwordSubjectId"
+  ).value = id;
+
+  document.getElementById(
+    "newSubjectPassword"
+  ).value = "";
+
+  document.getElementById(
+    "subjectPasswordModal"
+  ).style.display = "flex";
+
+}
+
 async function openPasswordModal(id) {
 
   document.getElementById(
@@ -1055,6 +1071,68 @@ document
 
     }
   );  
+
+document
+  .getElementById(
+    "updateSubjectPasswordBtn"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      const id =
+        document.getElementById(
+          "passwordSubjectId"
+        ).value;
+
+      const password =
+        document.getElementById(
+          "newSubjectPassword"
+        ).value.trim();
+
+      if (!password) {
+
+        alert(
+          "Enter a password"
+        );
+
+        return;
+
+      }
+
+      const { error } =
+        await supabaseClient
+          .from("subjects")
+          .update({
+
+            subject_password:
+              password
+
+          })
+          .eq("id", id);
+
+      if (error) {
+
+        alert(
+          error.message
+        );
+
+        return;
+
+      }
+
+      alert(
+        "Subject Password Updated"
+      );
+
+      document.getElementById(
+        "subjectPasswordModal"
+      ).style.display = "none";
+
+      loadSubjects();
+
+    }
+  );
 
 loadDashboardStats();
 loadSchools();
