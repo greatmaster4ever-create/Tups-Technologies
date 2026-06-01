@@ -129,18 +129,39 @@
     <!-- SUBJECTS -->
     <section id="subjects" class="tab-content">
 
-      <h2>Subjects Management</h2>
+  <h2>Subjects Management</h2>
 
-      <button class="action-btn">
-        + Add Subject
-      </button>
+  <button
+    id="addSubjectBtn"
+    class="action-btn"
+  >
+    + Add Subject
+  </button>
 
-      <div id="subjectsContainer">
-        Subject records will appear here.
-      </div>
+  <div class="table-wrapper">
 
-    </section>
+    <table id="subjectsTable">
 
+      <thead>
+
+        <tr>
+          <th>School</th>
+          <th>Cadre</th>
+          <th>Department</th>
+          <th>Subject</th>
+        </tr>
+
+      </thead>
+
+      <tbody id="subjectsTableBody">
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
     <!-- SHEETS -->
     <section id="sheets" class="tab-content">
 
@@ -310,6 +331,79 @@
           document.getElementById('passwordModal').style.display='none'
         "
       >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+	 <!-- ADD SUBJECT MODAL -->
+
+<div id="subjectModal" class="modal">
+
+  <div class="modal-content">
+
+    <h2>Add Subject</h2>
+
+    <select id="subjectSchoolCode">
+
+      <option value="">
+        Select School
+      </option>
+
+    </select>
+
+    <select id="subjectCadre">
+
+      <option value="Teacher">
+        Teacher
+      </option>
+
+      <option value="Admin">
+        Admin
+      </option>
+
+    </select>
+
+    <input
+      type="text"
+      id="subjectDepartment"
+      placeholder="Department"
+    >
+
+    <input
+      type="text"
+      id="subjectName"
+      placeholder="Subject"
+    >
+
+    <input
+      type="text"
+      id="subjectPassword"
+      placeholder="Subject Password"
+    >
+
+    <input
+      type="text"
+      id="adminPassword"
+      placeholder="Admin Password"
+    >
+
+    <input
+      type="text"
+      id="sheetUrl"
+      placeholder="Google Sheet URL"
+    >
+
+    <div class="modal-buttons">
+
+      <button id="saveSubjectBtn">
+        Save Subject
+      </button>
+
+      <button id="closeSubjectModal">
         Cancel
       </button>
 
