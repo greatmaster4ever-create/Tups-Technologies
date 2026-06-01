@@ -237,7 +237,12 @@ async function loadSchools() {
              >
       Edit
            </button>
-
+         <button
+  class="password-btn"
+  onclick="openPasswordModal('${row.id}')"
+>
+  Password
+</button>
           </td>
 
        </tr>
@@ -468,6 +473,82 @@ document
       loadDashboardStats();
 
       loadSchools();
+
+    }
+  );
+
+async function openPasswordModal(id) {
+
+  document.getElementById(
+    "passwordSchoolId"
+  ).value = id;
+
+  document.getElementById(
+    "newSchoolPassword"
+  ).value = "";
+
+  document.getElementById(
+    "passwordModal"
+  ).style.display = "flex";
+
+}
+
+document
+  .getElementById(
+    "updatePasswordBtn"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      const id =
+        document.getElementById(
+          "passwordSchoolId"
+        ).value;
+
+      const password =
+        document.getElementById(
+          "newSchoolPassword"
+        ).value.trim();
+
+      if (!password) {
+
+        alert(
+          "Enter a password"
+        );
+
+        return;
+
+      }
+
+      const { error } =
+        await supabaseClient
+          .from("schools")
+          .update({
+
+            password:
+              password
+
+          })
+          .eq("id", id);
+
+      if (error) {
+
+        alert(
+          error.message
+        );
+
+        return;
+
+      }
+
+      alert(
+        "Password Updated"
+      );
+
+      document.getElementById(
+        "passwordModal"
+      ).style.display = "none";
 
     }
   );

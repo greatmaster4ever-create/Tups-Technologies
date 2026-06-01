@@ -273,6 +273,52 @@
 
 </div>
 
+<!-- CHANGE PASSWORD MODAL -->
+
+<div
+  id="passwordModal"
+  class="modal"
+>
+
+  <div class="modal-content">
+
+    <h2>
+      Change School Password
+    </h2>
+
+    <input
+      type="hidden"
+      id="passwordSchoolId"
+    >
+
+    <input
+      type="text"
+      id="newSchoolPassword"
+      placeholder="New Password"
+    >
+
+    <div class="modal-buttons">
+
+      <button
+        id="updatePasswordBtn"
+      >
+        Update Password
+      </button>
+
+      <button
+        onclick="
+          document.getElementById('passwordModal').style.display='none'
+        "
+      >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
   <script src="superadmin.js"></script>
 
 </body>
