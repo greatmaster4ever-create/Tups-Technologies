@@ -404,7 +404,7 @@ document
 
   document.getElementById(
     "editSchoolStatus"
-  ).value = data.Status;
+  ).value = data.status;
 
   document.getElementById(
     "editSchoolModal"
