@@ -443,7 +443,7 @@ document
             School_name:
               schoolName,
 
-            Status:
+            status:
               status
 
           })
