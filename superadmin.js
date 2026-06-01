@@ -261,6 +261,223 @@ async function loadSchools() {
 
 }
 
+async function loadSchoolDropdown() {
+
+  const { data, error } =
+    await supabaseClient
+      .from("schools")
+      .select(
+        "school_code, School_name"
+      )
+      .order("school_code");
+
+  if (error) {
+
+    console.error(error);
+
+    return;
+
+  }
+
+  const dropdown =
+    document.getElementById(
+      "subjectSchoolCode"
+    );
+
+  dropdown.innerHTML =
+    `<option value="">
+      Select School
+    </option>`;
+
+  data.forEach(row => {
+
+    dropdown.innerHTML += `
+      <option
+        value="${row.school_code}"
+      >
+        ${row.school_code}
+        -
+        ${row.School_name}
+      </option>
+    `;
+
+  });
+
+}
+
+const subjectModal =
+  document.getElementById(
+    "subjectModal"
+  );
+	
+document
+  .getElementById(
+    "addSubjectBtn"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      subjectModal.style.display =
+        "flex";
+   loadSchoolDropdown();
+
+    }
+  );
+
+document
+  .getElementById(
+    "closeSubjectModal"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      subjectModal.style.display =
+        "none";
+
+    }
+  );
+
+document
+  .getElementById(
+    "saveSubjectBtn"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      const schoolCode =
+        document.getElementById(
+          "subjectSchoolCode"
+        ).value;
+
+      const cadre =
+        document.getElementById(
+          "subjectCadre"
+        ).value;
+
+      const department =
+        document.getElementById(
+          "subjectDepartment"
+        ).value.trim();
+
+      const subject =
+        document.getElementById(
+          "subjectName"
+        ).value.trim();
+
+      const subjectPassword =
+        document.getElementById(
+          "subjectPassword"
+        ).value.trim();
+
+      const adminPassword =
+        document.getElementById(
+          "adminPassword"
+        ).value.trim();
+
+      const sheetUrl =
+        document.getElementById(
+          "sheetUrl"
+        ).value.trim();
+
+      if (
+        !schoolCode ||
+        !department ||
+        !subject
+      ) {
+
+        alert(
+          "Please complete all required fields."
+        );
+
+        return;
+
+      }
+
+      const { error } =
+        await supabaseClient
+          .from("subjects")
+          .insert([{
+
+            school_code:
+              schoolCode,
+
+            cadre:
+              cadre,
+
+            department:
+              department,
+
+            subject:
+              subject,
+
+            subject_password:
+              subjectPassword,
+
+            admin_password:
+              adminPassword,
+
+            sheet_url:
+              sheetUrl
+
+          }]);
+
+      if (error) {
+
+        alert(
+          error.message
+        );
+
+        return;
+
+      }
+
+      alert(
+        "Subject Added Successfully"
+      );
+
+      subjectModal.style.display =
+        "none";
+	
+/* CLEAR FORM */
+
+document.getElementById(
+  "subjectSchoolCode"
+).value = "";
+
+document.getElementById(
+  "subjectCadre"
+).value = "Teacher";
+
+document.getElementById(
+  "subjectDepartment"
+).value = "";
+
+document.getElementById(
+  "subjectName"
+).value = "";
+
+document.getElementById(
+  "subjectPassword"
+).value = "";
+
+document.getElementById(
+  "adminPassword"
+).value = "";
+
+document.getElementById(
+  "sheetUrl"
+).value = "";
+
+/* REFRESH DASHBOARD */
+
+loadDashboardStats();
+
+    }
+  );
+
 resetTimer();
 const schoolModal =
   document.getElementById(
@@ -375,6 +592,22 @@ document
 
       schoolModal.style.display =
         "none";
+	
+	document.getElementById(
+  "schoolCodeInput"
+).value = "";
+
+document.getElementById(
+  "schoolNameInput"
+).value = "";
+
+document.getElementById(
+  "schoolPasswordInput"
+).value = "";
+
+document.getElementById(
+  "schoolStatusInput"
+).value = "Active";
 
       loadDashboardStats();
 
@@ -550,8 +783,12 @@ document
         "passwordModal"
       ).style.display = "none";
 
+	loadSchools();
+
     }
   );
+	
+   
 
 loadDashboardStats();
 loadSchools();
