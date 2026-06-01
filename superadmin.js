@@ -727,6 +727,31 @@ document
           "schoolStatusInput"
         )
         .value;
+	
+	const logoUrl =
+  document.getElementById(
+    "schoolLogoUrl"
+  ).value.trim();
+
+const primaryColor =
+  document.getElementById(
+    "primaryColor"
+  ).value;
+
+const secondaryColor =
+  document.getElementById(
+    "secondaryColor"
+  ).value;
+
+const email =
+  document.getElementById(
+    "schoolEmail"
+  ).value.trim();
+
+const phone =
+  document.getElementById(
+    "schoolPhone"
+  ).value.trim();
 
       if (
         !schoolCode ||
@@ -747,23 +772,37 @@ document
         .from("schools")
         .insert([{
 
-          school_code:
-            schoolCode,
+  school_code:
+    schoolCode,
 
-          password:
-            password,
+  password:
+    password,
 
-          school_page:
-            "school-template.html",
+  school_page:
+    "school-template.html",
 
-          School_name:
-            schoolName,
+  School_name:
+    schoolName,
 
-          status:
-            status
+  status:
+    status,
 
-        }]);
+  logo_url:
+    logoUrl,
 
+  primary_color:
+    primaryColor,
+
+  secondary_color:
+    secondaryColor,
+
+  contact_email:
+    email,
+
+  phone:
+    phone
+
+}]);
       if (error) {
 
         alert(
@@ -796,6 +835,26 @@ document.getElementById(
 document.getElementById(
   "schoolStatusInput"
 ).value = "Active";
+
+document.getElementById(
+  "schoolLogoUrl"
+).value = "";
+
+document.getElementById(
+  "primaryColor"
+).value = "#000066";
+
+document.getElementById(
+  "secondaryColor"
+).value = "#00f5ff";
+
+document.getElementById(
+  "schoolEmail"
+).value = "";
+
+document.getElementById(
+  "schoolPhone"
+).value = "";
 
       loadDashboardStats();
 
@@ -831,6 +890,31 @@ document.getElementById(
   document.getElementById(
     "editSchoolStatus"
   ).value = data.status;
+ 
+  document.getElementById(
+  "editSchoolLogoUrl"
+).value =
+  data.logo_url || "";
+
+document.getElementById(
+  "editPrimaryColor"
+).value =
+  data.primary_color || "#000066";
+
+document.getElementById(
+  "editSecondaryColor"
+).value =
+  data.secondary_color || "#00f5ff";
+
+document.getElementById(
+  "editSchoolEmail"
+).value =
+  data.contact_email || "";
+
+document.getElementById(
+  "editSchoolPhone"
+).value =
+  data.phone || "";
 
   document.getElementById(
     "editSchoolModal"
@@ -861,18 +945,58 @@ document
           "editSchoolStatus"
         ).value;
 
+      const logoUrl =
+  document.getElementById(
+    "editSchoolLogoUrl"
+  ).value.trim();
+
+const primaryColor =
+  document.getElementById(
+    "editPrimaryColor"
+  ).value;
+
+const secondaryColor =
+  document.getElementById(
+    "editSecondaryColor"
+  ).value;
+
+const email =
+  document.getElementById(
+    "editSchoolEmail"
+  ).value.trim();
+
+const phone =
+  document.getElementById(
+    "editSchoolPhone"
+  ).value.trim();
+
       const { error } =
         await supabaseClient
           .from("schools")
           .update({
 
-            School_name:
-              schoolName,
+  School_name:
+    schoolName,
 
-            status:
-              status
+  status:
+    status,
 
-          })
+  logo_url:
+    logoUrl,
+
+  primary_color:
+    primaryColor,
+
+  secondary_color:
+    secondaryColor,
+
+  contact_email:
+    email,
+
+  phone:
+    phone
+
+})
           .eq("id", id);
 
       if (error) {
