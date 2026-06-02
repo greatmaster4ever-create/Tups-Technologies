@@ -19,12 +19,15 @@ const supabaseClient =
 // GET SCHOOL CODE
 // ==========================
 const schoolCode =
-  sessionStorage.getItem("school_code");
+  sessionStorage.getItem("school_code") || "";
+
+console.log("SCHOOL CODE LOADED:", schoolCode);
 
 if (!schoolCode) {
   alert("Session expired. Please login again.");
   window.location.href = "index.html";
 }
+
 
 // ==========================
 // GLOBAL STATE
@@ -117,6 +120,11 @@ console.table(currentSubjects);
     option.value = sub.subject;
     datalist.appendChild(option);
   });
+
+  if (!schoolCode) {
+  console.error("No school code - aborting subject load");
+  return;
+}
 }
 
 // ==========================
@@ -250,7 +258,6 @@ departmentSelect.addEventListener("change", () => {
     loadSubjects(departmentSelect.value, false);
   }
 });
-
 // ==========================
 // FOOTER YEAR
 // ==========================
