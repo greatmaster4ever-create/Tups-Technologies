@@ -18,8 +18,21 @@ const supabaseClient =
 // ==========================
 // GET SCHOOL CODE
 // ==========================
-const schoolCode =
-  sessionStorage.getItem("school_code") || "";
+let schoolCode = null;
+
+function getSchoolCode() {
+  const code = sessionStorage.getItem("school_code");
+  console.log("SESSION STORAGE VALUE:", code);
+  return code;
+}
+
+schoolCode = getSchoolCode();
+
+if (!schoolCode) {
+  alert("Session expired. Please login again.");
+  window.location.href = "index.html";
+  throw new Error("Missing school code");
+}
 
 console.log("SCHOOL CODE LOADED:", schoolCode);
 
@@ -122,7 +135,7 @@ console.table(currentSubjects);
   });
 
   if (!schoolCode) {
-  console.error("No school code - aborting subject load");
+  console.error("ABORT: schoolCode is missing");
   return;
 }
 }
