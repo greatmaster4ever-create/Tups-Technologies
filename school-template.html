@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <!-- DYNAMIC TITLE -->
+  <title id="pageTitle">School Portal</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CACHE CONTROL -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000066">
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="school-template.css?v=1">
+</head>
+
+<body>
+
+  <!-- MAIN CONTENT -->
+  <div class="container">
+
+    <div class="header">
+
+      <!-- DYNAMIC SCHOOL NAME -->
+      <h1 class="school-title" id="schoolName">
+        School Name
+      </h1>
+
+      <!-- DYNAMIC LOGO -->
+      <img
+        id="schoolLogo"
+        class="school-logo"
+        src="schlogo.png"
+        alt="Logo"
+      >
+
+    </div>
+
+    <form id="subjectForm">
+
+      <!-- ACCESS TYPE -->
+      <div class="form-row">
+        <label>Access Type</label>
+
+        <select id="cadre" required>
+          <option value="Teacher">Teacher</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+
+      <!-- DEPARTMENT -->
+      <div class="form-row">
+        <label>Department</label>
+
+        <select id="department" required>
+          <option value="">Select Department</option>
+          <option value="KG">KG</option>
+          <option value="Nursery">Nursery</option>
+          <option value="Primary">Primary</option>
+          <option value="Secondary">Secondary</option>
+        </select>
+      </div>
+
+      <!-- SUBJECT -->
+      <div class="form-row">
+        <label>Subject</label>
+
+        <input
+          list="subjectsList"
+          id="subject"
+          placeholder="Search subject..."
+          required
+        >
+
+        <datalist id="subjectsList"></datalist>
+      </div>
+
+      <!-- PASSWORD -->
+      <div class="form-row">
+        <label>Password</label>
+
+        <div class="password-box">
+
+          <input
+            type="password"
+            id="subjectPassword"
+            placeholder="Enter Password"
+            required
+          >
+
+          <span class="eye" onclick="togglePassword()">👁</span>
+
+        </div>
+      </div>
+
+      <!-- BUTTON ROW -->
+      <div class="button-row">
+
+        <button type="submit" class="access-btn">
+          Access Subject
+        </button>
+
+        <button
+          type="button"
+          id="changePasswordBtn"
+          class="change-btn"
+          onclick="openChangePasswordModal()"
+        >
+          Change Password
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+  <!-- PASSWORD CHANGE MODAL -->
+  <div id="passwordModal" class="modal">
+
+    <div class="modal-content">
+
+      <span
+        class="close-modal"
+        id="closeModal"
+        onclick="closeChangePasswordModal()"
+      >
+        &times;
+      </span>
+
+      <h2>Change Subject Password</h2>
+
+      <form id="changePasswordForm">
+
+        <div class="modal-form-row">
+
+          <label>Subject</label>
+
+          <select id="changeSubject" required>
+            <option value="">Select Subject</option>
+          </select>
+
+        </div>
+
+        <div class="modal-form-row">
+
+          <label>Admin Password</label>
+
+          <input
+            type="password"
+            id="adminPassword"
+            placeholder="Enter Admin Password"
+            required
+          >
+
+        </div>
+
+        <div class="modal-form-row">
+
+          <label>New Password</label>
+
+          <div class="password-box">
+
+            <input
+              type="password"
+              id="newSubjectPassword"
+              placeholder="Enter New Password"
+              required
+            >
+
+            <span class="eye" onclick="toggleChangePassword()">👁</span>
+
+          </div>
+
+        </div>
+
+        <button type="submit" class="update-btn">
+          Update Password
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+  <div class="school-contact">
+
+  <div id="schoolEmail"></div>
+
+  <div id="schoolPhone"></div>
+
+</div>
+
+  <!-- SUPABASE -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
+  <!-- JS -->
+  <script src="school-template.js?v=1"></script>
+
+  <!-- FOOTER -->
+  <footer class="global-footer">
+    Powered by TupsTechnologies ©
+    <span id="year"></span>.
+    All Rights Reserved.
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent =
+      new Date().getFullYear();
+  </script>
+
+</body>
+</html>
