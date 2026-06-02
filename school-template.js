@@ -50,7 +50,8 @@ async function loadSchoolInfo() {
   }
 
   document.getElementById("schoolName").textContent = data.School_name;
-  document.getElementById("pageTitle").textContent = data.School_name;
+  document.title =
+  data.School_name;
 
   const schoolLogo = document.getElementById("schoolLogo");
   if (schoolLogo && data.logo_url) schoolLogo.src = data.logo_url;
@@ -98,6 +99,18 @@ async function loadSubjects(department, isAdmin = false) {
   }
 
   currentSubjects = data || [];
+  
+  console.log(
+  "Current School:",
+  schoolCode
+);
+
+console.log(
+  "Subjects Loaded:",
+  currentSubjects.length
+);
+
+console.table(currentSubjects);
 
   currentSubjects.forEach(sub => {
     const option = document.createElement("option");
