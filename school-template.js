@@ -1,4 +1,4 @@
-```javascript
+javascript
 console.log("SCHOOL TEMPLATE JS LOADED");
 
 // ==========================
@@ -244,4 +244,3 @@ departmentSelect.addEventListener("change", () => {
 // ==========================
 document.getElementById("year").textContent =
   new Date().getFullYear();
-```
