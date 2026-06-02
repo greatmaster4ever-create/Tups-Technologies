@@ -158,17 +158,47 @@ if (
 
 }
 
-
 // ==========================
 // LOAD SUBJECTS
 // ==========================
-async function loadSubjects() {
+async function loadSubjects(
+  department,
+  isAdmin = false
+) {
 
-  const { data, error } =
-    await supabaseClient
+  const datalist =
+    document.getElementById(
+      "subjectsList"
+    );
+
+  datalist.innerHTML = "";
+
+  let query =
+    supabaseClient
       .from("subjects")
       .select("*")
-      .eq("school_code", schoolCode);
+      .eq(
+        "school_code",
+        schoolCode
+      );
+
+  if (
+    !isAdmin &&
+    department
+  ) {
+
+    query =
+      query.ilike(
+        "department",
+        department
+      );
+
+  }
+
+  const {
+    data,
+    error
+  } = await query;
 
   if (error) {
 
@@ -178,50 +208,22 @@ async function loadSubjects() {
 
   }
 
-  currentSubjects = data || [];
-
-  const datalist =
-    document.getElementById("subjectsList");
-
-  const changeSubject =
-    document.getElementById("changeSubject");
-
-  if (datalist) {
-    datalist.innerHTML = "";
-  }
-
-  if (changeSubject) {
-    changeSubject.innerHTML =
-      `<option value="">Select Subject</option>`;
-  }
+  currentSubjects =
+    data || [];
 
   currentSubjects.forEach(sub => {
 
-    // fill datalist
-    if (datalist) {
+    const option =
+      document.createElement(
+        "option"
+      );
 
-      const option =
-        document.createElement("option");
+    option.value =
+      sub.subject;
 
-      option.value = sub.subject;
-
-      datalist.appendChild(option);
-
-    }
-
-    // fill modal dropdown
-    if (changeSubject) {
-
-      const option =
-        document.createElement("option");
-
-      option.value = sub.subject;
-
-      option.textContent = sub.subject;
-
-      changeSubject.appendChild(option);
-
-    }
+    datalist.appendChild(
+      option
+    );
 
   });
 
@@ -373,7 +375,78 @@ function toggleChangePassword() {
 // INIT APP
 // ==========================
 loadSchoolInfo();
-loadSubjects();
+// ==========================
+// CADRE / DEPARTMENT LOGIC
+// ==========================
+
+const cadreSelect =
+  document.getElementById(
+    "cadre"
+  );
+
+const departmentSelect =
+  document.getElementById(
+    "department"
+  );
+
+const subjectInput =
+  document.getElementById(
+    "subject"
+  );
+
+cadreSelect.addEventListener(
+  "change",
+  () => {
+
+    const isAdmin =
+      cadreSelect.value ===
+      "Admin";
+
+    departmentSelect.disabled =
+      isAdmin;
+
+    subjectInput.value = "";
+
+    document.getElementById(
+      "subjectsList"
+    ).innerHTML = "";
+
+    if (isAdmin) {
+
+      departmentSelect.value =
+        "";
+
+      loadSubjects(
+        null,
+        true
+      );
+
+    }
+
+  }
+);
+
+departmentSelect.addEventListener(
+  "change",
+  () => {
+
+    if (
+      cadreSelect.value !==
+      "Admin"
+    ) {
+
+      subjectInput.value =
+        "";
+
+      loadSubjects(
+        departmentSelect.value,
+        false
+      );
+
+    }
+
+  }
+);
 
 
 // ==========================
