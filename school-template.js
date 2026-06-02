@@ -293,6 +293,53 @@ departmentSelect.addEventListener("change", () => {
   }
 
 });
+
+// ==========================
+// AUTO LOGOUT (1 MINUTE)
+// ==========================
+
+let logoutTimer;
+
+function resetLogoutTimer() {
+
+  clearTimeout(logoutTimer);
+
+  logoutTimer = setTimeout(() => {
+
+    alert(
+      "Session expired due to inactivity."
+    );
+
+    sessionStorage.removeItem(
+      "school_code"
+    );
+
+    window.location.href =
+      "index.html";
+
+  }, 60000); // 1 minute
+
+}
+
+// User activity events
+[
+  "click",
+  "mousemove",
+  "keydown",
+  "scroll",
+  "touchstart"
+].forEach(event => {
+
+  document.addEventListener(
+    event,
+    resetLogoutTimer
+  );
+
+});
+
+// Start timer immediately
+resetLogoutTimer();
+
 // ==========================
 // FOOTER YEAR
 // ==========================
