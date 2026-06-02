@@ -1,3 +1,4 @@
+```javascript
 console.log("SCHOOL TEMPLATE JS LOADED");
 
 // ==========================
@@ -15,28 +16,21 @@ const supabaseClient =
     supabaseKey
   );
 
-
 // ==========================
 // GET SCHOOL CODE
 // ==========================
-// must be set during login redirect
 const schoolCode =
   sessionStorage.getItem("school_code");
 
 if (!schoolCode) {
-
   alert("Session expired. Please login again.");
-
   window.location.href = "index.html";
-
 }
-
 
 // ==========================
 // GLOBAL STATE
 // ==========================
 let currentSubjects = [];
-
 
 // ==========================
 // LOAD SCHOOL INFO
@@ -51,125 +45,39 @@ async function loadSchoolInfo() {
       .single();
 
   if (error || !data) {
-
     console.error(error);
-
     alert("School not found");
-
     return;
-
   }
 
-  // update UI
-  const schoolNameEl =
-    document.getElementById("schoolName");
+  document.getElementById("schoolName").textContent = data.School_name;
+  document.getElementById("pageTitle").textContent = data.School_name;
 
-  const pageTitle =
-    document.getElementById("pageTitle");
+  const schoolLogo = document.getElementById("schoolLogo");
+  if (schoolLogo && data.logo_url) schoolLogo.src = data.logo_url;
 
-  if (schoolNameEl) {
-    schoolNameEl.textContent =
-      data.School_name;
-  }
+  const emailEl = document.getElementById("schoolEmail");
+  if (emailEl && data.contact_email)
+    emailEl.textContent = data.contact_email;
 
-  if (pageTitle) {
-    pageTitle.textContent =
-      data.School_name;
-  }
+  const phoneEl = document.getElementById("schoolPhone");
+  if (phoneEl && data.phone)
+    phoneEl.textContent = data.phone;
 
-/* SCHOOL LOGO */
+  if (data.primary_color)
+    document.documentElement.style.setProperty("--primary-color", data.primary_color);
 
-const schoolLogo =
-  document.getElementById(
-    "schoolLogo"
-  );
-
-if (
-  schoolLogo &&
-  data.logo_url
-) {
-
-  schoolLogo.src =
-    data.logo_url;
-
-}
-
-/* CONTACT DETAILS */
-
-const emailEl =
-  document.getElementById(
-    "schoolEmail"
-  );
-
-const phoneEl =
-  document.getElementById(
-    "schoolPhone"
-  );
-
-if (
-  emailEl &&
-  data.contact_email
-) {
-
-  emailEl.textContent =
-    data.contact_email;
-
-}
-
-if (
-  phoneEl &&
-  data.phone
-) {
-
-  phoneEl.textContent =
-    data.phone;
-
-}
-
- /* BRAND COLORS */
-
-if (
-  data.primary_color
-) {
-
-  document
-    .documentElement
-    .style
-    .setProperty(
-      "--primary-color",
-      data.primary_color
-    );
-
-}
-
-if (
-  data.secondary_color
-) {
-
-  document
-    .documentElement
-    .style
-    .setProperty(
-      "--secondary-color",
-      data.secondary_color
-    );
-
-}
-
+  if (data.secondary_color)
+    document.documentElement.style.setProperty("--secondary-color", data.secondary_color);
 }
 
 // ==========================
 // LOAD SUBJECTS
 // ==========================
-async function loadSubjects(
-  department,
-  isAdmin = false
-) {
+async function loadSubjects(department, isAdmin = false) {
 
   const datalist =
-    document.getElementById(
-      "subjectsList"
-    );
+    document.getElementById("subjectsList");
 
   datalist.innerHTML = "";
 
@@ -177,61 +85,30 @@ async function loadSubjects(
     supabaseClient
       .from("subjects")
       .select("*")
-      .eq(
-        "school_code",
-        schoolCode
-      );
+      .eq("school_code", schoolCode);
 
-  if (
-    !isAdmin &&
-    department
-  ) {
-
-    query =
-      query.ilike(
-        "department",
-        department
-      );
-
+  if (!isAdmin && department) {
+    query = query.ilike("department", department);
   }
 
-  const {
-    data,
-    error
-  } = await query;
+  const { data, error } = await query;
 
   if (error) {
-
     console.error(error);
-
     return;
-
   }
 
-  currentSubjects =
-    data || [];
+  currentSubjects = data || [];
 
   currentSubjects.forEach(sub => {
-
-    const option =
-      document.createElement(
-        "option"
-      );
-
-    option.value =
-      sub.subject;
-
-    datalist.appendChild(
-      option
-    );
-
+    const option = document.createElement("option");
+    option.value = sub.subject;
+    datalist.appendChild(option);
   });
-
 }
 
-
 // ==========================
-// ACCESS SUBJECT
+// ACCESS SUBJECT (FIXED)
 // ==========================
 document
   .getElementById("subjectForm")
@@ -239,43 +116,28 @@ document
 
     e.preventDefault();
 
-    const cadre =
-      document.getElementById("cadre").value;
+    const cadre = document.getElementById("cadre").value;
+    const department = document.getElementById("department").value;
+    const subject = document.getElementById("subject").value;
+    const password = document.getElementById("subjectPassword").value;
 
-    const department =
-      document.getElementById("department").value;
-
-    const subject =
-      document.getElementById("subject").value;
-
-    const password =
-      document.getElementById("subjectPassword").value;
-
-    const match =
-      currentSubjects.find(s =>
-        s.subject === subject &&
-        s.department === department &&
-        s.cadre === cadre &&
-        s.subject_password === password
-      );
+    const match = currentSubjects.find(s =>
+      s.subject === subject &&
+      s.department === department &&
+      s.cadre === cadre &&
+      s.subject_password === password
+    );
 
     if (!match) {
-
       alert("Invalid subject login");
-
       return;
-
     }
 
-    // redirect to sheet
-    window.open(
-  match.sheet_url,
-  "_blank"
-);
-
+    window.open(match.sheet_url, "_blank");
+  });
 
 // ==========================
-// CHANGE PASSWORD
+// CHANGE PASSWORD (FIXED POSITION)
 // ==========================
 document
   .getElementById("changePasswordForm")
@@ -299,11 +161,8 @@ document
       );
 
     if (!match) {
-
       alert("Invalid admin password");
-
       return;
-
     }
 
     const { error } =
@@ -315,142 +174,74 @@ document
         .eq("id", match.id);
 
     if (error) {
-
       alert(error.message);
-
       return;
-
     }
 
     alert("Password updated successfully");
-
     loadSubjects();
-
   });
 
-
 // ==========================
-// MODAL CONTROLS (SAFE)
+// MODALS
 // ==========================
 function openChangePasswordModal() {
-
-  document.getElementById("passwordModal")
-    .style.display = "block";
-
+  document.getElementById("passwordModal").style.display = "block";
 }
 
 function closeChangePasswordModal() {
-
-  document.getElementById("passwordModal")
-    .style.display = "none";
-
+  document.getElementById("passwordModal").style.display = "none";
 }
 
 function togglePassword() {
-
-  const input =
-    document.getElementById("subjectPassword");
-
-  input.type =
-    input.type === "password"
-      ? "text"
-      : "password";
-
+  const input = document.getElementById("subjectPassword");
+  input.type = input.type === "password" ? "text" : "password";
 }
 
 function toggleChangePassword() {
-
-  const input =
-    document.getElementById("newSubjectPassword");
-
-  input.type =
-    input.type === "password"
-      ? "text"
-      : "password";
-
+  const input = document.getElementById("newSubjectPassword");
+  input.type = input.type === "password" ? "text" : "password";
 }
 
-
 // ==========================
-// INIT APP
+// INIT
 // ==========================
 loadSchoolInfo();
+loadSubjects();
+
 // ==========================
 // CADRE / DEPARTMENT LOGIC
 // ==========================
+const cadreSelect = document.getElementById("cadre");
+const departmentSelect = document.getElementById("department");
+const subjectInput = document.getElementById("subject");
 
-const cadreSelect =
-  document.getElementById(
-    "cadre"
-  );
+cadreSelect.addEventListener("change", () => {
 
-const departmentSelect =
-  document.getElementById(
-    "department"
-  );
+  const isAdmin = cadreSelect.value === "Admin";
 
-const subjectInput =
-  document.getElementById(
-    "subject"
-  );
+  departmentSelect.disabled = isAdmin;
 
-cadreSelect.addEventListener(
-  "change",
-  () => {
+  subjectInput.value = "";
+  document.getElementById("subjectsList").innerHTML = "";
 
-    const isAdmin =
-      cadreSelect.value ===
-      "Admin";
+  if (isAdmin) {
+    departmentSelect.value = "";
+    loadSubjects(null, true);
+  }
 
-    departmentSelect.disabled =
-      isAdmin;
+});
 
+departmentSelect.addEventListener("change", () => {
+  if (cadreSelect.value !== "Admin") {
     subjectInput.value = "";
-
-    document.getElementById(
-      "subjectsList"
-    ).innerHTML = "";
-
-    if (isAdmin) {
-
-      departmentSelect.value =
-        "";
-
-      loadSubjects(
-        null,
-        true
-      );
-
-    }
-
+    loadSubjects(departmentSelect.value, false);
   }
-);
-
-departmentSelect.addEventListener(
-  "change",
-  () => {
-
-    if (
-      cadreSelect.value !==
-      "Admin"
-    ) {
-
-      subjectInput.value =
-        "";
-
-      loadSubjects(
-        departmentSelect.value,
-        false
-      );
-
-    }
-
-  }
-);
-
+});
 
 // ==========================
-// FOOTER YEAR (SAFE)
+// FOOTER YEAR
 // ==========================
 document.getElementById("year").textContent =
   new Date().getFullYear();
+```
