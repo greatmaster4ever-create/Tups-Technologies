@@ -308,3 +308,17 @@ button:hover {
 
   margin-top: auto;
 }
+
+/* SCHOOL CONTACT INFO */
+.school-contact {
+  text-align: center;
+  margin-top: 10px;
+  color: white;
+}
+
+#schoolEmail,
+#schoolPhone {
+  color: white;
+  font-size: 14px;
+  margin: 4px 0;
+}
