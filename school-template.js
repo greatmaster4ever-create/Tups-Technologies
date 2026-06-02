@@ -90,55 +90,6 @@ async function loadSchoolInfo() {
 // ==========================
 // LOAD SUBJECTS
 // ==========================
-async function loadSubjects(department, isAdmin = false) {
-
-  const datalist =
-    document.getElementById("subjectsList");
-
-  datalist.innerHTML = "";
-
-  let query =
-    supabaseClient
-      .from("subjects")
-      .select("*")
-      .eq("school_code", schoolCode);
-
-  if (!isAdmin && department) {
-    query = query.ilike("department", department);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  currentSubjects = data || [];
-  
-  console.log(
-  "Current School:",
-  schoolCode
-);
-
-console.log(
-  "Subjects Loaded:",
-  currentSubjects.length
-);
-
-console.table(currentSubjects);
-
-  currentSubjects.forEach(sub => {
-    const option = document.createElement("option");
-    option.value = sub.subject;
-    datalist.appendChild(option);
-  });
-
-  if (!schoolCode) {
-  console.error("ABORT: schoolCode is missing");
-  return;
-}
-}
 
 // ==========================
 // ACCESS SUBJECT (FIXED)
