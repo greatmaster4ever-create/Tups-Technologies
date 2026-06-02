@@ -316,6 +316,14 @@ button:hover {
   color: white;
 }
 
+.contact-title {
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+}
+
 #schoolEmail,
 #schoolPhone {
   color: white;
