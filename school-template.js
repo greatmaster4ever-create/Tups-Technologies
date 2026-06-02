@@ -1,4 +1,3 @@
-javascript
 console.log("SCHOOL TEMPLATE JS LOADED");
 
 // ==========================
