@@ -266,10 +266,10 @@ document
     }
 
     // redirect to sheet
-    window.location.href =
-      match.sheet_url;
-
-  });
+    window.open(
+  match.sheet_url,
+  "_blank"
+);
 
 
 // ==========================
