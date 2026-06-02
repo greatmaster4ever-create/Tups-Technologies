@@ -36,10 +36,6 @@ if (!schoolCode) {
 
 console.log("SCHOOL CODE LOADED:", schoolCode);
 
-if (!schoolCode) {
-  alert("Session expired. Please login again.");
-  window.location.href = "index.html";
-}
 
 
 // ==========================
@@ -92,7 +88,14 @@ async function loadSchoolInfo() {
 // ==========================
 async function loadSubjects(department, isAdmin = false) {
 
-  console.log("LOADING SUBJECTS FOR:", schoolCode);
+  console.log(
+  "Loading subjects for department:",
+  department,
+  "| Admin:",
+  isAdmin,
+  "| School:",
+  schoolCode
+);
 
   const datalist = document.getElementById("subjectsList");
 
@@ -105,10 +108,17 @@ async function loadSubjects(department, isAdmin = false) {
   datalist.innerHTML = "";
   currentSubjects = [];
 
-  const { data, error } = await supabaseClient
-    .from("subjects")
-    .select("*")
-    .eq("school_code", schoolCode);
+ let query = supabaseClient
+  .from("subjects")
+  .select("*")
+  .eq("school_code", schoolCode);
+
+// 🔥 APPLY DEPARTMENT FILTER FOR TEACHERS ONLY
+if (!isAdmin && department) {
+  query = query.eq("department", department);
+}
+
+const { data, error } = await query;
 
   if (error) {
     console.error(error);
@@ -144,12 +154,18 @@ document
     const subject = document.getElementById("subject").value;
     const password = document.getElementById("subjectPassword").value;
 
-    const match = currentSubjects.find(s =>
-      s.subject === subject &&
-      s.department === department &&
-      s.cadre === cadre &&
-      s.subject_password === password
-    );
+  const match = currentSubjects.find(s =>
+  s.subject === subject &&
+  s.subject_password === password &&
+  (
+    cadre === "Admin"
+      ? true
+      : (
+          s.department === department &&
+          s.cadre === cadre
+        )
+  )
+);
 
     if (!match) {
       alert("Invalid subject login");
@@ -202,7 +218,10 @@ document
     }
 
     alert("Password updated successfully");
-    loadSubjects();
+    loadSubjects(
+  departmentSelect.value,
+  cadreSelect.value === "Admin"
+);
   });
 
 // ==========================
@@ -256,10 +275,23 @@ cadreSelect.addEventListener("change", () => {
 });
 
 departmentSelect.addEventListener("change", () => {
+
+  console.log(
+    "Department selected:",
+    departmentSelect.value
+  );
+
   if (cadreSelect.value !== "Admin") {
+
     subjectInput.value = "";
-    loadSubjects(departmentSelect.value, false);
+
+    loadSubjects(
+      departmentSelect.value,
+      false
+    );
+
   }
+
 });
 // ==========================
 // FOOTER YEAR
