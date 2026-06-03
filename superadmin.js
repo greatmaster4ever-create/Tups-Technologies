@@ -497,8 +497,16 @@ try {
       }
     );
 
-  const result =
-    await response.json();
+ const text =
+  await response.text();
+
+console.log(
+  "Apps Script Response:",
+  text
+);
+
+const result =
+  JSON.parse(text);
 
   if (!result.success) {
 
