@@ -450,10 +450,87 @@ document
           "adminPassword"
         ).value.trim();
 
-      const sheetUrl =
-        document.getElementById(
-          "sheetUrl"
-        ).value.trim();
+      if (
+        !schoolCode ||
+        !department ||
+        !subject
+      ) {
+
+        alert(
+          "Please complete all required fields."
+        );
+
+        return;
+
+      }
+
+      // ==========================
+// AUTO CREATE GOOGLE SHEET
+// ==========================
+
+let sheetUrl = "";
+
+try {
+
+  const response =
+    await fetch(
+      "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          schoolCode:
+            schoolCode,
+
+          department:
+            department,
+
+          subject:
+            subject
+        })
+
+      }
+    );
+
+  const result =
+    await response.json();
+
+  if (!result.success) {
+
+    throw new Error(
+      result.error
+    );
+
+  }
+
+  sheetUrl =
+    result.sheetUrl;
+
+document.getElementById(
+  "sheetUrl"
+).value = sheetUrl;
+
+  console.log(
+    "NEW SHEET:",
+    sheetUrl
+  );
+
+} catch (err) {
+
+  console.error(err);
+
+  alert(
+    "Failed to create Google Sheet."
+  );
+
+  return;
+
+}
 
       if (
         !schoolCode ||
@@ -551,78 +628,7 @@ loadDashboardStats();
     }
   );
 
-async function loadSubjects() {
 
-  try {
-
-    const { data, error } =
-      await supabaseClient
-        .from("subjects")
-        .select("*")
-        .order("school_code");
-
-    if (error) throw error;
-
-    const tbody =
-      document.getElementById(
-        "subjectsTableBody"
-      );
-
-    tbody.innerHTML = "";
-
-    data.forEach(row => {
-
-      tbody.innerHTML += `
-        <tr>
-
-          <td>${row.school_code}</td>
-
-          <td>${row.cadre}</td>
-
-          <td>${row.department}</td>
-
-          <td>${row.subject}</td>
-
-          <td>
-
-            <button
-              class="edit-btn"
-              onclick="openEditSubject('${row.id}')"
-            >
-              Edit
-            </button>
-
-            <button
-              class="password-btn"
-              onclick="openSubjectPasswordModal('${row.id}')"
-            >
-              Password
-            </button>
-
-            <button
-              class="delete-btn"
-              onclick="deleteSubject('${row.id}')"
-            >
-              Delete
-            </button>
-
-          </td>
-
-        </tr>
-      `;
-
-    });
-
-  } catch (err) {
-
-    console.error(
-      "Subjects Load Error:",
-      err
-    );
-
-  }
-
-}
 async function openEditSubject(id) {
 
   const { data, error } =
@@ -1190,6 +1196,7 @@ document
       loadSubjects();
 
       loadDashboardStats();
+       loadSubjects();
 
     }
   );  
