@@ -530,10 +530,13 @@ document.getElementById(
 
 } catch (err) {
 
-  console.error(err);
+  console.error(
+    "GOOGLE SHEET ERROR:",
+    err
+  );
 
   alert(
-    "Failed to create Google Sheet."
+    err.toString()
   );
 
   return;
