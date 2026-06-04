@@ -419,38 +419,49 @@ document
   .addEventListener(
     "click",
     async () => {
-   
-console.log("SAVE BUTTON CLICKED");
+   console.log("SAVE BUTTON CLICKED");
 
-      const schoolCode =
-        document.getElementById(
-          "subjectSchoolCode"
-        ).value;
+const schoolCode =
+  document.getElementById(
+    "subjectSchoolCode"
+  ).value;
 
-      const cadre =
-        document.getElementById(
-          "subjectCadre"
-        ).value;
+console.log("STEP 1");
 
-      const department =
-        document.getElementById(
-          "subjectDepartment"
-        ).value.trim();
+const cadre =
+  document.getElementById(
+    "subjectCadre"
+  ).value;
 
-      const subject =
-        document.getElementById(
-          "subjectName"
-        ).value.trim();
+console.log("STEP 2");
 
-      const subjectPassword =
-        document.getElementById(
-          "subjectPassword"
-        ).value.trim();
+const department =
+  document.getElementById(
+    "subjectDepartment"
+  ).value.trim();
 
-      const adminPassword =
-        document.getElementById(
-          "adminPassword"
-        ).value.trim();
+console.log("STEP 3");
+
+const subject =
+  document.getElementById(
+    "subjectName"
+  ).value.trim();
+
+console.log("STEP 4");
+
+const subjectPassword =
+  document.getElementById(
+    "subjectPassword"
+  ).value.trim();
+
+console.log("STEP 5");
+
+const adminPassword =
+  document.getElementById(
+    "adminPassword"
+  ).value.trim();
+
+console.log("STEP 6");
 
       if (
         !schoolCode ||
@@ -473,6 +484,8 @@ console.log("SAVE BUTTON CLICKED");
 let sheetUrl = "";
 
 try {
+
+  console.log("ABOUT TO FETCH");
 
   const response =
     await fetch(
@@ -498,6 +511,8 @@ try {
 
       }
     );
+
+  console.log("FETCH FINISHED");
 
  const text =
   await response.text();
