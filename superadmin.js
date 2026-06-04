@@ -419,6 +419,8 @@ document
   .addEventListener(
     "click",
     async () => {
+   
+console.log("SAVE BUTTON CLICKED");
 
       const schoolCode =
         document.getElementById(
