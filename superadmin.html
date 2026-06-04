@@ -163,15 +163,41 @@
 
 </section>
     <!-- SHEETS -->
-    <section id="sheets" class="tab-content">
+    <!-- SHEETS -->
+<section id="sheets" class="tab-content">
 
-      <h2>Google Sheets Management</h2>
+  <h2>Google Sheets Management</h2>
 
-      <div id="sheetsContainer">
-        Sheet records will appear here.
-      </div>
+  <input
+    type="text"
+    id="sheetSearch"
+    placeholder="Search School or Subject..."
+  >
 
-    </section>
+  <div class="table-wrapper">
+
+    <table id="sheetsTable">
+
+      <thead>
+
+        <tr>
+          <th>School</th>
+          <th>Department</th>
+          <th>Subject</th>
+          <th>Open Sheet</th>
+        </tr>
+
+      </thead>
+
+      <tbody id="sheetsTableBody">
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</section>
 
     <!-- SETTINGS -->
     <section id="settings" class="tab-content">

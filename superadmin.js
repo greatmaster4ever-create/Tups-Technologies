@@ -334,6 +334,98 @@ async function loadSubjects() {
 
 }
 
+async function loadSheets() {
+
+  try {
+
+    const { data, error } =
+      await supabaseClient
+        .from("subjects")
+        .select(
+          "school_code, department, subject, sheet_url"
+        )
+        .order("school_code");
+
+    if (error) throw error;
+
+    const tbody =
+      document.getElementById(
+        "sheetsTableBody"
+      );
+
+    tbody.innerHTML = "";
+
+    data.forEach(row => {
+
+      tbody.innerHTML += `
+
+        <tr>
+
+          <td>${row.school_code}</td>
+
+          <td>${row.department}</td>
+
+          <td>${row.subject}</td>
+
+          <td>
+
+            <a
+              href="${row.sheet_url}"
+              target="_blank"
+            >
+              Open Sheet
+            </a>
+
+          </td>
+
+        </tr>
+
+      `;
+
+    });
+
+  } catch (err) {
+
+    console.error(
+      "Sheets Load Error:",
+      err
+    );
+
+  }
+
+}
+
+document
+  .getElementById(
+    "sheetSearch"
+  )
+  .addEventListener(
+    "keyup",
+    function () {
+
+      const search =
+        this.value.toLowerCase();
+
+      const rows =
+        document.querySelectorAll(
+          "#sheetsTableBody tr"
+        );
+
+      rows.forEach(row => {
+
+        const text =
+          row.innerText.toLowerCase();
+
+        row.style.display =
+          text.includes(search)
+            ? ""
+            : "none";
+
+      });
+
+    }
+  );
+
 async function loadSchoolDropdown() {
 
   const { data, error } =
@@ -654,6 +746,8 @@ document.getElementById(
 /* REFRESH DASHBOARD */
 
 loadDashboardStats();
+loadSubjects();
+loadSheets();
 
     }
   );
@@ -1331,3 +1425,4 @@ async function deleteSubject(id) {
 loadDashboardStats();
 loadSchools();
 loadSubjects();
+loadSheets();
