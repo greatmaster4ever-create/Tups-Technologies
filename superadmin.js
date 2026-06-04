@@ -487,30 +487,32 @@ try {
 
   console.log("ABOUT TO FETCH");
 
-  const response =
-    await fetch(
-      "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
-      {
-        method: "POST",
+  const formData =
+  new URLSearchParams();
 
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
+formData.append(
+  "schoolCode",
+  schoolCode
+);
 
-        body: JSON.stringify({
-          schoolCode:
-            schoolCode,
+formData.append(
+  "department",
+  department
+);
 
-          department:
-            department,
+formData.append(
+  "subject",
+  subject
+);
 
-          subject:
-            subject
-        })
-
-      }
-    );
+const response =
+  await fetch(
+    "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
+    {
+      method: "POST",
+      body: formData
+    }
+  );
 
   console.log("FETCH FINISHED");
 
