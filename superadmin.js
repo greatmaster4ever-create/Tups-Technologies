@@ -26,6 +26,36 @@ if (schoolCode !== "TUPSADMIN") {
 
 }
 
+window.addEventListener(
+  "pageshow",
+  function (event) {
+
+    if (
+      event.persisted ||
+      window.performance
+        .getEntriesByType(
+          "navigation"
+        )[0]
+        ?.type === "back_forward"
+    ) {
+
+      if (
+        sessionStorage.getItem(
+          "school_code"
+        ) !== "TUPSADMIN"
+      ) {
+
+        window.location.replace(
+          "index.html"
+        );
+
+      }
+
+    }
+
+  }
+);
+
 /* ==========================
    MOBILE MENU
 ========================== */
@@ -85,7 +115,9 @@ function logoutAdmin() {
 
   sessionStorage.clear();
 
-  window.location.href = "index.html";
+  window.location.replace(
+    "index.html"
+  );
 
 }
 
