@@ -1,4 +1,4 @@
-console.log("SUPER ADMIN LOADED");
+console.log("SUPER ADMIN LOADED - VERSION 99");
 const supabaseUrl =
   "https://sgdrncpiqingjwxmkqij.supabase.co";
 
