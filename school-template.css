@@ -482,7 +482,12 @@ button:hover {
 }
 
 .admin-tab {
-  flex: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  flex: 0 0 auto;
 
   padding: 10px 18px;
 
@@ -496,6 +501,8 @@ button:hover {
 
   font-size: 14px;
   font-weight: 600;
+
+  white-space: nowrap;
 }
 
 .admin-tab:hover {
