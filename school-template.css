@@ -426,3 +426,9 @@ button:hover {
     align-items: center;
   }
 }
+
+#schoolEmail strong,
+#schoolPhone strong {
+  color: white;
+  font-weight: 700;
+}

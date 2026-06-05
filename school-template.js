@@ -69,12 +69,14 @@ async function loadSchoolInfo() {
   if (schoolLogo && data.logo_url) schoolLogo.src = data.logo_url;
 
   const emailEl = document.getElementById("schoolEmail");
-  if (emailEl && data.contact_email)
-    emailEl.textContent = data.contact_email;
+if (emailEl && data.contact_email)
+  emailEl.innerHTML =
+    "<strong>E-mail:</strong> " + data.contact_email;
 
-  const phoneEl = document.getElementById("schoolPhone");
-  if (phoneEl && data.phone)
-    phoneEl.textContent = data.phone;
+const phoneEl = document.getElementById("schoolPhone");
+if (phoneEl && data.phone)
+  phoneEl.innerHTML =
+    "<strong>Phone:</strong> " + data.phone;
 
   if (data.primary_color)
     document.documentElement.style.setProperty("--primary-color", data.primary_color);
