@@ -1451,53 +1451,58 @@ async function deleteSubject(id) {
 
     // Extract Spreadsheet ID
 
-    const spreadsheetId =
-      data.sheet_url
-        .split("/d/")[1]
-        .split("/")[0];
+   // Old subjects may not have a sheet_url
 
-    // Call Apps Script
+if (!data.sheet_url) {
 
-    const formData =
-      new URLSearchParams();
+  console.log(
+    "Legacy subject detected. No Google Sheet attached."
+  );
 
-    formData.append(
-      "action",
-      "deleteSheet"
+} else {
+
+  const spreadsheetId =
+    data.sheet_url
+      .split("/d/")[1]
+      .split("/")[0];
+
+  const formData =
+    new URLSearchParams();
+
+  formData.append(
+    "action",
+    "deleteSheet"
+  );
+
+  formData.append(
+    "spreadsheetId",
+    spreadsheetId
+  );
+
+  const response =
+    await fetch(
+      "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
+      {
+        method: "POST",
+        body: formData
+      }
     );
 
-    formData.append(
-      "spreadsheetId",
-      spreadsheetId
+  const text =
+    await response.text();
+
+  const result =
+    JSON.parse(text);
+
+  if (!result.success) {
+
+    throw new Error(
+      result.error
     );
 
-    const response =
-      await fetch(
-        "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
-        {
-          method: "POST",
-          body:
-            formData
-        }
-      );
+  }
 
-    const text =
-      await response.text();
-
-    const result =
-      JSON.parse(
-        text
-      );
-
-    if (
-      !result.success
-    ) {
-
-      throw new Error(
-        result.error
-      );
-
-    }
+}
 
     // Delete Supabase row
 
