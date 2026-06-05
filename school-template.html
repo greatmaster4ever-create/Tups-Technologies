@@ -136,18 +136,46 @@
      <!-- RIGHT CARD (ADMIN LOGIN) -->
   <div class="card admin-card">
 
-    <h2>School Administration</h2>
+  <h2>School Administration</h2>
 
-    <p>Access administrative tools and school management dashboard.</p>
+  <p class="admin-text">
+    Secure access to the school's administrative workspace.
+  </p>
+
+  <div class="admin-login">
+
+    <label class="admin-label">
+      Admin Password
+    </label>
+
+    <div class="password-box admin-password-box">
+
+      <input
+        type="password"
+        id="adminPortalPassword"
+        placeholder="Enter Admin Password"
+      >
+
+      <span
+        class="eye"
+        onclick="toggleAdminPortalPassword()"
+      >
+        👁
+      </span>
+
+    </div>
 
     <button
       id="openAdminPortal"
       class="admin-btn"
+      type="button"
     >
-      Admin Portal
+      Open Portal
     </button>
 
   </div>
+
+</div>
 
 </div>
 

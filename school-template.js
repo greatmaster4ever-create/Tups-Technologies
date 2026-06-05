@@ -296,6 +296,82 @@ departmentSelect.addEventListener("change", () => {
 
 });
 
+function toggleAdminPortalPassword() {
+
+  const input =
+    document.getElementById(
+      "adminPortalPassword"
+    );
+
+  input.type =
+    input.type === "password"
+      ? "text"
+      : "password";
+
+}
+
+const adminDashboardHTML = `
+  <h2>School Administration</h2>
+
+  <p class="admin-text">
+    Welcome, Administrator.
+  </p>
+
+  <button class="admin-btn" id="openDriveBtn">
+    📁 Open School Drive
+  </button>
+
+  <br><br>
+
+  <button class="admin-btn" id="openMasterSheetBtn">
+    📊 Open Master Spreadsheet
+  </button>
+
+  <br><br>
+
+  <button class="admin-btn">
+    👥 Manage Teachers
+  </button>
+
+  <br><br>
+
+  <button class="admin-btn">
+    ⚙ School Settings
+  </button>
+
+  <br><br>
+
+  <button class="admin-btn" id="logoutAdminBtn">
+    🚪 Logout
+  </button>
+`;
+
+document
+  .getElementById("openAdminPortal")
+  .addEventListener(
+    "click",
+    function () {
+
+      const password =
+        document.getElementById(
+          "adminPortalPassword"
+        ).value;
+
+      if (!password) {
+        alert(
+          "Please enter Admin Password."
+        );
+        return;
+      }
+
+      document.querySelector(
+        ".admin-card"
+      ).innerHTML =
+        adminDashboardHTML;
+
+    }
+  );
+
 // ==========================
 // AUTO LOGOUT (1 MINUTE)
 // ==========================

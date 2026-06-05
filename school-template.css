@@ -408,16 +408,51 @@ button:hover {
 .admin-btn {
   width: 100%;
   padding: 12px;
-  background: #000066;
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  flex: 0;
+  width: 100%;
+  background: var(--primary-color);
 }
 
 .admin-btn:hover {
   opacity: 0.9;
 }
+
+.admin-text {
+  color: #555;
+  text-align: center;
+  margin: 15px 0 25px;
+  line-height: 1.5;
+}
+
+.admin-login {
+  width: 100%;
+}
+
+.admin-label {
+  display: block;
+  width: 100%;
+  margin-bottom: 8px;
+
+  color: var(--primary-color);
+  font-weight: 600;
+  text-align: left;
+}
+
+.admin-password-box {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.admin-password-box input {
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+
 
 /* MOBILE FIX */
 @media (max-width: 768px) {
