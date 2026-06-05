@@ -143,7 +143,43 @@
     <!-- SUBJECTS -->
     <section id="subjects" class="tab-content">
 
-  <h2>Subjects Management</h2>
+  <div
+  style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:15px;
+    gap:10px;
+    flex-wrap:wrap;
+  "
+>
+
+  <h2>
+    Subjects Management
+  </h2>
+
+  <div
+    style="
+      display:flex;
+      align-items:center;
+      gap:5px;
+    "
+  >
+
+    🔍
+
+    <input
+      type="text"
+      id="subjectSearch"
+      placeholder="Search school, Department or Subject..."
+      style="
+        padding:8px;
+        border-radius:6px;
+        border:1px solid #ccc;
+      "
+    >
+
+  </div>
 
   <button
     id="addSubjectBtn"
@@ -151,6 +187,8 @@
   >
     + Add Subject
   </button>
+
+</div>
 
   <div class="table-wrapper">
 
