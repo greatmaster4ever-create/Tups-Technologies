@@ -1423,34 +1423,122 @@ async function deleteSubject(id) {
 
   const confirmed =
     confirm(
-      "Delete this subject permanently?"
+      "This will:\n\n" +
+      "• Delete the subject\n" +
+      "• Move its Google Sheet to Drive Trash\n\n" +
+      "Continue?"
     );
 
-  if (!confirmed) return;
-
-  const { error } =
-    await supabaseClient
-      .from("subjects")
-      .delete()
-      .eq("id", id);
-
-  if (error) {
-
-    alert(
-      error.message
-    );
-
+  if (!confirmed)
     return;
 
+  try {
+
+    // Get subject record
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("subjects")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+    if (error)
+      throw error;
+
+    // Extract Spreadsheet ID
+
+    const spreadsheetId =
+      data.sheet_url
+        .split("/d/")[1]
+        .split("/")[0];
+
+    // Call Apps Script
+
+    const formData =
+      new URLSearchParams();
+
+    formData.append(
+      "action",
+      "deleteSheet"
+    );
+
+    formData.append(
+      "spreadsheetId",
+      spreadsheetId
+    );
+
+    const response =
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
+        {
+          method: "POST",
+          body:
+            formData
+        }
+      );
+
+    const text =
+      await response.text();
+
+    const result =
+      JSON.parse(
+        text
+      );
+
+    if (
+      !result.success
+    ) {
+
+      throw new Error(
+        result.error
+      );
+
+    }
+
+    // Delete Supabase row
+
+    const {
+      error:
+      deleteError
+    } =
+      await supabaseClient
+        .from(
+          "subjects"
+        )
+        .delete()
+        .eq(
+          "id",
+          id
+        );
+
+    if (
+      deleteError
+    )
+      throw deleteError;
+
+    alert(
+      "Subject Deleted Successfully"
+    );
+
+    loadSubjects();
+
+    loadDashboardStats();
+
+  } catch (err) {
+
+    console.error(
+      err
+    );
+
+    alert(
+      err.toString()
+    );
+
   }
-
-  alert(
-    "Subject Deleted"
-  );
-
-  loadSubjects();
-
-  loadDashboardStats();
 
 }
 
