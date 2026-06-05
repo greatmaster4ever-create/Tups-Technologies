@@ -29,30 +29,31 @@ body {
 }
 
 /* CONTAINER */
-.container {
-  width: 100%;
-  padding: 30px 60px;
-  margin: 0;
-  flex: 1;
-
-}
+background: rgba(255,255,255,0.1);
+backdrop-filter: blur(15px);
 
 /* HEADER */
 .header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 25px;
+  justify-content: center;
+
+  margin-bottom: 40px;
 }
 
 .school-title {
   color: white;
-  font-size: 18px;
+  font-size: 28px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 15px;
 }
 
 .school-logo {
-  width: 50px;
-  height: 50px;
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
 }
 
 /* FORM */
@@ -310,7 +311,8 @@ button:hover {
 /* SCHOOL CONTACT INFO */
 .school-contact {
   text-align: center;
-  margin-top: 10px;
+  margin-top: 40px;
+  margin-bottom: 20px;
   color: white;
 }
 
@@ -333,31 +335,50 @@ button:hover {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 60px;
+  gap: 70px;
   flex-wrap: wrap;
-  margin-top: 20px;
+
+  width: 100%;
 }
 
 /* BOTH CARDS SHARE BASE STYLE */
 .card {
- width: 100%;
- max-width: 420px;
+  width: 100%;
+  max-width: 420px;
+
+  padding: 30px;
+  border-radius: 18px;
+
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+
+  border: 1px solid rgba(255,255,255,0.18);
+
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+
   flex-shrink: 0;
-  border-radius: 12px;
 }
 
 /* TEACHER CARD (your existing form style stays dominant) */
 .teacher-card {
   background: rgba(255,255,255,0.12);
   backdrop-filter: blur(15px);
+  max-width: 420px;
 }
 
 /* ADMIN CARD (white clean contrast) */
 .admin-card {
+  max-width: 540px;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
   background: rgba(255,255,255,0.95);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-  text-align: center;
 }
+
 
 .admin-card h2 {
   color: #000066;
