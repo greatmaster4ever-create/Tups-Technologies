@@ -313,37 +313,63 @@ function toggleAdminPortalPassword() {
 const adminDashboardHTML = `
   <h2>School Administration</h2>
 
-  <p class="admin-text">
-    Welcome, Administrator.
-  </p>
+  <div class="admin-nav">
 
-  <button class="admin-btn" id="openDriveBtn">
-    📁 Open School Drive
-  </button>
+    <button
+      class="admin-tab"
+      onclick="showDrive()"
+    >
+      📁 School Drive
+    </button>
 
-  <br><br>
+    <button
+      class="admin-tab"
+      onclick="showMasterSheet()"
+    >
+      📊 Master Sheet
+    </button>
 
-  <button class="admin-btn" id="openMasterSheetBtn">
-    📊 Open Master Spreadsheet
-  </button>
+    <button
+      class="admin-tab"
+      onclick="showTeachers()"
+    >
+      👥 Teachers
+    </button>
 
-  <br><br>
+    <button
+      class="admin-tab"
+      onclick="showSettings()"
+    >
+      ⚙️ Settings
+    </button>
 
-  <button class="admin-btn">
-    👥 Manage Teachers
-  </button>
+    <button
+      class="admin-tab"
+      onclick="adminLogout()"
+    >
+      🚪 Logout
+    </button>
 
-  <br><br>
+  </div>
 
-  <button class="admin-btn">
-    ⚙ School Settings
-  </button>
+  <div
+    id="adminContent"
+    class="admin-content"
+  >
 
-  <br><br>
+    <h3>
+      Welcome
+    </h3>
 
-  <button class="admin-btn" id="logoutAdminBtn">
-    🚪 Logout
-  </button>
+    <p>
+      Welcome to the School Administration Portal.
+    </p>
+
+    <p>
+      Select an option from the menu above.
+    </p>
+
+  </div>
 `;
 
 document
@@ -371,6 +397,95 @@ document
 
     }
   );
+
+function showDrive() {
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+    <h3>📁 School Drive</h3>
+
+    <p>
+      Access the school's secure Google Drive workspace.
+    </p>
+
+    <br>
+
+    <button
+      id="openDriveBtn"
+      class="admin-btn"
+    >
+      Open School Drive
+    </button>
+
+  `;
+
+}
+
+function showMasterSheet() {
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+    <h3>📊 Master Spreadsheet</h3>
+
+    <p>
+      Access the school's master workbook.
+    </p>
+
+    <br>
+
+    <button
+      id="openMasterSheetBtn"
+      class="admin-btn"
+    >
+      Open Master Spreadsheet
+    </button>
+
+  `;
+
+}
+
+function showTeachers() {
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+    <h3>👥 Manage Teachers</h3>
+
+    <p>
+      This feature is coming soon.
+    </p>
+
+  `;
+
+}
+
+function showSettings() {
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+    <h3>⚙️ School Settings</h3>
+
+    <p>
+      This feature is coming soon.
+    </p>
+
+  `;
+
+}
+
+function adminLogout() {
+
+  location.reload();
+
+}
+
 
 // ==========================
 // AUTO LOGOUT (1 MINUTE)

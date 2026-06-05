@@ -467,3 +467,57 @@ button:hover {
   color: white;
   font-weight: 700;
 }
+/* ===========================
+   ADMIN DASHBOARD
+=========================== */
+
+.admin-nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  margin-top: 20px;
+  margin-bottom: 25px;
+}
+
+.admin-tab {
+  flex: 0;
+
+  padding: 10px 18px;
+
+  background: var(--primary-color);
+  color: white;
+
+  border: none;
+  border-radius: 8px;
+
+  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-tab:hover {
+  opacity: 0.9;
+}
+
+.admin-content {
+
+  background: rgba(245,245,245,1);
+
+  border-radius: 12px;
+
+  padding: 30px;
+
+  min-height: 280px;
+
+  color: #333;
+
+  text-align: center;
+}
+
+.admin-content h3 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
