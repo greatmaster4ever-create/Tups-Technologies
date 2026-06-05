@@ -485,7 +485,7 @@ button:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 3px;
 
   flex: 0 0 auto;
 
