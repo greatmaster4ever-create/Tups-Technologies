@@ -383,8 +383,8 @@ button:hover {
 
 /* ADMIN CARD (white clean contrast) */
   .admin-card {
-  max-width: 600px;
-  min-height: 300px;
+  max-width: 950px;
+  min-height: 350px;
   display: flex;
   flex-direction: column;
   justify-content: center;
