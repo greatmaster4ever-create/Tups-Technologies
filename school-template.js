@@ -429,24 +429,146 @@ function showMasterSheet() {
     "adminContent"
   ).innerHTML = `
 
-    <h3>📊 Master Spreadsheet</h3>
+    <h3>
+      🗂 Department Records
+    </h3>
 
-    <p>
-      Access the school's master workbook.
-    </p>
+    <div class="department-list">
 
-    <br>
+      ${createDepartment("CRECHE")}
+      ${createDepartment("KG")}
+      ${createDepartment("NURSERY")}
+      ${createDepartment("PRIMARY")}
+      ${createDepartment("JSEC")}
+      ${createDepartment("SSEC")}
 
-    <button
-      id="openMasterSheetBtn"
-      class="admin-btn"
-    >
-      Open Master Spreadsheet
-    </button>
+    </div>
 
   `;
 
 }
+
+function createDepartment(name) {
+
+  return `
+
+    <div class="department-item">
+
+      <button
+        class="department-header"
+        onclick="toggleDepartment('${name}')"
+      >
+        <span>${name}</span>
+
+        <span id="arrow-${name}">
+          ▶
+        </span>
+      </button>
+
+      <div
+        id="content-${name}"
+        class="department-content"
+      >
+
+        <button
+          class="resource-btn"
+          onclick="openMasterSpreadsheet('${name}')"
+        >
+          📄 Master Spreadsheet
+        </button>
+
+        <button
+          class="resource-btn"
+          onclick="openMasterBroadsheet('${name}')"
+        >
+          📊 Master Broadsheet
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+function toggleDepartment(
+  department
+) {
+
+  const allContents =
+    document.querySelectorAll(
+      ".department-content"
+    );
+
+  const allArrows =
+    document.querySelectorAll(
+      "[id^='arrow-']"
+    );
+
+  allContents.forEach(
+    item =>
+      item.style.display =
+      "none"
+  );
+
+  allArrows.forEach(
+    item =>
+      item.innerHTML =
+      "▶"
+  );
+
+  const content =
+    document.getElementById(
+      "content-" +
+      department
+    );
+
+  const arrow =
+    document.getElementById(
+      "arrow-" +
+      department
+    );
+
+  if (
+    content.dataset.open ===
+    "true"
+  ) {
+
+    content.dataset.open =
+      "false";
+
+    content.style.display =
+      "none";
+
+    arrow.innerHTML =
+      "▶";
+
+  } else {
+
+    document
+      .querySelectorAll(
+        ".department-content"
+      )
+      .forEach(
+        x =>
+          x.dataset.open =
+          "false"
+      );
+
+    content.dataset.open =
+      "true";
+
+    content.style.display =
+      "block";
+
+    arrow.innerHTML =
+      "▼";
+
+  }
+
+}
+
 
 function showTeachers() {
 

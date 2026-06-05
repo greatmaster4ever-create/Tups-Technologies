@@ -528,3 +528,84 @@ button:hover {
   color: var(--primary-color);
   margin-bottom: 20px;
 }
+
+.department-list {
+
+  margin-top: 20px;
+
+}
+
+.department-item {
+
+  margin-bottom: 12px;
+
+}
+
+.department-header {
+
+  width: 100%;
+
+  background: var(
+    --primary-color
+  );
+
+  color: white;
+
+  padding: 14px 18px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  cursor: pointer;
+
+}
+
+.department-content {
+
+  display: none;
+
+  margin-top: 8px;
+
+  padding-left: 20px;
+
+}
+
+.department-content .resource-btn {
+
+  display: block;
+
+  width: 100%;
+
+  margin-bottom: 8px;
+
+  background: rgba(
+    255,
+    255,
+    255,
+    0.15
+  );
+
+  border: 1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.2
+    );
+
+}
+
+.department-content .resource-btn:hover {
+
+  background: var(
+    --secondary-color
+  );
+
+}
