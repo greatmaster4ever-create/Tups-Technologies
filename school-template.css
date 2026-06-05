@@ -51,17 +51,20 @@ backdrop-filter: blur(15px);
 }
 
 .school-logo {
-  width: 100px;
-  height: 100px;
+  width: 90px;
+  height: 90px;
 
   object-fit: contain;
 
   background: rgba(255,255,255,0.95);
   padding: 8px;
 
-  border-radius: 50%;
+  border-radius: 45%;
 
   display: block;
+    margin-left: auto;
+  margin-right: auto;
+
 }
 
 /* FORM */
@@ -378,7 +381,7 @@ button:hover {
 /* ADMIN CARD (white clean contrast) */
   .admin-card {
   max-width: 600px;
-  min-height: 320px;
+  min-height: 300px;
   display: flex;
   flex-direction: column;
   justify-content: center;
