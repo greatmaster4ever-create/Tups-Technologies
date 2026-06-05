@@ -32,9 +32,6 @@ body {
 .container {
   width: 100%;
   padding: 30px 60px;
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(15px);
-
   margin: 0;
   flex: 1;
 
@@ -351,12 +348,13 @@ button:hover {
 
 /* TEACHER CARD (your existing form style stays dominant) */
 .teacher-card {
-  background: transparent;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(15px);
 }
 
 /* ADMIN CARD (white clean contrast) */
 .admin-card {
-  background: #ffffff;
+  background: rgba(255,255,255,0.95);
   box-shadow: 0 4px 15px rgba(0,0,0,0.15);
   text-align: center;
 }
