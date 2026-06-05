@@ -130,7 +130,6 @@ select {
 
 /* MAIN BUTTON */
 button {
-  flex: 1;
   padding: 12px;
   border: none;
   border-radius: 10px;
@@ -139,6 +138,10 @@ button {
   font-weight: bold;
   cursor: pointer;
   transition: 0.3s ease;
+}
+
+.button-row button {
+  flex: 1;
 }
 
 button:hover {
