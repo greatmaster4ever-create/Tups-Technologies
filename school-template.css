@@ -24,18 +24,20 @@ body {
               rgba(0,0,0,0.75)
             ),
             url('background_sch.jfif') no-repeat center center / cover;
+
+  justify-content: flex-start;
 }
 
 /* CONTAINER */
 .container {
-    width: 95%;
-  max-width: 1000px;
-  border-radius: 20px;
+  width: 100%;
+  padding: 30px 60px;
   background: rgba(255,255,255,0.1);
   backdrop-filter: blur(15px);
 
-  /* 🔥 centers form properly but allows footer space */
-  margin: auto;
+  margin: 0;
+  flex: 1;
+
 }
 
 /* HEADER */
@@ -334,14 +336,15 @@ button:hover {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 30px;
+  gap: 60px;
   flex-wrap: wrap;
-  margin-top: 40px;
+  margin-top: 20px;
 }
 
 /* BOTH CARDS SHARE BASE STYLE */
 .card {
- width: 380px;
+ width: 100%;
+ max-width: 420px;
   flex-shrink: 0;
   border-radius: 12px;
 }
