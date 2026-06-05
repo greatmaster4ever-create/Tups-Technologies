@@ -46,9 +46,14 @@
 
     </div>
 
-    <form id="subjectForm">
+   <div class="login-container">
 
-      <!-- ACCESS TYPE -->
+      <!-- LEFT CARD (TEACHER LOGIN) -->
+    <div class="card teacher-card">
+
+        <form id="subjectForm">
+
+         <!-- ACCESS TYPE -->
       <div class="form-row">
         <label>Access Type</label>
 
@@ -122,11 +127,31 @@
           Change Password
         </button>
 
-      </div>
+         </div>
 
-    </form>
+        </form>
+
+       </div>
+
+     <!-- RIGHT CARD (ADMIN LOGIN) -->
+  <div class="card admin-card">
+
+    <h2>School Administration</h2>
+
+    <p>Access administrative tools and school management dashboard.</p>
+
+    <button
+      id="openAdminPortal"
+      class="admin-btn"
+    >
+      Admin Portal
+    </button>
 
   </div>
+
+</div>
+
+</div>
 
   <!-- PASSWORD CHANGE MODAL -->
   <div id="passwordModal" class="modal">

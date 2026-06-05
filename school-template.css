@@ -330,3 +330,64 @@ button:hover {
   font-size: 14px;
   margin: 4px 0;
 }
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 40px;
+}
+
+/* BOTH CARDS SHARE BASE STYLE */
+.card {
+  width: 340px;
+  padding: 25px;
+  border-radius: 12px;
+}
+
+/* TEACHER CARD (your existing form style stays dominant) */
+.teacher-card {
+  background: transparent;
+}
+
+/* ADMIN CARD (white clean contrast) */
+.admin-card {
+  background: #ffffff;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  text-align: center;
+}
+
+.admin-card h2 {
+  color: #000066;
+  margin-bottom: 10px;
+}
+
+.admin-card p {
+  color: #555;
+  margin-bottom: 20px;
+}
+
+/* ADMIN BUTTON */
+.admin-btn {
+  width: 100%;
+  padding: 12px;
+  background: #000066;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.admin-btn:hover {
+  opacity: 0.9;
+}
+
+/* MOBILE FIX */
+@media (max-width: 768px) {
+  .login-container {
+    flex-direction: column;
+    align-items: center;
+  }
+}
