@@ -394,10 +394,9 @@ document
         ".admin-card"
       ).innerHTML =
         adminDashboardHTML;
-        loadDepartmentResources();
-
     }
   );
+
 
 function showDrive() {
 
