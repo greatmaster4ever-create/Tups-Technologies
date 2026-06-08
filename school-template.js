@@ -326,7 +326,7 @@ const adminDashboardHTML = `
       class="admin-tab"
       onclick="showMasterSheet()"
     >
-      📊 Master Sheet
+      📊 Master Sheets
     </button>
 
     <button
@@ -502,7 +502,23 @@ function renderDepartments(data) {
 }
 
 function openSheet(url) {
-  window.open(url, "_blank");
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+    <iframe
+      src="${url}"
+      style="
+        width:100%;
+        height:700px;
+        border:none;
+        border-radius:10px;
+      ">
+    </iframe>
+
+  `;
+
 }
 
 
