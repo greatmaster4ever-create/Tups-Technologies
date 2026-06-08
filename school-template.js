@@ -522,23 +522,32 @@ async function showMasterSheet() {
 
 function toggleDepartment(department) {
 
-  const safe = department.replace(/\s+/g, "_");
+  console.log(
+    "CLICKED:",
+    department
+  );
 
-  document.querySelectorAll(".department-dropdown")
-    .forEach(item => {
-      if (item.id !== "dropdown-" + safe) {
-        item.style.display = "none";
-      }
-    });
+  const safe =
+    department.replace(/\s+/g, "_");
 
-  const dropdown = document.getElementById("dropdown-" + safe);
+  const dropdown =
+    document.getElementById(
+      "dropdown-" + safe
+    );
+
+  console.log(
+    "FOUND:",
+    dropdown
+  );
 
   if (!dropdown) return;
 
   dropdown.style.display =
-    dropdown.style.display === "block" ? "none" : "block";
-}
+    dropdown.style.display === "block"
+      ? "none"
+      : "block";
 
+}
 
 function showTeachers() {
 
