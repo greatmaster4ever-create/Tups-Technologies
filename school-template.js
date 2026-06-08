@@ -423,75 +423,6 @@ function showDrive() {
 
 }
 
-async function showMasterSheet() {
-
-  const adminContent =
-    document.getElementById(
-      "adminContent"
-    );
-
-  adminContent.innerHTML =
-    "<p>Loading records...</p>";
-
-  const { data, error } =
-    await supabaseClient
-      .from(
-        "department_resources"
-      )
-      .select("*")
-      .eq(
-        "school_code",
-        schoolCode
-      )
-      .order(
-        "department",
-        {
-          ascending: true
-        }
-      );
-
-  if (error) {
-
-    console.error(error);
-
-    adminContent.innerHTML =
-      "<p>Failed to load records.</p>";
-
-    return;
-
-  }
-
-  let html =
-    '<div class="department-list">';
-
- for (const dept of data) {
-
-  console.log(
-    "DEPARTMENT:",
-    dept
-  );
-
-  const card =
-    createDepartment(
-      dept
-    );
-
-  console.log(
-    "CARD:",
-    card
-  );
-
-  html += card;
-
-}
-
-  html += "</div>";
-  console.log(html);
-
-  adminContent.innerHTML =
-    html;
-   
-}
 
 
 function createDepartment(
@@ -568,6 +499,56 @@ function createDepartment(
   `;
 
 }
+
+async function showMasterSheet() {
+
+  const { data, error } = await supabaseClient
+    .from("departmentResources")
+    .select("*")
+    .eq("school_code", schoolCode);
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  console.log("MASTER SHEET DATA:", data);
+
+  let html = "<div class='department-list'>";
+
+  for (const row of data) {
+
+    html += `
+      <div class="department-item">
+
+        <div class="department-header">
+          ${row.department}
+        </div>
+
+        <div class="department-dropdown">
+
+          <div class="dropdown-item"
+            onclick="window.open('${row.master_sheet_url}', '_blank')">
+            📊 Open Master Sheet
+          </div>
+
+          <div class="dropdown-item"
+            onclick="window.open('${row.broadsheet_url}', '_blank')">
+            📑 Open Broadsheet
+          </div>
+
+        </div>
+
+      </div>
+    `;
+
+  }
+
+  html += "</div>";
+
+  document.getElementById("adminContent").innerHTML = html;
+}
+
 
 function toggleDepartment(
   department
