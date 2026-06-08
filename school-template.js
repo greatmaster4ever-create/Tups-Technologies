@@ -464,18 +464,26 @@ async function showMasterSheet() {
   let html =
     '<div class="department-list">';
 
-  data.forEach(
-  dept => {
+ for (const dept of data) {
 
-    console.log(dept);
+  console.log(
+    "DEPARTMENT:",
+    dept
+  );
 
-    html +=
-      createDepartment(
-        dept
-      );
+  const card =
+    createDepartment(
+      dept
+    );
 
-  }
-);
+  console.log(
+    "CARD:",
+    card
+  );
+
+  html += card;
+
+}
 
   html += "</div>";
   console.log(html);
