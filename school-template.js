@@ -434,7 +434,7 @@ async function loadDepartmentResources() {
   const { data, error } = await supabaseClient
     .from("department_resources")
     .select("*")
-    .eq("school_code", schoolCode);
+    
 
   if (error) {
     console.error(error);
