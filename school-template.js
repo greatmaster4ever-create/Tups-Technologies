@@ -425,83 +425,12 @@ function showDrive() {
 
 
 
-function createDepartment(
-  dept
-) {
 
-  return `
 
-  <div class="department-item">
+async function loadDepartmentResources() {
 
-    <div
-      class="department-header"
-
-      onclick="
-        toggleDepartment(
-          '${dept.department}'
-        )
-      "
-
-    >
-
-      ${dept.department}
-
-    </div>
-
-    <div
-
-      class="department-dropdown"
-
-      id="
-        dropdown-${dept.department}
-      "
-
-    >
-
-      <div
-
-        class="dropdown-item"
-
-        onclick="
-          window.open(
-            '${dept.spreadsheet_url}',
-            '_blank'
-          )
-        "
-
-      >
-
-        📋 Master Spreadsheet
-
-      </div>
-
-      <div
-
-        class="dropdown-item"
-
-        onclick="
-          window.open(
-            '${dept.broadsheet_url}',
-            '_blank'
-          )
-        "
-
-      >
-
-        📊 Master Broadsheet
-
-      </div>
-
-    </div>
-
-  </div>
-
-  `;
-
-}
-
-async function showMasterSheet() {
   console.log("CURRENT SCHOOL CODE:", schoolCode);
+
   const { data, error } = await supabaseClient
     .from("department_resources")
     .select("*")
@@ -509,91 +438,105 @@ async function showMasterSheet() {
 
   if (error) {
     console.error(error);
-    return;
+    return [];
   }
 
   console.log("MASTER SHEET DATA:", data);
 
+  return data || [];
+}
+
+
+function renderDepartments(data) {
+
   let html = "<div class='department-list'>";
 
-  for (const row of data) {
+  data.forEach(row => {
+
+    const safeId =
+      row.department.replace(/\s+/g, "_");
 
     html += `
-      <div class="department-item">
+  <div class="department-item">
 
-        <div class="department-header">
-          ${row.department}
-        </div>
+    <div
+      class="department-header"
+      onclick="toggleDepartment('${row.department}')"
+    >
 
-        <div class="department-dropdown">
+      ${row.department}
 
-          <div class="dropdown-item"
-            onclick="window.open('${row.master_sheet_url}', '_blank')">
-            📊 Open Master Sheet
-          </div>
+    </div>
 
-          <div class="dropdown-item"
-            onclick="window.open('${row.broadsheet_url}', '_blank')">
-            📑 Open Broadsheet
-          </div>
+    <div
+      class="department-dropdown"
+      id="dropdown-${safeId}"
+    >
 
-        </div>
-
+      <div
+        class="dropdown-item"
+        onclick="openSheet('${row.master_sheet_url}')"
+      >
+        📊 Open Master Sheet
       </div>
-    `;
 
-  }
+      <div
+        class="dropdown-item"
+        onclick="openSheet('${row.broadsheet_url}')"
+      >
+        📑 Open Broadsheet
+      </div>
+
+    </div>
+
+  </div>
+`;
+
+  });
 
   html += "</div>";
 
   document.getElementById("adminContent").innerHTML = html;
 }
 
-function toggleDepartment(
-  department
-) {
+function openSheet(url) {
+  window.open(url, "_blank");
+}
 
-  document
-    .querySelectorAll(
-      ".department-dropdown"
-    )
-    .forEach(
-      item => {
 
-        if (
-          item.id !==
-          "dropdown-" +
-          department
-        ) {
-          item.style.display =
-            "none";
-        }
+async function showMasterSheet() {
 
-      }
-    );
+  const data = await loadDepartmentResources();
 
-  const dropdown =
-    document.getElementById(
-      "dropdown-" +
-      department
-    );
-
-  if (
-    dropdown.style.display ===
-    "block"
-  ) {
-
-    dropdown.style.display =
-      "none";
-
-  } else {
-
-    dropdown.style.display =
-      "block";
-
+  if (!data.length) {
+    document.getElementById("adminContent").innerHTML =
+      "<p>No departments found.</p>";
+    return;
   }
 
+  renderDepartments(data);
 }
+
+
+function toggleDepartment(department) {
+
+  const safe = department.replace(/\s+/g, "_");
+
+  document.querySelectorAll(".department-dropdown")
+    .forEach(item => {
+      if (item.id !== "dropdown-" + safe) {
+        item.style.display = "none";
+      }
+    });
+
+  const dropdown = document.getElementById("dropdown-" + safe);
+
+  if (!dropdown) return;
+
+  dropdown.style.display =
+    dropdown.style.display === "block" ? "none" : "block";
+}
+
 
 function showTeachers() {
 
