@@ -475,7 +475,7 @@ function renderDepartments(data) {
 
       <div
         class="dropdown-item"
-        onclick="openSheet('${row.master_sheet_url}')"
+        onclick="openSheet('${row.spreadsheet_url}')"
       >
         📊 Open Master Sheet
       </div>
