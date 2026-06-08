@@ -465,21 +465,24 @@ async function showMasterSheet() {
     '<div class="department-list">';
 
   data.forEach(
-    dept => {
+  dept => {
 
-      html +=
-        createDepartment(
-          dept
-        );
+    console.log(dept);
 
-    }
-  );
+    html +=
+      createDepartment(
+        dept
+      );
+
+  }
+);
 
   html += "</div>";
+  console.log(html);
 
   adminContent.innerHTML =
     html;
-
+   
 }
 
 
