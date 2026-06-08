@@ -451,10 +451,12 @@ function renderDepartments(data) {
 
   let html = "<div class='department-list'>";
 
-  data.forEach(row => {
+ data.forEach(row => {
 
-    const safeId =
-      row.department.replace(/\s+/g, "_");
+  if (!row.department) return;
+
+  const safeId =
+    row.department.replace(/\s+/g, "_");
 
     html += `
   <div class="department-item">
