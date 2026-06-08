@@ -394,6 +394,7 @@ document
         ".admin-card"
       ).innerHTML =
         adminDashboardHTML;
+        loadDepartmentResources();
 
     }
   );
@@ -423,70 +424,136 @@ function showDrive() {
 
 }
 
-function showMasterSheet() {
+async function showMasterSheet() {
 
-  document.getElementById(
-    "adminContent"
-  ).innerHTML = `
+  const adminContent =
+    document.getElementById(
+      "adminContent"
+    );
 
-    <h3>
-      🗂 Department Records
-    </h3>
+  adminContent.innerHTML =
+    "<p>Loading records...</p>";
 
-    <div class="department-list">
+  const { data, error } =
+    await supabaseClient
+      .from(
+        "department_resources"
+      )
+      .select("*")
+      .eq(
+        "school_code",
+        schoolCode
+      )
+      .order(
+        "department",
+        {
+          ascending: true
+        }
+      );
 
-      ${createDepartment("CRECHE")}
-      ${createDepartment("KG")}
-      ${createDepartment("NURSERY")}
-      ${createDepartment("PRIMARY")}
-      ${createDepartment("JSEC")}
-      ${createDepartment("SSEC")}
+  if (error) {
 
-    </div>
+    console.error(error);
 
-  `;
+    adminContent.innerHTML =
+      "<p>Failed to load records.</p>";
+
+    return;
+
+  }
+
+  let html =
+    '<div class="department-list">';
+
+  data.forEach(
+    dept => {
+
+      html +=
+        createDepartment(
+          dept
+        );
+
+    }
+  );
+
+  html += "</div>";
+
+  adminContent.innerHTML =
+    html;
 
 }
 
-function createDepartment(name) {
+
+function createDepartment(
+  dept
+) {
 
   return `
 
-    <div class="department-item">
+  <div class="department-item">
 
-      <button
-        class="department-header"
-        onclick="toggleDepartment('${name}')"
-      >
-        <span>${name}</span>
+    <div
+      class="department-header"
 
-        <span id="arrow-${name}">
-          ▶
-        </span>
-      </button>
+      onclick="
+        toggleDepartment(
+          '${dept.department}'
+        )
+      "
+
+    >
+
+      ${dept.department}
+
+    </div>
+
+    <div
+
+      class="department-dropdown"
+
+      id="
+        dropdown-${dept.department}
+      "
+
+    >
 
       <div
-        id="content-${name}"
-        class="department-content"
+
+        class="dropdown-item"
+
+        onclick="
+          window.open(
+            '${dept.spreadsheet_url}',
+            '_blank'
+          )
+        "
+
       >
 
-        <button
-          class="resource-btn"
-          onclick="openMasterSpreadsheet('${name}')"
-        >
-          📄 Master Spreadsheet
-        </button>
+        📋 Master Spreadsheet
 
-        <button
-          class="resource-btn"
-          onclick="openMasterBroadsheet('${name}')"
-        >
-          📊 Master Broadsheet
-        </button>
+      </div>
+
+      <div
+
+        class="dropdown-item"
+
+        onclick="
+          window.open(
+            '${dept.broadsheet_url}',
+            '_blank'
+          )
+        "
+
+      >
+
+        📊 Master Broadsheet
 
       </div>
 
     </div>
+
+  </div>
 
   `;
 
@@ -496,79 +563,47 @@ function toggleDepartment(
   department
 ) {
 
-  const allContents =
-    document.querySelectorAll(
-      ".department-content"
+  document
+    .querySelectorAll(
+      ".department-dropdown"
+    )
+    .forEach(
+      item => {
+
+        if (
+          item.id !==
+          "dropdown-" +
+          department
+        ) {
+          item.style.display =
+            "none";
+        }
+
+      }
     );
 
-  const allArrows =
-    document.querySelectorAll(
-      "[id^='arrow-']"
-    );
-
-  allContents.forEach(
-    item =>
-      item.style.display =
-      "none"
-  );
-
-  allArrows.forEach(
-    item =>
-      item.innerHTML =
-      "▶"
-  );
-
-  const content =
+  const dropdown =
     document.getElementById(
-      "content-" +
-      department
-    );
-
-  const arrow =
-    document.getElementById(
-      "arrow-" +
+      "dropdown-" +
       department
     );
 
   if (
-    content.dataset.open ===
-    "true"
+    dropdown.style.display ===
+    "block"
   ) {
 
-    content.dataset.open =
-      "false";
-
-    content.style.display =
+    dropdown.style.display =
       "none";
-
-    arrow.innerHTML =
-      "▶";
 
   } else {
 
-    document
-      .querySelectorAll(
-        ".department-content"
-      )
-      .forEach(
-        x =>
-          x.dataset.open =
-          "false"
-      );
-
-    content.dataset.open =
-      "true";
-
-    content.style.display =
+    dropdown.style.display =
       "block";
-
-    arrow.innerHTML =
-      "▼";
 
   }
 
 }
-
 
 function showTeachers() {
 

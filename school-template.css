@@ -581,3 +581,18 @@ button:hover {
   );
 
 }
+
+.department-dropdown{
+  display:none;
+  margin-top:8px;
+}
+
+.dropdown-item{
+  padding:10px;
+  cursor:pointer;
+  border-radius:8px;
+}
+
+.dropdown-item:hover{
+  background:rgba(255,255,255,.15);
+}
