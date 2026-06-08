@@ -501,7 +501,7 @@ function createDepartment(
 }
 
 async function showMasterSheet() {
-
+  console.log("CURRENT SCHOOL CODE:", schoolCode);
   const { data, error } = await supabaseClient
     .from("department_resources")
     .select("*")
