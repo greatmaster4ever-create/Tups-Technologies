@@ -503,7 +503,7 @@ function createDepartment(
 async function showMasterSheet() {
 
   const { data, error } = await supabaseClient
-    .from("departmentResources")
+    .from("department_resources")
     .select("*")
     .eq("school_code", schoolCode);
 
@@ -548,7 +548,6 @@ async function showMasterSheet() {
 
   document.getElementById("adminContent").innerHTML = html;
 }
-
 
 function toggleDepartment(
   department
