@@ -656,23 +656,32 @@ if (yearEl) {
   yearEl.textContent = new Date().getFullYear();
 }
 
+
 document.addEventListener("click", async (e) => {
 
   if (e.target && e.target.id === "openDriveBtn") {
 
     document.getElementById("adminContent").innerHTML =
-      "<p>Loading School Drive...</p>";
+      "<p>Opening School Drive...</p>";
 
-    const data = await loadDepartmentResources();
+    const res = await fetch(SUPABASE_URL + "/exec", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        action: "openSchoolDrive",
+        schoolCode: schoolCode
+      })
+    });
 
-    if (!data.length) {
+    const data = await res.json();
+
+    if (data.success) {
+      window.open(data.url, "_blank"); // opens Drive folder
+    } else {
       document.getElementById("adminContent").innerHTML =
-        "<p>No Drive data found.</p>";
-      return;
+        "<p>Drive not found.</p>";
     }
-
-    renderDepartments(data);
   }
-});
 
+});
 
