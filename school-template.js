@@ -425,8 +425,6 @@ function showDrive() {
 
 
 
-
-
 async function loadDepartmentResources() {
 
   console.log("CURRENT SCHOOL CODE:", schoolCode);
@@ -657,3 +655,24 @@ const yearEl = document.getElementById("year");
 if (yearEl) {
   yearEl.textContent = new Date().getFullYear();
 }
+
+document.addEventListener("click", async (e) => {
+
+  if (e.target && e.target.id === "openDriveBtn") {
+
+    document.getElementById("adminContent").innerHTML =
+      "<p>Loading School Drive...</p>";
+
+    const data = await loadDepartmentResources();
+
+    if (!data.length) {
+      document.getElementById("adminContent").innerHTML =
+        "<p>No Drive data found.</p>";
+      return;
+    }
+
+    renderDepartments(data);
+  }
+});
+
+
