@@ -664,7 +664,7 @@ document.addEventListener("click", async (e) => {
     document.getElementById("adminContent").innerHTML =
       "<p>Opening School Drive...</p>";
 
-    const res = await fetch(SUPABASE_URL + "/exec", {
+    const res = await fetch("https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
