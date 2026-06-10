@@ -1560,6 +1560,11 @@ if (!data.sheet_url) {
 
 async function deleteSchool(schoolCode) {
 
+  console.log(
+    "schoolCode passed:",
+    schoolCode
+  );
+
   const confirmed =
     confirm(
       `WARNING!\n\n` +
@@ -1576,9 +1581,12 @@ async function deleteSchool(schoolCode) {
 
   try {
 
-    // Delete subjects
+    // ==========================
+    // DELETE SUBJECTS
+    // ==========================
 
     const {
+      data: deletedSubjects,
       error: subjectsError
     } =
       await supabaseClient
@@ -1587,32 +1595,48 @@ async function deleteSchool(schoolCode) {
         .eq(
           "school_code",
           schoolCode
-        );
+        )
+        .select();
+
+    console.log(
+      "Deleted Subjects:",
+      deletedSubjects
+    );
 
     if (subjectsError)
       throw subjectsError;
 
-    // Delete department resources
+    // ==========================
+    // DELETE DEPARTMENT RESOURCES
+    // ==========================
 
     const {
+      data: deletedResources,
       error: resourcesError
     } =
       await supabaseClient
-        .from(
-          "department_resources"
-        )
+        .from("department_resources")
         .delete()
         .eq(
           "school_code",
           schoolCode
-        );
+        )
+        .select();
+
+    console.log(
+      "Deleted Resources:",
+      deletedResources
+    );
 
     if (resourcesError)
       throw resourcesError;
 
-    // Delete school
+    // ==========================
+    // DELETE SCHOOL
+    // ==========================
 
     const {
+      data: deletedSchool,
       error: schoolError
     } =
       await supabaseClient
@@ -1621,12 +1645,20 @@ async function deleteSchool(schoolCode) {
         .eq(
           "school_code",
           schoolCode
-        );
+        )
+        .select();
+
+    console.log(
+      "Deleted School:",
+      deletedSchool
+    );
 
     if (schoolError)
       throw schoolError;
 
-    // Delete Drive folder
+    // ==========================
+    // DELETE DRIVE FOLDER
+    // ==========================
 
     const formData =
       new URLSearchParams();
@@ -1641,12 +1673,21 @@ async function deleteSchool(schoolCode) {
       schoolCode
     );
 
-    await fetch(
-      "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
-      {
-        method: "POST",
-        body: formData
-      }
+    const response =
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
+        {
+          method: "POST",
+          body: formData
+        }
+      );
+
+    const text =
+      await response.text();
+
+    console.log(
+      "Apps Script Response:",
+      text
     );
 
     alert(
@@ -1660,7 +1701,10 @@ async function deleteSchool(schoolCode) {
 
   } catch (err) {
 
-    console.error(err);
+    console.error(
+      "DELETE ERROR:",
+      err
+    );
 
     alert(
       err.toString()
