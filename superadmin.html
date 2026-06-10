@@ -122,6 +122,23 @@
       View School/Admin Passwords
     </button>
 
+
+<div
+  style="
+    margin-top:10px;
+  "
+>
+
+  <button
+    id="viewSchoolDetailsBtn"
+    class="action-btn"
+  >
+    View School Details
+  </button>
+
+</div>
+
+
   </div>
 
   <!-- PASSWORD TABLE -->
@@ -177,6 +194,68 @@
     </div>
 
   </div>
+
+<div
+  id="schoolDetailsSection"
+  style="
+    display:none;
+    margin-top:20px;
+  "
+>
+
+  <input
+    type="text"
+    id="schoolDetailsSearch"
+    placeholder="Search School..."
+    style="
+      width:100%;
+      margin-bottom:15px;
+      padding:10px;
+      border-radius:6px;
+      border:1px solid #ccc;
+    "
+  >
+
+  <table>
+
+    <thead>
+
+      <tr>
+
+        <th>School Code</th>
+
+        <th>School Name</th>
+
+        <th>Status</th>
+
+        <th>Action</th>
+
+      </tr>
+
+    </thead>
+
+    <tbody
+      id="schoolDetailsBody"
+    >
+    </tbody>
+
+  </table>
+
+</div>
+
+<div
+  id="schoolProfileCard"
+  style="
+    display:none;
+    margin-top:20px;
+    background:#fff;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+  "
+>
+</div>
+
 
 </section>
 
