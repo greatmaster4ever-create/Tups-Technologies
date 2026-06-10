@@ -81,33 +81,104 @@
     </header>
 
     <!-- DASHBOARD -->
-    <section id="dashboard" class="tab-content active-tab">
+<section id="dashboard" class="tab-content active-tab">
 
-      <div class="cards">
+  <div class="cards">
 
-        <div class="card">
-          <h3>Total Schools</h3>
-          <p id="totalSchools">0</p>
-        </div>
+    <div class="card">
+      <h3>Total Schools</h3>
+      <p id="totalSchools">0</p>
+    </div>
 
-        <div class="card">
-          <h3>Active Schools</h3>
-          <p id="activeSchools">0</p>
-        </div>
+    <div class="card">
+      <h3>Active Schools</h3>
+      <p id="activeSchools">0</p>
+    </div>
 
-        <div class="card">
-          <h3>Inactive Schools</h3>
-          <p id="inactiveSchools">0</p>
-        </div>
+    <div class="card">
+      <h3>Inactive Schools</h3>
+      <p id="inactiveSchools">0</p>
+    </div>
 
-        <div class="card">
-          <h3>Total Subjects</h3>
-          <p id="totalSubjects">0</p>
-        </div>
+    <div class="card">
+      <h3>Total Subjects</h3>
+      <p id="totalSubjects">0</p>
+    </div>
 
-      </div>
+  </div>
 
-    </section>
+  <!-- PASSWORD VIEWER BUTTON -->
+
+  <div
+    style="
+      margin-top:20px;
+    "
+  >
+
+    <button
+      id="viewPasswordsBtn"
+      class="action-btn"
+    >
+      View School/Admin Passwords
+    </button>
+
+  </div>
+
+  <!-- PASSWORD TABLE -->
+
+  <div
+    id="passwordViewerSection"
+    style="
+      display:none;
+      margin-top:20px;
+    "
+  >
+
+    <input
+      type="text"
+      id="passwordSearch"
+      placeholder="Search School..."
+      style="
+        width:100%;
+        margin-bottom:15px;
+        padding:10px;
+        border:1px solid #ccc;
+        border-radius:6px;
+      "
+    >
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>School Code</th>
+
+            <th>School Name</th>
+
+            <th>School Password</th>
+
+            <th>Admin Password</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody
+          id="passwordTableBody"
+        >
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</section>
 
     <!-- SCHOOLS -->
    <section id="schools" class="tab-content">

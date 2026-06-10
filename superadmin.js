@@ -439,6 +439,92 @@ async function loadSheets() {
 
 }
 
+async function loadPasswords() {
+
+  try {
+
+    const {
+      data: schools,
+      error: schoolError
+    } =
+      await supabaseClient
+        .from("schools")
+        .select(
+          "school_code, School_name, password"
+        )
+        .order("school_code");
+
+    if (schoolError)
+      throw schoolError;
+
+    const {
+      data: subjects,
+      error: subjectError
+    } =
+      await supabaseClient
+        .from("subjects")
+        .select(
+          "school_code, admin_password"
+        );
+
+    if (subjectError)
+      throw subjectError;
+
+    const adminPasswords = {};
+
+    subjects.forEach(row => {
+
+      if (
+        !adminPasswords[
+          row.school_code
+        ]
+      ) {
+
+        adminPasswords[
+          row.school_code
+        ] =
+          row.admin_password;
+
+      }
+
+    });
+
+    const tbody =
+      document.getElementById(
+        "passwordTableBody"
+      );
+
+    tbody.innerHTML = "";
+
+    schools.forEach(row => {
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${row.school_code}</td>
+          <td>${row.School_name}</td>
+          <td>${row.password || ""}</td>
+          <td>${adminPasswords[row.school_code] || ""}</td>
+        </tr>
+      `;
+
+    });
+
+  } catch (err) {
+
+    console.error(
+      "PASSWORD LOAD ERROR:",
+      err
+    );
+
+    alert(
+      err.message
+    );
+
+  }
+
+}
+
+
 document
   .getElementById(
     "sheetSearch"
@@ -1816,8 +1902,88 @@ document
     }
   );
 
+const viewPasswordsBtn =
+  document.getElementById(
+    "viewPasswordsBtn"
+  );
+
+if (viewPasswordsBtn) {
+
+  viewPasswordsBtn
+    .addEventListener(
+      "click",
+      async () => {
+
+        const section =
+          document.getElementById(
+            "passwordViewerSection"
+          );
+
+        if (
+          section.style.display ===
+          "none"
+        ) {
+
+          await loadPasswords();
+
+          section.style.display =
+            "block";
+
+        } else {
+
+          section.style.display =
+            "none";
+
+        }
+
+      }
+    );
+
+}
+
+const passwordSearch =
+  document.getElementById(
+    "passwordSearch"
+  );
+
+if (passwordSearch) {
+
+  passwordSearch
+    .addEventListener(
+      "keyup",
+      function () {
+
+        const search =
+          this.value
+            .toLowerCase();
+
+        const rows =
+          document.querySelectorAll(
+            "#passwordTableBody tr"
+          );
+
+        rows.forEach(
+          row => {
+
+            row.style.display =
+              row.innerText
+                .toLowerCase()
+                .includes(
+                  search
+                )
+              ? ""
+              : "none";
+
+          }
+        );
+
+      }
+    );
+
+}
 
 loadDashboardStats();
 loadSchools();
 loadSubjects();
 loadSheets();
+
