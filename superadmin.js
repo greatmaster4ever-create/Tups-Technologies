@@ -11,6 +11,47 @@ const supabaseClient =
     supabaseKey
   );
 
+// ==========================
+// GLOBAL LOADER
+// ==========================
+
+function showLoader(
+  message = "Processing..."
+) {
+
+  const loader =
+    document.getElementById(
+      "globalLoader"
+    );
+
+  const text =
+    document.getElementById(
+      "loaderText"
+    );
+
+  if (text)
+    text.innerText = message;
+
+  if (loader)
+    loader.style.display =
+      "flex";
+
+}
+
+function hideLoader() {
+
+  const loader =
+    document.getElementById(
+      "globalLoader"
+    );
+
+  if (loader)
+    loader.style.display =
+      "none";
+
+}
+
+
 /* ==========================
    SESSION PROTECTION
 ========================== */
@@ -2293,3 +2334,12 @@ loadSchools();
 loadSubjects();
 loadSheets();
 
+showLoader(
+  "Testing Loader..."
+);
+
+setTimeout(() => {
+
+  hideLoader();
+
+}, 3000);
