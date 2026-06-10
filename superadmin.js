@@ -1560,10 +1560,7 @@ if (!data.sheet_url) {
 
 async function deleteSchool(schoolCode) {
 
-  console.log(
-    "schoolCode passed:",
-    schoolCode
-  );
+  console.log("schoolCode passed:", schoolCode);
 
   const confirmed =
     confirm(
@@ -1573,11 +1570,40 @@ async function deleteSchool(schoolCode) {
       `• All Subjects\n` +
       `• All Department Resources\n` +
       `• Entire School Drive Folder\n\n` +
-      `Continue?`
+      `Do you want to continue?`
     );
 
-  if (!confirmed)
+  if (!confirmed) return;
+
+  // ==========================
+  // SECOND SAFETY CHECK (INPUT)
+  // ==========================
+
+  const inputCode = prompt(
+    `Type the school code "${schoolCode}" to confirm deletion:`
+  );
+
+  if (!inputCode) {
+    alert("Deletion cancelled.");
     return;
+  }
+
+  if (inputCode.trim() !== schoolCode) {
+    alert("School code does not match. Deletion aborted.");
+    return;
+  }
+
+  // ==========================
+  // FINAL CONFIRMATION
+  // ==========================
+
+  const finalConfirm = confirm(
+    "FINAL WARNING:\n\n" +
+    "This action is irreversible.\n\n" +
+    "Click OK to permanently delete."
+  );
+
+  if (!finalConfirm) return;
 
   try {
 
@@ -1585,114 +1611,67 @@ async function deleteSchool(schoolCode) {
     // DELETE SUBJECTS
     // ==========================
 
-    const {
-      data: deletedSubjects,
-      error: subjectsError
-    } =
+    const { data: deletedSubjects, error: subjectsError } =
       await supabaseClient
         .from("subjects")
         .delete()
-        .eq(
-          "school_code",
-          schoolCode
-        )
+        .eq("school_code", schoolCode)
         .select();
 
-    console.log(
-      "Deleted Subjects:",
-      deletedSubjects
-    );
+    console.log("Deleted Subjects:", deletedSubjects);
 
-    if (subjectsError)
-      throw subjectsError;
+    if (subjectsError) throw subjectsError;
 
     // ==========================
-    // DELETE DEPARTMENT RESOURCES
+    // DELETE RESOURCES
     // ==========================
 
-    const {
-      data: deletedResources,
-      error: resourcesError
-    } =
+    const { data: deletedResources, error: resourcesError } =
       await supabaseClient
         .from("department_resources")
         .delete()
-        .eq(
-          "school_code",
-          schoolCode
-        )
+        .eq("school_code", schoolCode)
         .select();
 
-    console.log(
-      "Deleted Resources:",
-      deletedResources
-    );
+    console.log("Deleted Resources:", deletedResources);
 
-    if (resourcesError)
-      throw resourcesError;
+    if (resourcesError) throw resourcesError;
 
     // ==========================
     // DELETE SCHOOL
     // ==========================
 
-    const {
-      data: deletedSchool,
-      error: schoolError
-    } =
+    const { data: deletedSchool, error: schoolError } =
       await supabaseClient
         .from("schools")
         .delete()
-        .eq(
-          "school_code",
-          schoolCode
-        )
+        .eq("school_code", schoolCode)
         .select();
 
-    console.log(
-      "Deleted School:",
-      deletedSchool
-    );
+    console.log("Deleted School:", deletedSchool);
 
-    if (schoolError)
-      throw schoolError;
+    if (schoolError) throw schoolError;
 
     // ==========================
-    // DELETE DRIVE FOLDER
+    // DELETE GOOGLE DRIVE FOLDER
     // ==========================
 
-    const formData =
-      new URLSearchParams();
+    const formData = new URLSearchParams();
+    formData.append("action", "deleteSchool");
+    formData.append("schoolCode", schoolCode);
 
-    formData.append(
-      "action",
-      "deleteSchool"
+    const response = await fetch(
+      "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
+      {
+        method: "POST",
+        body: formData
+      }
     );
 
-    formData.append(
-      "schoolCode",
-      schoolCode
-    );
+    const text = await response.text();
+    console.log("Apps Script Response:", text);
 
-    const response =
-      await fetch(
-        "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
-        {
-          method: "POST",
-          body: formData
-        }
-      );
-
-    const text =
-      await response.text();
-
-    console.log(
-      "Apps Script Response:",
-      text
-    );
-
-    alert(
-      `${schoolCode} deleted successfully`
-    );
+    alert(`${schoolCode} deleted successfully`);
 
     loadDashboardStats();
     loadSchools();
@@ -1701,21 +1680,13 @@ async function deleteSchool(schoolCode) {
 
   } catch (err) {
 
-    console.error(
-      "DELETE ERROR:",
-      err
-    );
-
-    alert(
-      err.toString()
-    );
+    console.error("DELETE ERROR:", err);
+    alert(err.toString());
 
   }
-
 }
 
-window.deleteSchool =
-  deleteSchool;
+window.deleteSchool = deleteSchool;
 
 document
   .getElementById(
