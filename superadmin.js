@@ -1513,21 +1513,7 @@ if (!data.sheet_url) {
 
 }
 
-function deleteSchool(schoolCode) {
 
-  const confirmed =
-    confirm(
-      `Delete ${schoolCode}?`
-    );
-
-  if (!confirmed)
-    return;
-
-  alert(
-    `Delete button clicked for ${schoolCode}`
-  );
-
-}
 
     // Delete Supabase row
 
@@ -1569,6 +1555,22 @@ function deleteSchool(schoolCode) {
     );
 
   }
+
+}
+
+function deleteSchool(schoolCode) {
+
+  const confirmed =
+    confirm(
+      `Delete ${schoolCode}?`
+    );
+
+  if (!confirmed)
+    return;
+
+  alert(
+    `Delete button clicked for ${schoolCode}`
+  );
 
 }
 
