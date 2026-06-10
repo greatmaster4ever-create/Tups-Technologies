@@ -1558,21 +1558,120 @@ if (!data.sheet_url) {
 
 }
 
-function deleteSchool(schoolCode) {
+async function deleteSchool(schoolCode) {
 
   const confirmed =
     confirm(
-      `Delete ${schoolCode}?`
+      `WARNING!\n\n` +
+      `This will permanently remove:\n\n` +
+      `• School Record\n` +
+      `• All Subjects\n` +
+      `• All Department Resources\n` +
+      `• Entire School Drive Folder\n\n` +
+      `Continue?`
     );
 
   if (!confirmed)
     return;
 
-  alert(
-    `Delete button clicked for ${schoolCode}`
-  );
+  try {
+
+    // Delete subjects
+
+    const {
+      error: subjectsError
+    } =
+      await supabaseClient
+        .from("subjects")
+        .delete()
+        .eq(
+          "school_code",
+          schoolCode
+        );
+
+    if (subjectsError)
+      throw subjectsError;
+
+    // Delete department resources
+
+    const {
+      error: resourcesError
+    } =
+      await supabaseClient
+        .from(
+          "department_resources"
+        )
+        .delete()
+        .eq(
+          "school_code",
+          schoolCode
+        );
+
+    if (resourcesError)
+      throw resourcesError;
+
+    // Delete school
+
+    const {
+      error: schoolError
+    } =
+      await supabaseClient
+        .from("schools")
+        .delete()
+        .eq(
+          "school_code",
+          schoolCode
+        );
+
+    if (schoolError)
+      throw schoolError;
+
+    // Delete Drive folder
+
+    const formData =
+      new URLSearchParams();
+
+    formData.append(
+      "action",
+      "deleteSchool"
+    );
+
+    formData.append(
+      "schoolCode",
+      schoolCode
+    );
+
+    await fetch(
+      "YOUR_APPS_SCRIPT_URL",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+
+    alert(
+      `${schoolCode} deleted successfully`
+    );
+
+    loadDashboardStats();
+    loadSchools();
+    loadSubjects();
+    loadSheets();
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert(
+      err.toString()
+    );
+
+  }
 
 }
+
+window.deleteSchool =
+  deleteSchool;
 
 document
   .getElementById(
