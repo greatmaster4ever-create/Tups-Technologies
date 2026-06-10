@@ -271,11 +271,14 @@ async function loadSchools() {
   </button>
 
   <button
-    class="password-btn"
-    onclick="openPasswordModal('${row.id}')"
-  >
-    Password
-  </button>
+  class="password-btn"
+  onclick="openPasswordModal(
+    '${row.id}',
+    '${row.school_code}'
+  )"
+>
+  Password
+</button>
 
   <button
     class="delete-btn"
@@ -1179,7 +1182,7 @@ const phone =
       }
 
       alert(
-        "School Updated"
+        "School Password Updated Successfully"
       );
 
       document.getElementById(
@@ -1209,15 +1212,31 @@ async function openSubjectPasswordModal(id) {
 
 }
 
-async function openPasswordModal(id) {
+async function openPasswordModal(
+  id,
+  schoolCode
+) {
 
   document.getElementById(
     "passwordSchoolId"
   ).value = id;
 
   document.getElementById(
+    "passwordSchoolCode"
+  ).value = schoolCode;
+
+  document.getElementById(
     "newSchoolPassword"
   ).value = "";
+
+  const adminField =
+    document.getElementById(
+      "newAdminPassword"
+    );
+
+  if (adminField) {
+    adminField.value = "";
+  }
 
   document.getElementById(
     "passwordModal"
@@ -1286,7 +1305,80 @@ document
 
     }
   );
-	
+
+document
+  .getElementById(
+    "updateAdminPasswordBtn"
+  )
+  .addEventListener(
+    "click",
+    async () => {
+
+      const schoolCode =
+        document.getElementById(
+          "passwordSchoolCode"
+        ).value;
+
+      const password =
+        document.getElementById(
+          "newAdminPassword"
+        ).value.trim();
+
+      if (!password) {
+
+        alert(
+          "Enter Admin Password"
+        );
+
+        return;
+
+      }
+
+      const confirmed =
+        confirm(
+          `Update Admin Password for all subjects in ${schoolCode}?`
+        );
+
+      if (!confirmed)
+        return;
+
+      const { error } =
+        await supabaseClient
+          .from("subjects")
+          .update({
+
+            admin_password:
+              password
+
+          })
+          .eq(
+            "school_code",
+            schoolCode
+          );
+
+      if (error) {
+
+        alert(
+          error.message
+        );
+
+        return;
+
+      }
+
+      alert(
+        "Admin Password Updated Successfully"
+      );
+
+      document.getElementById(
+        "newAdminPassword"
+      ).value = "";
+
+    }
+  );
+
+
+
  document
   .getElementById(
     "updateSubjectBtn"
