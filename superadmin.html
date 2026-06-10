@@ -445,7 +445,7 @@
   <div class="modal-content">
 
     <h2>
-      Change School Password
+      Password Management
     </h2>
 
     <input
@@ -454,9 +454,20 @@
     >
 
     <input
+      type="hidden"
+      id="passwordSchoolCode"
+    >
+
+    <!-- SCHOOL PASSWORD -->
+
+    <h3>
+      Change School Password
+    </h3>
+
+    <input
       type="text"
       id="newSchoolPassword"
-      placeholder="New Password"
+      placeholder="New School Password"
     >
 
     <div class="modal-buttons">
@@ -464,15 +475,52 @@
       <button
         id="updatePasswordBtn"
       >
-        Update Password
+        Update School Password
       </button>
+
+    </div>
+
+    <hr
+      style="
+        margin:20px 0;
+      "
+    >
+
+    <!-- ADMIN PASSWORD -->
+
+    <h3>
+      Change Admin Password
+    </h3>
+
+    <input
+      type="text"
+      id="newAdminPassword"
+      placeholder="New Admin Password"
+    >
+
+    <div class="modal-buttons">
+
+      <button
+        id="updateAdminPasswordBtn"
+      >
+        Update Admin Password
+      </button>
+
+    </div>
+
+    <div
+      class="modal-buttons"
+      style="
+        margin-top:20px;
+      "
+    >
 
       <button
         onclick="
           document.getElementById('passwordModal').style.display='none'
         "
       >
-        Cancel
+        Close
       </button>
 
     </div>
