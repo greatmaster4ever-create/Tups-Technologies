@@ -18,24 +18,32 @@ const supabaseClient =
 // ==========================
 // GET SCHOOL CODE
 // ==========================
-let schoolCode = null;
 
-function getSchoolCode() {
-  const code = sessionStorage.getItem("school_code");
-  console.log("SESSION STORAGE VALUE:", code);
-  return code;
-}
+let schoolCode = sessionStorage.getItem("school_code");
 
-schoolCode = getSchoolCode();
+console.log("SESSION STORAGE VALUE:", schoolCode);
 
+// ==========================
+// HARD SESSION GUARD
+// ==========================
 if (!schoolCode) {
-  alert("Session expired. Please login again.");
-  window.location.href = "index.html";
-  throw new Error("Missing school code");
+  window.location.replace("index.html");
+  throw new Error("No school session");
 }
 
 console.log("SCHOOL CODE LOADED:", schoolCode);
 
+// ==========================
+// HISTORY LOCK (BACK/FORWARD CONTROL)
+// ==========================
+
+history.pushState(null, null, window.location.href);
+
+window.addEventListener("popstate", function () {
+  sessionStorage.removeItem("school_code");
+  sessionStorage.clear();
+window.location.replace("index.html");
+});
 
 
 // ==========================
