@@ -496,18 +496,61 @@ async function loadPasswords() {
 
     tbody.innerHTML = "";
 
-    schools.forEach(row => {
+   schools.forEach(row => {
 
-      tbody.innerHTML += `
-        <tr>
-          <td>${row.school_code}</td>
-          <td>${row.School_name}</td>
-          <td>${row.password || ""}</td>
-          <td>${adminPasswords[row.school_code] || ""}</td>
-        </tr>
-      `;
+  const schoolPassword =
+    row.password || "";
 
-    });
+  const adminPassword =
+    adminPasswords[
+      row.school_code
+    ] || "";
+
+  tbody.innerHTML += `
+    <tr>
+
+      <td>
+        ${row.school_code}
+      </td>
+
+      <td>
+        ${row.School_name}
+      </td>
+
+      <td
+        id="schoolPwd_${row.school_code}"
+      >
+        ********
+      </td>
+
+      <td
+        id="adminPwd_${row.school_code}"
+      >
+        ********
+      </td>
+
+      <td>
+
+        <button
+          class="password-btn"
+          onclick="
+            togglePasswords(
+              '${row.school_code}',
+              '${schoolPassword}',
+              '${adminPassword}'
+            )
+          "
+        >
+          Show
+        </button>
+
+      </td>
+
+    </tr>
+  `;
+
+});
+
 
   } catch (err) {
 
@@ -1735,6 +1778,50 @@ if (!data.sheet_url) {
   }
 
 }
+
+function togglePasswords(
+  schoolCode,
+  schoolPassword,
+  adminPassword
+) {
+
+  const schoolCell =
+    document.getElementById(
+      `schoolPwd_${schoolCode}`
+    );
+
+  const adminCell =
+    document.getElementById(
+      `adminPwd_${schoolCode}`
+    );
+
+  const showing =
+    schoolCell.innerText !==
+    "********";
+
+  if (showing) {
+
+    schoolCell.innerText =
+      "********";
+
+    adminCell.innerText =
+      "********";
+
+  } else {
+
+    schoolCell.innerText =
+      schoolPassword;
+
+    adminCell.innerText =
+      adminPassword;
+
+  }
+
+}
+
+window.togglePasswords =
+  togglePasswords;
+
 
 async function deleteSchool(schoolCode) {
 
