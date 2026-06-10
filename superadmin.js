@@ -352,6 +352,7 @@ async function loadSchools() {
 
   <button
     class="delete-btn"
+	data-action="delete"
     onclick="deleteSchool('${row.school_code}')"
   >
     Delete
@@ -427,6 +428,7 @@ async function loadSubjects() {
 
             <button
               class="delete-btn"
+			  data-action="delete"
               onclick="deleteSubject('${row.id}')"
             >
               Delete
