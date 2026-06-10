@@ -12,43 +12,69 @@ const supabaseClient =
   );
 
 // ==========================
-// GLOBAL LOADER
+// SUPABASE ACTION GATEWAY
 // ==========================
 
-function showLoader(
+async function supabaseAction(
+  promise,
   message = "Processing..."
 ) {
 
-  const loader =
-    document.getElementById(
-      "globalLoader"
+  showLoader(message);
+
+  try {
+
+    const result = await promise;
+
+    hideLoader();
+
+    return result;
+
+  } catch (err) {
+
+    hideLoader();
+
+    console.error(err);
+
+    alert(
+      err.message ||
+      "Something went wrong"
     );
 
-  const text =
-    document.getElementById(
-      "loaderText"
-    );
+    return {
+      data: null,
+      error: err
+    };
 
-  if (text)
-    text.innerText = message;
+  }
+}
 
-  if (loader)
-    loader.style.display =
-      "flex";
+// ==========================
+// GLOBAL LOADER
+// ==========================
 
+function showLoader(message = "Processing...") {
+
+  const loader = document.getElementById("globalLoader");
+  const text = document.getElementById("loaderText");
+
+  if (text) text.innerText = message;
+  if (loader) loader.style.display = "flex";
+
+  // safety timeout (auto-hide after 20s)
+  clearTimeout(window.__loaderTimeout);
+
+  window.__loaderTimeout = setTimeout(() => {
+    hideLoader();
+  }, 20000);
 }
 
 function hideLoader() {
 
-  const loader =
-    document.getElementById(
-      "globalLoader"
-    );
+  const loader = document.getElementById("globalLoader");
+  if (loader) loader.style.display = "none";
 
-  if (loader)
-    loader.style.display =
-      "none";
-
+  clearTimeout(window.__loaderTimeout);
 }
 
 
@@ -56,7 +82,7 @@ function hideLoader() {
    SESSION PROTECTION
 ========================== */
 
-const schoolCode =
+let schoolCode =
   sessionStorage.getItem("school_code");
 
 if (schoolCode !== "TUPSADMIN") {
@@ -64,6 +90,7 @@ if (schoolCode !== "TUPSADMIN") {
   alert("Unauthorized Access");
 
   window.location.href = "index.html";
+  throw new Error("Invalid session");
 
 }
 
@@ -272,6 +299,8 @@ async function loadDashboardStats() {
       err
     );
 
+  } finally {
+    hideLoader(); // IMPORTANT
   }
 
 }
@@ -342,6 +371,8 @@ async function loadSchools() {
       err
     );
 
+  } finally {
+    hideLoader(); // IMPORTANT
   }
 
 }
@@ -415,6 +446,8 @@ async function loadSubjects() {
       err
     );
 
+  } finally {
+    hideLoader(); // IMPORTANT
   }
 
 }
@@ -476,6 +509,8 @@ async function loadSheets() {
       err
     );
 
+  } finally {
+    hideLoader(); // IMPORTANT
   }
 
 }
@@ -540,6 +575,8 @@ async function loadSchoolDetails() {
 
     console.error(err);
 
+  } finally {
+    hideLoader(); // IMPORTANT
   }
 
 }
@@ -647,6 +684,8 @@ async function viewSchoolProfile(id) {
 
     console.error(err);
 
+  } finally {
+    hideLoader(); // IMPORTANT
   }
 
 }
@@ -779,6 +818,8 @@ async function loadPasswords() {
       err.message
     );
 
+  } finally {
+    hideLoader(); // IMPORTANT
   }
 
 }
@@ -2334,12 +2375,58 @@ loadSchools();
 loadSubjects();
 loadSheets();
 
-showLoader(
-  "Testing Loader..."
+// ==========================
+// ACTION REGISTRY (FREEZE LAYER)
+// ==========================
+
+const ACTIONS = Object.freeze({
+  INSERT: "insert",
+  UPDATE: "update",
+  DELETE: "delete",
+  SAVE: "save",
+  SUBMIT: "submit",
+  PROCESS: "process"
+});
+
+// ==========================
+// GLOBAL ACTION LOADER GATEWAY (FINAL)
+// ==========================
+
+document.addEventListener("click", function (e) {
+
+  const btn = e.target.closest("button[data-action]");
+  if (!btn) return;
+
+  const action = btn.dataset.action;
+
+  if (!action) return;
+
+  const validActions = [
+    "insert",
+    "update",
+    "delete",
+    "save",
+    "submit",
+	"View",
+    "process"
+  ];
+
+  if (!validActions.includes(action)) return;
+
+  showLoader("Processing...");
+
+});
+
+// ==========================
+// GLOBAL ERROR HANDLERS
+// ==========================
+
+window.addEventListener(
+  "error",
+  hideLoader
 );
 
-setTimeout(() => {
-
-  hideLoader();
-
-}, 3000);
+window.addEventListener(
+  "unhandledrejection",
+  hideLoader
+);

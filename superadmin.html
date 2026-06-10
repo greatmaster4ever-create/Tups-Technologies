@@ -121,6 +121,7 @@
   <button
     id="viewPasswordsBtn"
     class="action-btn"
+	data-action="View"
   >
     View School/Admin Passwords
   </button>
@@ -128,6 +129,7 @@
   <button
     id="viewSchoolDetailsBtn"
     class="action-btn"
+	data-action="View"
   >
     View School Details
   </button>
@@ -358,7 +360,7 @@
   </div>
 
 </section>
-    <!-- SHEETS -->
+    
     <!-- SHEETS -->
 <section id="sheets" class="tab-content">
 
@@ -478,7 +480,8 @@
 
     <div class="modal-buttons">
 
-      <button id="saveSchoolBtn">
+      <button id="saveSchoolBtn" 
+	          data-action="save">
         Save School
       </button>
 
@@ -561,7 +564,8 @@
 
     <div class="modal-buttons">
 
-      <button id="updateSchoolBtn">
+      <button id="updateSchoolBtn"
+	           data-action="Update">
         Update School
       </button>
 
@@ -618,6 +622,7 @@
 
       <button
         id="updatePasswordBtn"
+		data-action="Update"
       >
         Update School Password
       </button>
@@ -646,6 +651,7 @@
 
       <button
         id="updateAdminPasswordBtn"
+		data-action="Update"
       >
         Update Admin Password
       </button>
@@ -758,7 +764,8 @@
 
     <div class="modal-buttons">
 
-      <button id="saveSubjectBtn">
+      <button id="saveSubjectBtn"
+	    data-action="save">
         Save Subject
       </button>
 
@@ -817,7 +824,8 @@
 
     <div class="modal-buttons">
 
-      <button id="updateSubjectBtn">
+      <button id="updateSubjectBtn"
+	    data-action="Update">
         Update Subject
       </button>
 
@@ -863,6 +871,7 @@
 
       <button
         id="updateSubjectPasswordBtn"
+		data-action="update"
       >
         Update Password
       </button>
