@@ -164,18 +164,50 @@ document
     const subject = document.getElementById("subject").value;
     const password = document.getElementById("subjectPassword").value;
 
-  const match = currentSubjects.find(s =>
-  s.subject === subject &&
-  s.subject_password === password &&
-  (
-    cadre === "Admin"
-      ? true
-      : (
-          s.department === department &&
-          s.cadre === cadre
-        )
-  )
-);
+
+
+console.log("CADRE:", cadre);
+console.log("SUBJECT:", subject);
+console.log("PASSWORD:", password);
+console.log("CURRENT SUBJECTS:", currentSubjects);
+console.log("TOTAL SUBJECTS:", currentSubjects.length);
+  
+  
+  const match =
+  currentSubjects.find(s => {
+
+   if (
+      cadre === "Admin"
+    ) {
+
+      const found =
+        s.subject === subject &&
+        s.admin_password === password;
+
+      console.log(
+        "Checking:",
+        s.subject,
+        s.admin_password,
+        found
+      );
+
+      return found;
+
+    }
+
+    return (
+
+      s.subject === subject &&
+
+      s.subject_password === password &&
+
+      s.department === department &&
+
+      s.cadre === cadre
+
+    );
+
+  });
 
     if (!match) {
       alert("Invalid subject login");
