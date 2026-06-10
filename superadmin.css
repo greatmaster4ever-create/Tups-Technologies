@@ -280,3 +280,26 @@ tr:hover{
   background: transparent;
 
 }
+.delete-btn {
+
+  background: #dc3545;
+
+  color: white;
+
+  border: none;
+
+  padding: 6px 12px;
+
+  border-radius: 4px;
+
+  cursor: pointer;
+
+  margin-left: 5px;
+
+}
+
+.delete-btn:hover {
+
+  opacity: 0.9;
+
+}

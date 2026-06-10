@@ -263,19 +263,28 @@ async function loadSchools() {
           <td>${row.status}</td>
 	   <td>
 
-           <button
-            class="edit-btn"
-            onclick="openEditSchool('${row.id}')"
-             >
-      Edit
-           </button>
-         <button
-  class="password-btn"
-  onclick="openPasswordModal('${row.id}')"
->
-  Password
-</button>
-          </td>
+  <button
+    class="edit-btn"
+    onclick="openEditSchool('${row.id}')"
+  >
+    Edit
+  </button>
+
+  <button
+    class="password-btn"
+    onclick="openPasswordModal('${row.id}')"
+  >
+    Password
+  </button>
+
+  <button
+    class="delete-btn"
+    onclick="deleteSchool('${row.school_code}')"
+  >
+    Delete
+  </button>
+
+</td>
 
        </tr>
       `;
@@ -1501,6 +1510,22 @@ if (!data.sheet_url) {
     );
 
   }
+
+}
+
+function deleteSchool(schoolCode) {
+
+  const confirmed =
+    confirm(
+      `Delete ${schoolCode}?`
+    );
+
+  if (!confirmed)
+    return;
+
+  alert(
+    `Delete button clicked for ${schoolCode}`
+  );
 
 }
 
