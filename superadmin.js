@@ -490,6 +490,7 @@ async function loadSheets() {
             <a
               href="${row.sheet_url}"
               target="_blank"
+			  data-action="Open"
             >
               Open Sheet
             </a>
@@ -559,6 +560,7 @@ async function loadSchoolDetails() {
 
             <button
               class="password-btn"
+			  data-action="View"
               onclick="viewSchoolProfile('${row.id}')"
             >
               View
