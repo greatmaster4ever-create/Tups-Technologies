@@ -439,6 +439,181 @@ async function loadSheets() {
 
 }
 
+async function loadSchoolDetails() {
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("schools")
+        .select("*")
+        .order("school_code");
+
+    if (error)
+      throw error;
+
+    const tbody =
+      document.getElementById(
+        "schoolDetailsBody"
+      );
+
+    tbody.innerHTML = "";
+
+    data.forEach(row => {
+
+      tbody.innerHTML += `
+        <tr>
+
+          <td>
+            ${row.school_code}
+          </td>
+
+          <td>
+            ${row.School_name}
+          </td>
+
+          <td>
+            ${row.status}
+          </td>
+
+          <td>
+
+            <button
+              class="password-btn"
+              onclick="viewSchoolProfile('${row.id}')"
+            >
+              View
+            </button>
+
+          </td>
+
+        </tr>
+      `;
+
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+  }
+
+}
+
+
+async function viewSchoolProfile(id) {
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("schools")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+    if (error)
+      throw error;
+
+    const {
+      count
+    } =
+      await supabaseClient
+        .from("subjects")
+        .select("*", {
+          count: "exact",
+          head: true
+        })
+        .eq(
+          "school_code",
+          data.school_code
+        );
+
+    const card =
+      document.getElementById(
+        "schoolProfileCard"
+      );
+
+    card.innerHTML = `
+
+      <h2>
+        School Profile
+      </h2>
+
+      <img
+        src="${data.logo_url || ''}"
+        style="
+          width:100px;
+          height:100px;
+          object-fit:cover;
+          border-radius:50%;
+          margin-bottom:15px;
+        "
+      >
+
+      <p>
+        <strong>School Code:</strong>
+        ${data.school_code}
+      </p>
+
+      <p>
+        <strong>School Name:</strong>
+        ${data.School_name}
+      </p>
+
+      <p>
+        <strong>Status:</strong>
+        ${data.status}
+      </p>
+
+      <p>
+        <strong>Email:</strong>
+        ${data.contact_email || ''}
+      </p>
+
+      <p>
+        <strong>Phone:</strong>
+        ${data.phone || ''}
+      </p>
+
+      <p>
+        <strong>Primary Color:</strong>
+        ${data.primary_color || ''}
+      </p>
+
+      <p>
+        <strong>Secondary Color:</strong>
+        ${data.secondary_color || ''}
+      </p>
+
+      <p>
+        <strong>Total Subjects:</strong>
+        ${count || 0}
+      </p>
+
+    `;
+
+    card.style.display =
+      "block";
+
+  } catch (err) {
+
+    console.error(err);
+
+  }
+
+}
+
+window.viewSchoolProfile =
+  viewSchoolProfile;
+  
+
 async function loadPasswords() {
 
   try {
@@ -2063,6 +2238,50 @@ if (passwordSearch) {
 
           }
         );
+
+      }
+    );
+
+}
+
+const viewSchoolDetailsBtn =
+  document.getElementById(
+    "viewSchoolDetailsBtn"
+  );
+
+if (viewSchoolDetailsBtn) {
+
+  viewSchoolDetailsBtn
+    .addEventListener(
+      "click",
+      async () => {
+
+        const section =
+          document.getElementById(
+            "schoolDetailsSection"
+          );
+
+        if (
+          section.style.display ===
+          "none"
+        ) {
+
+          await loadSchoolDetails();
+
+          section.style.display =
+            "block";
+
+        } else {
+
+          section.style.display =
+            "none";
+
+          document.getElementById(
+            "schoolProfileCard"
+          ).style.display =
+            "none";
+
+        }
 
       }
     );
