@@ -384,24 +384,68 @@ document
   .getElementById("openAdminPortal")
   .addEventListener(
     "click",
-    function () {
+    async function () {
 
       const password =
         document.getElementById(
           "adminPortalPassword"
-        ).value;
+        ).value.trim();
 
       if (!password) {
+
         alert(
           "Please enter Admin Password."
         );
+
         return;
+
+      }
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("subjects")
+          .select(
+            "admin_password"
+          )
+          .eq(
+            "school_code",
+            schoolCode
+          );
+
+      if (error) {
+
+        alert(
+          error.message
+        );
+
+        return;
+
+      }
+
+      const valid =
+        data.some(
+          row =>
+            row.admin_password === password
+        );
+
+      if (!valid) {
+
+        alert(
+          "Invalid Admin Password"
+        );
+
+        return;
+
       }
 
       document.querySelector(
         ".admin-card"
       ).innerHTML =
         adminDashboardHTML;
+
     }
   );
 
