@@ -2409,7 +2409,6 @@ document.addEventListener("click", function (e) {
     "delete",
     "save",
     "submit",
-	"View",
     "process"
   ];
 
