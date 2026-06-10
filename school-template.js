@@ -603,6 +603,30 @@ function showSettings() {
 
 }
 
+
+function logoutSchoolPortal() {
+
+  const confirmed =
+    confirm(
+      "Are you sure you want to logout?"
+    );
+
+  if (!confirmed) return;
+
+  // Clear session
+  sessionStorage.removeItem(
+    "school_code"
+  );
+
+  sessionStorage.clear();
+
+  // Prevent browser returning here
+  window.location.replace(
+    "index.html"
+  );
+
+}
+
 function adminLogout() {
 
   location.reload();
@@ -627,11 +651,14 @@ function resetLogoutTimer() {
     );
 
     sessionStorage.removeItem(
-      "school_code"
-    );
+  "school_code"
+);
 
-    window.location.href =
-      "index.html";
+sessionStorage.clear();
+
+window.location.replace(
+  "index.html"
+);
 
   }, 60000); // 1 minute
 
@@ -656,6 +683,19 @@ function resetLogoutTimer() {
 // Start timer immediately
 resetLogoutTimer();
 
+const logoutBtn =
+  document.getElementById(
+    "logoutSchoolBtn"
+  );
+
+if (logoutBtn) {
+
+  logoutBtn.addEventListener(
+    "click",
+    logoutSchoolPortal
+  );
+
+}
 // ==========================
 // FOOTER YEAR
 // ==========================
