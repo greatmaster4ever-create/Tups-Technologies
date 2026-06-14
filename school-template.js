@@ -369,19 +369,19 @@ const adminDashboardHTML = `
       📊 Master Sheets
     </button>
 
-    <button
-      class="admin-tab"
-      onclick="showTeachers()"
-    >
-      👥 Teachers
-    </button>
+  <button
+  class="admin-tab"
+  onclick="showStudentsFees()"
+>
+  👨‍🎓 Students & Fees
+</button>
 
-    <button
-      class="admin-tab"
-      onclick="showSettings()"
-    >
-      ⚙️ Settings
-    </button>
+<button
+  class="admin-tab"
+  onclick="showPayments()"
+>
+  💳 Payments
+</button>
 
     <button
       class="admin-tab"
