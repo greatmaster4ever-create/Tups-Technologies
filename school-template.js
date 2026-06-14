@@ -617,6 +617,326 @@ async function showMasterSheet() {
   renderDepartments(data);
 }
 
+async function showStudentsFees() {
+
+  const { data, error } =
+    await supabaseClient
+      .from(
+        "department_resources"
+      )
+      .select(
+        "department"
+      )
+      .eq(
+        "school_code",
+        schoolCode
+      )
+      .order(
+        "department"
+      );
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+  let options =
+    `<option value="">
+      Select Department
+    </option>`;
+
+  data.forEach(row => {
+
+    options += `
+
+      <option
+        value="${row.department}"
+      >
+
+        ${row.department}
+
+      </option>
+
+    `;
+
+  });
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+    <h3>
+      👨‍🎓 Students & Fees
+    </h3>
+
+    <div
+      class="student-toolbar"
+    >
+
+      <select
+        id="studentDepartment"
+      >
+
+        ${options}
+
+      </select>
+
+      <button
+        id="refreshStudentsBtn"
+        class="admin-btn"
+      >
+
+        Refresh Students
+
+      </button>
+
+    </div>
+
+    <br>
+
+    <input
+      type="text"
+      id="studentSearch"
+      placeholder="Search Student..."
+    >
+
+    <br><br>
+
+    <div
+      id="studentsTableContainer"
+    >
+
+    </div>
+
+  `;
+
+  wireStudentsModule();
+
+}
+
+async function syncStudentsFromSheet() {
+
+  const department =
+    document.getElementById(
+      "studentDepartment"
+    ).value;
+
+  if (!department) {
+
+    alert(
+      "Select department first"
+    );
+
+    return;
+
+  }
+
+  const formData =
+    new URLSearchParams();
+
+  formData.append(
+    "action",
+    "syncStudents"
+  );
+
+  formData.append(
+    "schoolCode",
+    schoolCode
+  );
+
+  formData.append(
+    "department",
+    department
+  );
+
+  const response =
+    await fetch(
+      "YOUR_APPS_SCRIPT_URL",
+      {
+        method:"POST",
+        body:formData
+      }
+    );
+
+  const result =
+    await response.json();
+
+  if (!result.success) {
+
+    alert(
+      result.error
+    );
+
+    return;
+
+  }
+
+  alert(
+    `${result.synced} students synced`
+  );
+
+  loadStudentsTable(
+    department
+  );
+
+}
+
+
+async function loadStudentsTable(
+  department
+) {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("students")
+      .select("*")
+      .eq(
+        "school_code",
+        schoolCode
+      )
+      .eq(
+        "department",
+        department
+      )
+      .order(
+        "student_name"
+      );
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+  let html = `
+
+    <table
+      class="students-table"
+    >
+
+      <tr>
+
+        <th>
+          Student Name
+        </th>
+
+        <th>
+          Class
+        </th>
+
+        <th>
+          Actions
+        </th>
+
+      </tr>
+
+  `;
+
+  data.forEach(student => {
+
+    html += `
+
+      <tr>
+
+        <td>
+
+          ${student.student_name}
+
+        </td>
+
+        <td>
+
+          ${student.class || ""}
+
+        </td>
+
+        <td>
+
+          <button
+            onclick="
+              viewStudentInfo(
+                ${student.id}
+              )
+            "
+          >
+
+            Info
+
+          </button>
+
+          <button
+            onclick="
+              openTermReport(
+                ${student.id}
+              )
+            "
+          >
+
+            Term Report
+
+          </button>
+
+        </td>
+
+      </tr>
+
+    `;
+
+  });
+
+  html +=
+    "</table>";
+
+  document.getElementById(
+    "studentsTableContainer"
+  ).innerHTML =
+    html;
+
+}
+
+
+function wireStudentsModule() {
+
+  const departmentSelect =
+    document.getElementById(
+      "studentDepartment"
+    );
+
+  departmentSelect
+    .addEventListener(
+      "change",
+      () => {
+
+        loadStudentsTable(
+          departmentSelect.value
+        );
+
+      }
+    );
+
+  document
+    .getElementById(
+      "refreshStudentsBtn"
+    )
+    .addEventListener(
+      "click",
+      syncStudentsFromSheet
+    );
+
+}
+
 
 function toggleDepartment(department) {
 
