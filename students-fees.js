@@ -1,17 +1,10 @@
-function showStudentsFees() {
-
-  document.getElementById(
-    "adminContent"
-  ).innerHTML = `
-
-    <h3>
-      👨‍🎓 Students & Fees
-    </h3>
-
-    <p>
-      Module Under Development
-    </p>
-
-  `;
-
-}
+// =====================================
+// STUDENTS & FEES MODULE
+// =====================================
+//
+// Module logic currently lives inside
+// school-template.js.
+//
+// This file is reserved for future
+// migration/refactoring.
+//
