@@ -791,6 +791,11 @@ async function loadStudentsTable(
   department
 ) {
 
+  console.log(
+    "Department Selected:",
+    department
+  );
+
   const {
     data,
     error
@@ -809,6 +814,16 @@ async function loadStudentsTable(
       .order(
         "student_name"
       );
+
+  console.log(
+    "Students Returned:",
+    data
+  );
+
+  console.log(
+    "Query Error:",
+    error
+  );
 
   if (error) {
 
