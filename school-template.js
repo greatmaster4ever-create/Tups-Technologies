@@ -906,6 +906,346 @@ async function loadStudentsTable(
 
 }
 
+async function viewStudentInfo(id) {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("students")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+    <div
+      class="student-info-card"
+    >
+
+      <img
+        src="${
+          data.passport_url || ""
+        }"
+        class="student-passport"
+      >
+
+      <h3>
+        ${data.student_name}
+      </h3>
+
+      <table
+        class="student-info-table"
+      >
+
+        <tr>
+          <td><strong>Class</strong></td>
+          <td>${data.class || ""}</td>
+        </tr>
+
+        <tr>
+          <td><strong>Parent Contact 1</strong></td>
+          <td>
+            ${
+              data.parent_contact_1 || ""
+            }
+          </td>
+        </tr>
+
+        <tr>
+          <td><strong>Parent Contact 2</strong></td>
+          <td>
+            ${
+              data.parent_contact_2 || ""
+            }
+          </td>
+        </tr>
+
+        <tr>
+          <td><strong>Address</strong></td>
+          <td>
+            ${data.address || ""}
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <strong>
+              Total Fees Paid
+            </strong>
+          </td>
+          <td>
+
+            ₦${(
+              data.total_fees_paid || 0
+            ).toLocaleString()}
+
+          </td>
+        </tr>
+
+      </table>
+
+      <br>
+
+      <button
+  class="admin-btn"
+  onclick="
+    openStudentUpdateForm(
+      ${student.id}
+    )
+  "
+>
+  Update Student Info
+</button>
+
+    </div>
+
+  `;
+
+}
+
+window.viewStudentInfo =
+  viewStudentInfo;
+  
+  async function openStudentUpdateForm(
+  studentId
+) {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("students")
+      .select("*")
+      .eq(
+        "id",
+        studentId
+      )
+      .single();
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+    <h3>
+      Update Student Info
+    </h3>
+
+    <br>
+
+    <label>
+      Parent Contact 1
+    </label>
+
+    <input
+      type="text"
+      id="parentContact1"
+      value="${
+        data.parent_contact1 || ""
+      }"
+    >
+
+    <br><br>
+
+    <label>
+      Parent Contact 2
+    </label>
+
+    <input
+      type="text"
+      id="parentContact2"
+      value="${
+        data.parent_contact2 || ""
+      }"
+    >
+
+    <br><br>
+
+    <label>
+      Address
+    </label>
+
+    <textarea
+      id="studentAddress"
+    >${
+      data.address || ""
+    }</textarea>
+
+    <br><br>
+
+    <label>
+      New Amount Paid
+    </label>
+
+    <input
+      type="number"
+      id="newAmountPaid"
+      value="0"
+    >
+
+    <br><br>
+
+    <button
+      class="admin-btn"
+      onclick="
+        saveStudentInfo(
+          ${studentId}
+        )
+      "
+    >
+      Update
+    </button>
+
+    <button
+      class="admin-btn"
+      onclick="
+        openStudentUpdateForm(
+          ${studentId}
+        )
+      "
+    >
+      Clear
+    </button>
+
+  `;
+
+}
+
+async function saveStudentInfo(
+  studentId
+) {
+
+  const parent1 =
+    document.getElementById(
+      "parentContact1"
+    ).value.trim();
+
+  const parent2 =
+    document.getElementById(
+      "parentContact2"
+    ).value.trim();
+
+  const address =
+    document.getElementById(
+      "studentAddress"
+    ).value.trim();
+
+  const newAmount =
+    Number(
+      document.getElementById(
+        "newAmountPaid"
+      ).value
+    ) || 0;
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("students")
+      .select(
+        "total_fees_paid"
+      )
+      .eq(
+        "id",
+        studentId
+      )
+      .single();
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+  const currentTotal =
+    Number(
+      data.total_fees_paid
+    ) || 0;
+
+  const updatedTotal =
+    currentTotal +
+    newAmount;
+
+  const {
+    error:updateError
+  } =
+    await supabaseClient
+      .from("students")
+      .update({
+
+        parent_contact1:
+          parent1,
+
+        parent_contact2:
+          parent2,
+
+        address:
+          address,
+
+        total_fees_paid:
+          updatedTotal
+
+      })
+      .eq(
+        "id",
+        studentId
+      );
+
+  if (updateError) {
+
+    alert(
+      updateError.message
+    );
+
+    return;
+
+  }
+
+  alert(
+    "Student Updated Successfully"
+  );
+
+  viewStudentInfo(
+    studentId
+  );
+
+}
+
+window.openStudentUpdateForm =
+  openStudentUpdateForm;
+
+window.saveStudentInfo =
+  saveStudentInfo;
+
 
 function wireStudentsModule() {
 
@@ -919,7 +1259,8 @@ function wireStudentsModule() {
       "change",
       () => {
 
-        loadStudentsTable(
+       
+	(
           departmentSelect.value
         );
 
