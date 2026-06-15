@@ -688,7 +688,7 @@ async function showStudentsFees() {
     id="refreshStudentsBtn"
     class="admin-btn"
   >
-    Refresh
+    Refresh List
   </button>
 
   <input
