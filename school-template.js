@@ -963,12 +963,11 @@ async function viewStudentInfo(id) {
       class="student-info-card"
     >
 
-      <img
-        src="${
-          data.passport_url || ""
-        }"
-        class="student-passport"
-      >
+     <img
+  src="${data.passport_url || 'images/default-avatar.png'}"
+  class="student-passport"
+  onerror="this.src='images/default-avatar.png'"
+>
 
       <h3>
         ${data.student_name}
@@ -1157,7 +1156,31 @@ window.viewStudentInfo =
     >
       Clear
     </button>
+   <div class="student-form-buttons">
 
+  <button type="submit"
+      class="admin-btn"
+      onclick="
+        saveStudentInfo(
+          ${studentId}
+        )
+      "
+    >
+    Update
+  </button>
+
+  <button type="button"
+      class="admin-btn"
+      onclick="
+        openStudentUpdateForm(
+          ${studentId}
+        )
+      "
+    >
+    Clear
+  </button>
+
+</div>
   `;
 
 }

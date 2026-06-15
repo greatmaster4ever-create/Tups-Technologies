@@ -624,17 +624,12 @@ button:hover {
 }
 
 .student-passport {
-
   width: 120px;
-
   height: 120px;
-
-  object-fit: cover;
-
   border-radius: 50%;
-
-  margin-bottom: 15px;
-
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 20px;
 }
 
 .student-info-card {
@@ -681,4 +676,54 @@ button:hover {
 
   padding: 10px;
 
+}
+.student-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.student-info-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.student-info-table td:first-child {
+  width: 30%;
+  font-weight: 600;
+}
+
+.student-info-table td:last-child {
+  width: 70%;
+}
+.student-info-card .admin-btn {
+  width: auto;
+  min-width: 180px;
+  padding: 10px 20px;
+}
+.student-info-card {
+  max-width: 700px;
+  margin: auto;
+  padding: 20px;
+}
+.student-update-form label {
+  color: #000;
+  font-weight: 600;
+}
+.student-update-form,
+.student-update-form * {
+  color: #000;
+}
+.student-update-form textarea {
+  width: 100%;
+  min-height: 80px;
+}
+.student-form-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.student-form-buttons button {
+  width: 150px;
 }
