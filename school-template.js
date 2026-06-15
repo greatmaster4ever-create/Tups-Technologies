@@ -1031,7 +1031,7 @@ async function viewStudentInfo(id) {
   class="admin-btn"
   onclick="
     openStudentUpdateForm(
-      ${student.id}
+      ${data.id}
     )
   "
 >
