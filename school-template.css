@@ -703,6 +703,24 @@ button:hover {
 
 }
 
+.students-table td:last-child {
+
+  white-space: nowrap;
+
+}
+.students-table button {
+
+  padding: 2px 6px;
+
+  font-size: 10px;
+
+  line-height: 1.1;
+
+  margin-right: 2px;
+
+  border-radius: 3px;
+
+}
 .student-info-table {
 
   width: 100%;
