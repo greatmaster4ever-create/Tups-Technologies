@@ -1175,10 +1175,12 @@ window.viewStudentInfo =
 async function saveStudentInfo(
   studentId
 ) {
+
   console.log(
-  "SAVE BUTTON CLICKED",
-  studentId
-);
+    "SAVE BUTTON CLICKED",
+    studentId
+  );
+
   const parent1 =
     document.getElementById(
       "parentContact1"
@@ -1200,6 +1202,16 @@ async function saveStudentInfo(
         "newAmountPaid"
       ).value
     ) || 0;
+
+  console.log(
+    "Parent1 Value:",
+    parent1
+  );
+
+  console.log(
+    "Parent2 Value:",
+    parent2
+  );
 
   const {
     data,
@@ -1236,7 +1248,7 @@ async function saveStudentInfo(
     newAmount;
 
   const {
-    error:updateError
+    error: updateError
   } =
     await supabaseClient
       .from("students")
@@ -1260,6 +1272,11 @@ async function saveStudentInfo(
         studentId
       );
 
+  console.log(
+    "Update Error:",
+    updateError
+  );
+
   if (updateError) {
 
     alert(
@@ -1269,6 +1286,25 @@ async function saveStudentInfo(
     return;
 
   }
+
+  const {
+    data: verifyData
+  } =
+    await supabaseClient
+      .from("students")
+      .select(
+        "parent_contact1,parent_contact2"
+      )
+      .eq(
+        "id",
+        studentId
+      )
+      .single();
+
+  console.log(
+    "After Update:",
+    verifyData
+  );
 
   alert(
     "Student Updated Successfully"
