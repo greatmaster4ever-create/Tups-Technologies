@@ -806,7 +806,19 @@ const {
 } =
   await supabaseClient
     .from("students")
-    .select("*");
+    .select("*")
+    .eq(
+      "school_code",
+      schoolCode
+    )
+    .eq(
+      "department",
+      department
+    );
+	console.log(
+  "FILTERED STUDENTS:",
+  data
+);
 
 console.log(
   "RAW DATA:",
