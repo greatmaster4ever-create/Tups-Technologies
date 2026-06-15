@@ -707,8 +707,10 @@ button:hover {
   padding: 20px;
 }
 .student-update-form label {
-  color: #000;
+  color: #000 !important;
   font-weight: 600;
+  display: block;
+  margin-bottom: 5px;
 }
 .student-update-form,
 .student-update-form * {
@@ -717,6 +719,11 @@ button:hover {
 .student-update-form textarea {
   width: 100%;
   min-height: 80px;
+}
+.student-update-form h3 {
+
+  color: #000;
+
 }
 .student-form-buttons {
   display: flex;

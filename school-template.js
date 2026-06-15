@@ -1079,8 +1079,10 @@ window.viewStudentInfo =
   }
 
   document.getElementById(
-    "adminContent"
-  ).innerHTML = `
+  "adminContent"
+).innerHTML = `
+
+<div class="student-update-form">
 
     <h3>
       Update Student Info
@@ -1166,14 +1168,17 @@ window.viewStudentInfo =
   </button>
 
 </div>
-  `;
+  </div>`;
 
 }
 
 async function saveStudentInfo(
   studentId
 ) {
-
+  console.log(
+  "SAVE BUTTON CLICKED",
+  studentId
+);
   const parent1 =
     document.getElementById(
       "parentContact1"
