@@ -955,6 +955,10 @@ async function viewStudentInfo(id) {
 
   }
 
+console.log(
+  "PASSPORT URL:",
+  data.passport_url
+
   document.getElementById(
     "adminContent"
   ).innerHTML = `
