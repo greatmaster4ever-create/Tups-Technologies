@@ -939,6 +939,47 @@ console.log(
 
 }
 
+function filterStudentsTable() {
+
+  const searchValue =
+    document
+      .getElementById(
+        "studentSearch"
+      )
+      .value
+      .toLowerCase();
+
+  const rows =
+    document.querySelectorAll(
+      ".students-table tr"
+    );
+
+  rows.forEach(
+    (
+      row,
+      index
+    ) => {
+
+      if (
+        index === 0
+      ) return;
+
+      const rowText =
+        row.innerText
+          .toLowerCase();
+
+      row.style.display =
+        rowText.includes(
+          searchValue
+        )
+          ? ""
+          : "none";
+
+    }
+  );
+
+}
+
 async function viewStudentInfo(id) {
 
   const {
@@ -1369,6 +1410,14 @@ function wireStudentsModule() {
     .addEventListener(
       "click",
       syncStudentsFromSheet
+    );
+	 document
+    .getElementById(
+      "studentSearch"
+    )
+    .addEventListener(
+      "keyup",
+      filterStudentsTable
     );
 
 }
