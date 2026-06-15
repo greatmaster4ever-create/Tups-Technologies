@@ -748,3 +748,34 @@ button:hover {
 .student-form-buttons button {
   width: 150px;
 }
+.student-toolbar {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 15px;
+
+}
+
+.student-toolbar select {
+
+  width: 220px;
+
+  max-width: 220px;
+
+}
+
+#refreshStudentsBtn {
+
+  width: 120px;
+
+  padding: 8px 12px;
+
+  font-size: 13px;
+
+  white-space: nowrap;
+
+}
