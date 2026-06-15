@@ -960,6 +960,20 @@ console.log(
   data.passport_url
   );
 
+let passportUrl = "";
+
+if (
+  data.passport_url
+) {
+
+  const fileId =
+    data.passport_url
+      .split("id=")[1];
+
+  passportUrl =
+    `https://drive.google.com/thumbnail?id=${fileId}&sz=w500`;
+
+}
   document.getElementById(
     "adminContent"
   ).innerHTML = `
@@ -969,7 +983,7 @@ console.log(
     >
 
    <img
-  src="https://drive.google.com/thumbnail?id=1OrA2Rey9tJO8aKj8tU2renM8c6LCpdKr&sz=w500"
+  src="${passportUrl}"
   class="student-passport"
 >
 
