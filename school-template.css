@@ -755,27 +755,32 @@ button:hover {
   align-items: center;
 
   gap: 10px;
-
-  margin-bottom: 15px;
+  flex-wrap: nowrap;
+  margin-bottom: 10px;
 
 }
 
 .student-toolbar select {
 
-  width: 220px;
-
-  max-width: 220px;
+  width: 180px;
 
 }
 
 #refreshStudentsBtn {
 
-  width: 120px;
+  width: 90px;
 
-  padding: 8px 12px;
+  padding: 8px;
 
   font-size: 13px;
 
-  white-space: nowrap;
+}
+#studentSearch {
+
+  width: 220px;
+
+  padding: 8px 10px;
+
+  font-size: 13px;
 
 }

@@ -675,37 +675,31 @@ async function showStudentsFees() {
     </h3>
 
     <div
-      class="student-toolbar"
-    >
+  class="student-toolbar"
+>
 
-      <select
-        id="studentDepartment"
-      >
+  <select
+    id="studentDepartment"
+  >
+    ${options}
+  </select>
 
-        ${options}
+  <button
+    id="refreshStudentsBtn"
+    class="admin-btn"
+  >
+    Refresh
+  </button>
 
-      </select>
+  <input
+    type="text"
+    id="studentSearch"
+    placeholder="Search Student..."
+  >
 
-      <button
-        id="refreshStudentsBtn"
-        class="admin-btn"
-      >
+</div>
 
-        Refresh Students
-
-      </button>
-
-    </div>
-
-    <br>
-
-    <input
-      type="text"
-      id="studentSearch"
-      placeholder="Search Student..."
-    >
-
-    <br><br>
+<br>
 
     <div
       id="studentsTableContainer"
