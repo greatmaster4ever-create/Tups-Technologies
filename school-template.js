@@ -792,58 +792,51 @@ async function loadStudentsTable(
 ) {
 
   console.log(
-    "LOAD STUDENTS FUNCTION RUNNING"
-  );
+  "LOAD STUDENTS FUNCTION RUNNING"
+);
 
-  console.log(
-    "Department Selected:",
-    department
-  );
+console.log(
+  "Department Selected:",
+  department
+);
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("students")
-      .select("*")
-      .eq(
-        "school_code",
-        schoolCode
-      )
-      .eq(
-        "department",
-        department
-      )
-      .order(
-        "student_name"
-      );
+const {
+  data,
+  error
+} =
+  await supabaseClient
+    .from("students")
+    .select("*");
 
-  console.log(
-    "RAW DATA:",
-    data
-  );
+console.log(
+  "RAW DATA:",
+  data
+);
 
-  console.log(
-    "Students Returned:",
-    data
-  );
+console.log(
+  "TOTAL STUDENTS:",
+  data?.length
+);
 
-  console.log(
-    "Department:",
-    department
-  );
+console.log(
+  "Students Returned:",
+  data
+);
 
-  console.log(
-    "School Code:",
-    schoolCode
-  );
+console.log(
+  "Department:",
+  department
+);
 
-  console.log(
-    "Query Error:",
-    error
-  );
+console.log(
+  "School Code:",
+  schoolCode
+);
 
+console.log(
+  "Query Error:",
+  error
+);
   if (error) {
 
     alert(
