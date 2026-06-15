@@ -754,7 +754,7 @@ button:hover {
 
   align-items: center;
 
-  gap: 13px;
+  gap: 15px;
   flex-wrap: nowrap;
   margin-bottom: 10px;
 
@@ -768,7 +768,7 @@ button:hover {
 
 #refreshStudentsBtn {
 
-  width: 120px;
+  width: 180px;
 
   padding: 8px;
 
