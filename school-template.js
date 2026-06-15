@@ -969,9 +969,15 @@ console.log(
     >
 
      <img
-  src="${data.passport_url || 'images/default-avatar.png'}"
+  src="${data.passport_url}"
   class="student-passport"
-  onerror="this.src='images/default-avatar.png'"
+  style="
+    width:120px;
+    height:120px;
+    border-radius:50%;
+    object-fit:cover;
+    border:2px solid #ccc;
+  "
 >
 
       <h3>
