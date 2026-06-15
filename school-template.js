@@ -958,6 +958,7 @@ async function viewStudentInfo(id) {
 console.log(
   "PASSPORT URL:",
   data.passport_url
+  );
 
   document.getElementById(
     "adminContent"
@@ -1139,27 +1140,7 @@ window.viewStudentInfo =
 
     <br><br>
 
-    <button
-      class="admin-btn"
-      onclick="
-        saveStudentInfo(
-          ${studentId}
-        )
-      "
-    >
-      Update
-    </button>
-
-    <button
-      class="admin-btn"
-      onclick="
-        openStudentUpdateForm(
-          ${studentId}
-        )
-      "
-    >
-      Clear
-    </button>
+   
    <div class="student-form-buttons">
 
   <button type="submit"
@@ -1314,9 +1295,9 @@ function wireStudentsModule() {
       () => {
 
        
-	(
-          departmentSelect.value
-        );
+	loadStudentsTable(
+        departmentSelect.value
+      );
 
       }
     );
