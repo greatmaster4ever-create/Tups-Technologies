@@ -630,6 +630,7 @@ button:hover {
   object-fit: cover;
   display: block;
   margin: 0 auto 20px;
+  object-position: center top;
 }
 
 .student-info-card {
