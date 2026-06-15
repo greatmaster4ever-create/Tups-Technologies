@@ -901,20 +901,20 @@ console.log(
 
     <button
       onclick="
-        viewStudentInfo(
-          ${student.id}
-        )
-      "
+  viewStudentInfo(
+    '${student.id}'
+  )
+"
     >
       Info
     </button>
 
     <button
       onclick="
-        openTermReport(
-          ${student.id}
-        )
-      "
+  openTermReport(
+    '${student.id}'
+  )
+"
     >
       Result
     </button>
