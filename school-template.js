@@ -755,13 +755,13 @@ async function syncStudentsFromSheet() {
   );
 
   const response =
-    await fetch(
-      "YOUR_APPS_SCRIPT_URL",
-      {
-        method:"POST",
-        body:formData
-      }
-    );
+  await fetch(
+    "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
+    {
+      method: "POST",
+      body: formData
+    }
+  );
 
   const result =
     await response.json();
