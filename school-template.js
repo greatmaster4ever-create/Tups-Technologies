@@ -991,7 +991,7 @@ console.log(
           <td><strong>Parent Contact 1</strong></td>
           <td>
             ${
-              data.parent_contact_1 || ""
+              data.parent_contact1 || ""
             }
           </td>
         </tr>
@@ -1000,7 +1000,7 @@ console.log(
           <td><strong>Parent Contact 2</strong></td>
           <td>
             ${
-              data.parent_contact_2 || ""
+              data.parent_contact2 || ""
             }
           </td>
         </tr>
