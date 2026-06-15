@@ -897,31 +897,31 @@ console.log(
 
         <td>
 
-          <button
-            onclick="
-              viewStudentInfo(
-                ${student.id}
-              )
-            "
-          >
+  <div class="action-buttons">
 
-            Info
+    <button
+      onclick="
+        viewStudentInfo(
+          ${student.id}
+        )
+      "
+    >
+      Info
+    </button>
 
-          </button>
+    <button
+      onclick="
+        openTermReport(
+          ${student.id}
+        )
+      "
+    >
+      Result
+    </button>
 
-          <button
-            onclick="
-              openTermReport(
-                ${student.id}
-              )
-            "
-          >
+  </div>
 
-            Term Report
-
-          </button>
-
-        </td>
+</td>
 
       </tr>
 

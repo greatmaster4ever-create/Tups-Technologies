@@ -843,3 +843,39 @@ button:hover {
   font-size: 13px;
 
 }
+.action-buttons {
+
+  display: flex;
+
+  gap: 3px;
+
+  justify-content: center;
+
+  align-items: center;
+
+  flex-wrap: nowrap;
+
+}
+
+.action-buttons button {
+
+  padding: 2px 6px;
+
+  font-size: 10px;
+
+  line-height: 1.1;
+
+  white-space: nowrap;
+
+}
+@media (max-width: 768px) {
+
+  .action-buttons button {
+
+    padding: 2px 5px;
+
+    font-size: 9px;
+
+  }
+
+}
