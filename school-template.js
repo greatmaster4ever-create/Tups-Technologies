@@ -968,16 +968,9 @@ console.log(
       class="student-info-card"
     >
 
-     <img
-  src="${data.passport_url}"
+   <img
+  src="https://drive.google.com/thumbnail?id=1OrA2Rey9tJO8aKj8tU2renM8c6LCpdKr&sz=w500"
   class="student-passport"
-  style="
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    object-fit:cover;
-    border:2px solid #ccc;
-  "
 >
 
       <h3>
