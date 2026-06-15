@@ -816,9 +816,19 @@ async function loadStudentsTable(
       );
 
   console.log(
-    "Students Returned:",
-    data
-  );
+  "Students Returned:",
+  data
+);
+
+console.log(
+  "Department:",
+  department
+);
+
+console.log(
+  "School Code:",
+  schoolCode
+);
 
   console.log(
     "Query Error:",
