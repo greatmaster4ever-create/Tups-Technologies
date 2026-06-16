@@ -759,6 +759,10 @@ async function syncStudentsFromSheet() {
 
   const result =
     await response.json();
+  console.log(
+  "SYNC RESPONSE:",
+  result
+);
 
   if (!result.success) {
 
@@ -1577,6 +1581,147 @@ if (logoutBtn) {
   );
 
 }
+
+async function openTermReport(
+  studentId
+) {
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("students")
+      .select(
+        "student_name,result_url"
+      )
+      .eq(
+        "id",
+        studentId
+      )
+      .single();
+
+  if (error) {
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+  if (
+    !data.result_url
+  ) {
+
+    alert(
+      "No result found for this student."
+    );
+
+    return;
+
+  }
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+    <h3>
+      ${data.student_name}
+    </h3>
+
+    <iframe
+      src="${data.result_url.replace('/view', '/preview')}"
+      style="
+        width:100%;
+        height:85vh;
+        border:none;
+        border-radius:10px;
+      "
+    ></iframe>
+
+    <br><br>
+
+    <div
+  style="
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:15px;
+  "
+>
+
+  <a
+    href="${data.result_url}"
+    target="_blank"
+    class="admin-btn"
+  >
+    Download Result
+  </a>
+
+  <button
+    class="admin-btn"
+    onclick="shareResult(
+      '${data.student_name}',
+      '${data.result_url}'
+    )"
+  >
+    Share Result
+  </button>
+
+</div>
+
+  `;
+
+}
+
+async function shareResult(
+  studentName,
+  resultUrl
+) {
+
+  try {
+
+    if (
+      navigator.share
+    ) {
+
+      await navigator.share({
+
+        title:
+          studentName +
+          " Result",
+
+        text:
+          "Student Result",
+
+        url:
+          resultUrl
+
+      });
+
+    } else {
+
+      await navigator.clipboard.writeText(
+        resultUrl
+      );
+
+      alert(
+        "Result link copied to clipboard."
+      );
+
+    }
+
+  } catch (err) {
+
+    console.error(err);
+
+  }
+
+}
+window.openTermReport =
+  openTermReport;
 // ==========================
 // FOOTER YEAR
 // ==========================
