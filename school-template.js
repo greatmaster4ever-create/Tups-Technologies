@@ -1635,7 +1635,10 @@ async function openTermReport(
     "adminContent"
   ).innerHTML = `
 
-    <h3>
+    <h3 style="
+      margin-bottom:15px;
+      text-align:center;
+    ">
       ${data.student_name}
     </h3>
 
@@ -1649,42 +1652,49 @@ async function openTermReport(
       "
     ></iframe>
 
-    <br><br>
-
     <div
       style="
         display:flex;
-        gap:15px;
-        flex-wrap:wrap;
+        gap:12px;
         margin-top:20px;
       "
     >
 
-      <a
-        href="${downloadUrl}"
+      <button
         class="admin-btn"
-		 style="
-      min-width:180px;
-      padding:12px 24px;
-      font-size:15px;
-    "
+        onclick="window.location.href='${downloadUrl}'"
+        style="
+          flex:1;
+          min-height:50px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:8px;
+          font-size:15px;
+          font-weight:600;
+        "
       >
-        Download Result
-      </a>
+        ⬇️ Download Result
+      </button>
 
       <button
         class="admin-btn"
-    onclick="shareResult(
-      '${data.student_name}',
-      '${data.result_url}'
-    )"
-    style="
-      min-width:180px;
-      padding:12px 24px;
-      font-size:15px;
-    "
+        onclick="shareResult(
+          '${data.student_name}',
+          '${data.result_url}'
+        )"
+        style="
+          flex:1;
+          min-height:50px;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:8px;
+          font-size:15px;
+          font-weight:600;
+        "
       >
-        Share Result
+        📤 Share Result
       </button>
 
     </div>
@@ -1692,6 +1702,7 @@ async function openTermReport(
   `;
 
 }
+
 window.openTermReport =
   openTermReport;
   
