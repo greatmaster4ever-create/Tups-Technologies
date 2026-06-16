@@ -1651,14 +1651,18 @@ async function openTermReport(
     margin-top:15px;
   "
 >
-
-  <a
-    href="${data.result_url}"
-    target="_blank"
-    class="admin-btn"
-  >
-    Download Result
-  </a>
+<a
+  href="${
+    data.result_url
+      .replace(
+        /\/file\/d\/([^/]+).*/,
+        "https://drive.google.com/uc?export=download&id=$1"
+      )
+  }"
+  class="admin-btn"
+>
+  Download Result
+</a>
 
   <button
     class="admin-btn"
@@ -1677,38 +1681,59 @@ async function openTermReport(
 }
 
 async function shareResult(
-  studentName,
-  resultUrl
+  resultUrl,
+  studentName
 ) {
 
   try {
 
+    const fileId =
+      resultUrl.match(
+        /\/d\/([^/]+)\//
+      )[1];
+
+    const downloadUrl =
+      `https://drive.google.com/uc?export=download&id=${fileId}`;
+
+    const response =
+      await fetch(
+        downloadUrl
+      );
+
+    const blob =
+      await response.blob();
+
+    const file =
+      new File(
+        [blob],
+        `${studentName}.pdf`,
+        {
+          type:
+            "application/pdf"
+        }
+      );
+
     if (
-      navigator.share
+      navigator.canShare &&
+      navigator.canShare({
+        files: [file]
+      })
     ) {
 
       await navigator.share({
 
         title:
-          studentName +
-          " Result",
+          studentName,
 
-        text:
-          "Student Result",
-
-        url:
-          resultUrl
+        files: [file]
 
       });
 
     } else {
 
-      await navigator.clipboard.writeText(
-        resultUrl
-      );
-
-      alert(
-        "Result link copied to clipboard."
+      window.open(
+        resultUrl,
+        "_blank"
       );
 
     }
@@ -1716,6 +1741,10 @@ async function shareResult(
   } catch (err) {
 
     console.error(err);
+
+    alert(
+      "Unable to share result."
+    );
 
   }
 
