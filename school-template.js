@@ -1623,6 +1623,14 @@ async function openTermReport(
 
   }
 
+  const fileId =
+    data.result_url.match(
+      /\/d\/([^/]+)\//
+    )[1];
+
+  const downloadUrl =
+    `https://drive.google.com/uc?export=download&id=${fileId}`;
+
   document.getElementById(
     "adminContent"
   ).innerHTML = `
@@ -1632,7 +1640,7 @@ async function openTermReport(
     </h3>
 
     <iframe
-      src="${data.result_url.replace('/view', '/preview')}"
+      src="${data.result_url.replace('/view','/preview')}"
       style="
         width:100%;
         height:85vh;
@@ -1644,43 +1652,40 @@ async function openTermReport(
     <br><br>
 
     <div
-  style="
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    margin-top:15px;
-  "
->
-<a
-  href="${
-    data.result_url
-      .replace(
-        /\/file\/d\/([^/]+).*/,
-        "https://drive.google.com/uc?export=download&id=$1"
-      )
-  }"
-  class="admin-btn"
->
-  Download Result
-</a>
+      style="
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        margin-top:15px;
+      "
+    >
 
-  <button
-    class="admin-btn"
-    onclick="shareResult(
-      '${data.student_name}',
-      '${data.result_url}'
-    )"
-  >
-    Share Result
-  </button>
+      <a
+        href="${downloadUrl}"
+        class="admin-btn"
+      >
+        Download Result
+      </a>
 
-</div>
+      <button
+        class="admin-btn"
+        onclick="shareResult(
+          '${data.result_url}',
+          '${data.student_name}'
+        )"
+      >
+        Share Result
+      </button>
+
+    </div>
 
   `;
 
 }
-
-async function shareResult(
+window.openTermReport =
+  openTermReport;
+  
+  async function shareResult(
   resultUrl,
   studentName
 ) {
@@ -1749,8 +1754,9 @@ async function shareResult(
   }
 
 }
-window.openTermReport =
-  openTermReport;
+
+window.shareResult =
+  shareResult;
 // ==========================
 // FOOTER YEAR
 // ==========================
