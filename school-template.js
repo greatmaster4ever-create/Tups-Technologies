@@ -1685,59 +1685,43 @@ async function openTermReport(
 window.openTermReport =
   openTermReport;
   
-  async function shareResult(
-  resultUrl,
-  studentName
+ async function shareResult(
+  studentName,
+  resultUrl
 ) {
 
   try {
 
-    const fileId =
-      resultUrl.match(
-        /\/d\/([^/]+)\//
-      )[1];
-
-    const downloadUrl =
-      `https://drive.google.com/uc?export=download&id=${fileId}`;
-
-    const response =
-      await fetch(
-        downloadUrl
-      );
-
-    const blob =
-      await response.blob();
-
-    const file =
-      new File(
-        [blob],
-        `${studentName}.pdf`,
-        {
-          type:
-            "application/pdf"
-        }
-      );
-
     if (
-      navigator.canShare &&
-      navigator.canShare({
-        files: [file]
-      })
+      navigator.share
     ) {
 
       await navigator.share({
 
         title:
-          studentName,
+          studentName +
+          " Result",
 
-        files: [file]
+        text:
+          studentName +
+          " Result",
+
+        url:
+          resultUrl
 
       });
 
     } else {
 
+      const shareUrl =
+        `https://wa.me/?text=${encodeURIComponent(
+          studentName +
+          " Result: " +
+          resultUrl
+        )}`;
+
       window.open(
-        resultUrl,
+        shareUrl,
         "_blank"
       );
 
@@ -1745,16 +1729,9 @@ window.openTermReport =
 
   } catch (err) {
 
-  console.error(
-    "SHARE ERROR:",
-    err
-  );
+    console.error(err);
 
-  alert(
-    err.message
-  );
-
-}
+  }
 
 }
 
