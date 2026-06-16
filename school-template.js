@@ -1654,25 +1654,35 @@ async function openTermReport(
     <div
       style="
         display:flex;
-        gap:10px;
+        gap:15px;
         flex-wrap:wrap;
-        margin-top:15px;
+        margin-top:20px;
       "
     >
 
       <a
         href="${downloadUrl}"
         class="admin-btn"
+		 style="
+      min-width:180px;
+      padding:12px 24px;
+      font-size:15px;
+    "
       >
         Download Result
       </a>
 
       <button
         class="admin-btn"
-        onclick="shareResult(
-          '${data.result_url}',
-          '${data.student_name}'
-        )"
+    onclick="shareResult(
+      '${data.student_name}',
+      '${data.result_url}'
+    )"
+    style="
+      min-width:180px;
+      padding:12px 24px;
+      font-size:15px;
+    "
       >
         Share Result
       </button>
