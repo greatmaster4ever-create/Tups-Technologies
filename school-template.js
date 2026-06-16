@@ -1745,13 +1745,16 @@ window.openTermReport =
 
   } catch (err) {
 
-    console.error(err);
+  console.error(
+    "SHARE ERROR:",
+    err
+  );
 
-    alert(
-      "Unable to share result."
-    );
+  alert(
+    err.message
+  );
 
-  }
+}
 
 }
 
