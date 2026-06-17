@@ -2,10 +2,6 @@ console.log("SCHOOL TEMPLATE JS LOADED");
 
 let currentDepartment = "";
 let currentSchoolCode = "";
-if (!department) {
-  console.warn("No department selected");
-  return;
-}
 
 // ==========================
 // SUPABASE INIT
