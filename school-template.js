@@ -1846,30 +1846,31 @@ console.log(
     "
   >
 
-  <button
-    class="admin-btn"
-    style="
-      height:40px;
-      padding:0 15px;
-      font-size:13px;
-      white-space:nowrap;
-    "
-  >
-    Print Fees
-  </button>
+ <button
+  class="admin-btn"
+  onclick="printFeesTable()"
+  style="
+    height:40px;
+    padding:0 15px;
+    font-size:13px;
+    white-space:nowrap;
+  "
+>
+  Print Fees
+</button>
 
   <button
-    class="admin-btn"
-    style="
-      height:40px;
-      padding:0 15px;
-      font-size:13px;
-      white-space:nowrap;
-    "
-  >
-    Clear All Fees
-  </button>
-
+  class="admin-btn"
+  onclick="clearAllFees()"
+  style="
+    height:40px;
+    padding:0 15px;
+    font-size:13px;
+    white-space:nowrap;
+  "
+>
+  Clear All Fees
+</button>
 </div>
 
 <table class="admin-table">
@@ -2093,6 +2094,143 @@ async function saveTermFee(
 window.saveTermFee =
   saveTermFee;
   
+  
+  function printFeesTable() {
+
+ const table =
+  document.querySelector(
+    ".admin-table"
+  );
+
+if (!table) {
+  alert("No fee table found.");
+  return;
+}
+
+// Clone table for printing
+const clonedTable =
+  table.cloneNode(true);
+
+clonedTable
+  .querySelectorAll("tr")
+  .forEach(row => {
+
+    if (
+      row.cells.length > 2
+    ) {
+
+      row.deleteCell(2);
+
+    }
+
+  });
+
+const printWindow =
+  window.open(
+    "",
+    "",
+    "width=900,height=700"
+  );
+
+const clonedTable =
+  table.cloneNode(true);
+
+clonedTable
+  .querySelectorAll("tr")
+  .forEach(row => {
+    if (row.cells.length > 2) {
+      row.deleteCell(2);
+    }
+  });
+  
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>Class Fees</title>
+
+        <style>
+          body{
+            font-family:Arial;
+            padding:20px;
+          }
+
+          table{
+            width:100%;
+            border-collapse:collapse;
+          }
+
+          th,td{
+            border:1px solid #000;
+            padding:8px;
+            text-align:left;
+          }
+
+          th{
+            background:#f2f2f2;
+          }
+        </style>
+      </head>
+
+      <body>
+
+        <h2>
+          Class Fees
+        </h2>
+
+        ${clonedTable.outerHTML}
+
+      </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+
+  printWindow.print();
+
+}
+window.printFeesTable =
+  printFeesTable;
+  
+  async function clearAllFees() {
+
+  const confirmed =
+    confirm(
+      "This will delete ALL class fees. Continue?"
+    );
+
+  if (!confirmed) return;
+
+  const { error } =
+    await supabaseClient
+      .from("class_fees")
+      .delete()
+      .eq(
+        "school_code",
+        currentSchoolCode
+      );
+
+  if (error) {
+
+    console.error(error);
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+  alert(
+    "All fees cleared successfully."
+  );
+
+  await loadTermFees();
+
+}
+
+window.clearAllFees =
+  clearAllFees;
 // ==========================
 // FOOTER YEAR
 // ==========================
