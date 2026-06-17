@@ -1808,7 +1808,7 @@ function togglePaymentsMenu() {
 async function loadTermFees() {
 console.log(
   "Department:",
-  currentDepartment
+  selectedDepartment
 );
 
 console.log(
