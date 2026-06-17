@@ -1900,77 +1900,88 @@ console.log(
 
 async function loadTermFeesData() {
 
-  console.log(
-    "School:",
-    currentSchoolCode
-  );
+  console.log("School:", currentSchoolCode);
 
+  // 1. Get all students ONLY to extract classes
   const { data, error } =
     await supabaseClient
       .from("students")
       .select("class")
-      .eq(
-        "school_code",
-        currentSchoolCode
-      );
+      .eq("school_code", currentSchoolCode);
 
   if (error) {
     console.error(error);
     return;
   }
 
-  console.log(
-    "STUDENTS RETURNED:",
-    data
-  );
+  console.log("STUDENTS RETURNED:", data);
 
-  const classes =
-    [...new Set(
+  // 2. Unique + cleaned classes
+  const classes = [
+    ...new Set(
       data
-        .map(x => x.class)
+        .map(x => x.class?.trim())
         .filter(Boolean)
-    )];
+    )
+  ];
 
-  console.log(
-    "UNIQUE CLASSES:",
-    classes
-  );
+  console.log("UNIQUE CLASSES:", classes);
 
+  // 3. NOW fetch fees from CORRECT TABLE
+  const { data: feeData, error: feeError } =
+    await supabaseClient
+      .from("class_fees")
+      .select("*")
+      .eq("school_code", currentSchoolCode);
+
+  if (feeError) {
+    console.error(feeError);
+    return;
+  }
+
+  console.log("CLASS FEES DATA:", feeData);
+
+  // 4. Render table
   const body =
-    document.getElementById(
-      "termFeesBody"
-    );
+    document.getElementById("termFeesBody");
 
   body.innerHTML = "";
 
   classes.forEach(className => {
 
+   const feeRecord = feeData.find(f =>
+  f.class_name?.trim().toLowerCase() === className?.trim().toLowerCase()
+);
+
+    const fee =
+      feeRecord?.term_fee || 0;
+
     body.innerHTML += `
+      <tr style="border-bottom:1px solid #ddd;">
 
-      <tr>
+        <td style="padding:8px;">
+          ${className}
+        </td>
 
-        <td>${className}</td>
+        <td style="padding:8px;">
+          ₦${Number(fee).toLocaleString()}
+        </td>
 
-        <td>₦0</td>
-
-     <td>
-  <button
-    class="admin-btn"
-    onclick="editClassFee('${className}')"
-  >
-    Edit
-  </button>
-</td>
+        <td style="padding:8px;">
+          <button
+            class="admin-btn"
+            onclick="editClassFee('${className}', ${fee})"
+          >
+            Edit
+          </button>
+        </td>
 
       </tr>
-
     `;
-
   });
-
 }
 
-function editClassFee(className) {
+function editClassFee(className, currentFee = 0) {
 
   document.getElementById(
     "adminContent"
@@ -2001,10 +2012,11 @@ function editClassFee(className) {
       </label>
 
       <input
-        type="number"
-        id="termFeeAmount"
-        placeholder="Enter Amount"
-      >
+  type="number"
+  id="termFeeAmount"
+  value="${currentFee}"
+  placeholder="Enter Amount"
+/>
 
       <br><br>
 
@@ -2027,23 +2039,61 @@ function editClassFee(className) {
 window.editClassFee =
   editClassFee;
   
-  async function saveTermFee(
+async function saveTermFee(
   className
 ) {
 
   const amount =
-    document.getElementById(
-      "termFeeAmount"
-    ).value;
+    Number(
+      document.getElementById(
+        "termFeeAmount"
+      ).value
+    );
 
-  alert(
-    `${className}
-     = ₦${amount}`
-  );
+  if (
+    isNaN(amount) ||
+    amount < 0
+  ) {
+    alert(
+      "Enter a valid fee amount"
+    );
+    return;
+  }
 
-}window.saveTermFee =
+  const { error } =
+    await supabaseClient
+      .from("class_fees")
+      .upsert({
+        school_code:
+          currentSchoolCode,
+
+        class_name:
+          className,
+
+        term_fee:
+          amount
+      });
+
+  if (error) {
+
+    console.error(error);
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
+  alert("Fee Saved");
+
+  await loadTermFees();
+
+}
+
+window.saveTermFee =
   saveTermFee;
-  
   
 // ==========================
 // FOOTER YEAR
