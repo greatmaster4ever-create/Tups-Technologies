@@ -2,6 +2,10 @@ console.log("SCHOOL TEMPLATE JS LOADED");
 
 let currentDepartment = "";
 let currentSchoolCode = "";
+if (!department) {
+  console.warn("No department selected");
+  return;
+}
 
 // ==========================
 // SUPABASE INIT
@@ -1908,11 +1912,11 @@ async function loadTermFeesData() {
     currentSchoolCode
   );
 
-  const department =
-    currentDepartment;
-
-  const schoolCode =
-    currentSchoolCode;
+ const department =
+  currentDepartment ||
+  document.getElementById("department")?.value ||
+  "";
+const schoolCode = currentSchoolCode;
 
   const {
     data,
