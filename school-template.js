@@ -1896,18 +1896,16 @@ console.log(
 
 }
 
-async function loadTermFeesData() {
+aasync function loadTermFeesData() {
 
-  const department =
-    document.getElementById("department")?.value;
+  console.log("Department (STATE):", currentDepartment);
+  console.log("School:", currentSchoolCode);
 
+  const department = currentDepartment;
   const schoolCode = currentSchoolCode;
 
-  console.log("Department (UI):", department);
-  console.log("School:", schoolCode);
-
   if (!department) {
-    console.warn("No department selected yet");
+    console.warn("Department not loaded yet (currentDepartment is empty)");
     return;
   }
 
@@ -1922,9 +1920,14 @@ async function loadTermFeesData() {
     return;
   }
 
-  const classes = [...new Set(data.map(x => x.class))];
+  const classes = [...new Set((data || []).map(x => x.class))];
 
   const body = document.getElementById("termFeesBody");
+  if (!body) {
+    console.error("termFeesBody not found in DOM");
+    return;
+  }
+
   body.innerHTML = "";
 
   classes.forEach(className => {
@@ -1932,7 +1935,9 @@ async function loadTermFeesData() {
       <tr>
         <td>${className}</td>
         <td>₦0</td>
-        <td><button class="admin-btn">Edit</button></td>
+        <td>
+          <button class="admin-btn">Edit</button>
+        </td>
       </tr>
     `;
   });
