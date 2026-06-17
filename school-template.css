@@ -883,3 +883,42 @@ button:hover {
   }
 
 }
+#paymentsDropdown {
+
+  position: absolute;
+
+  top: 55px;
+
+  left: 0;
+
+  background: white;
+
+  border-radius: 8px;
+
+  padding: 6px;
+
+  min-width: 140px;
+
+  box-shadow:
+    0 3px 12px rgba(
+      0,0,0,.15
+    );
+
+  z-index: 1000;
+
+}
+.payment-menu-btn {
+
+  width: 100%;
+
+  height: 36px;
+
+  font-size: 13px;
+
+  font-weight: 500;
+
+  margin-bottom: 4px;
+
+  border-radius: 6px;
+
+}

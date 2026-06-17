@@ -1880,6 +1880,10 @@ console.log(
 
 </thead>
 
+<tbody id="termFeesBody">
+</tbody>
+
+</table>
   `;
 
   await loadTermFeesData();
@@ -1888,18 +1892,18 @@ console.log(
 
 async function loadTermFeesData() {
 
-console.log(
-  "Department:",
-  currentDepartment
-);
+  console.log(
+    "Department:",
+    selectedDepartment
+  );
 
-console.log(
-  "School:",
-  currentSchoolCode
-);
+  console.log(
+    "School:",
+    currentSchoolCode
+  );
 
   const department =
-    currentDepartment;
+    selectedDepartment;
 
   const schoolCode =
     currentSchoolCode;
@@ -1951,13 +1955,9 @@ console.log(
 
         <tr>
 
-          <td>
-            ${className}
-          </td>
+          <td>${className}</td>
 
-          <td>
-            ₦0
-          </td>
+          <td>₦0</td>
 
           <td>
 
