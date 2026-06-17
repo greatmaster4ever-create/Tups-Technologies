@@ -2061,18 +2061,18 @@ async function saveTermFee(
   }
 
   const { error } =
-    await supabaseClient
-      .from("class_fees")
-      .upsert({
-        school_code:
-          currentSchoolCode,
-
-        class_name:
-          className,
-
-        term_fee:
-          amount
-      });
+   await supabaseClient
+  .from("class_fees")
+  .upsert(
+    {
+      school_code: currentSchoolCode,
+      class_name: className.trim(),
+      term_fee: amount
+    },
+    {
+      onConflict: "school_code,class_name"
+    }
+  );
 
   if (error) {
 
