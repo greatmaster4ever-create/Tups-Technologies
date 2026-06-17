@@ -376,13 +376,36 @@ const adminDashboardHTML = `
   👨‍🎓 Students & Fees
 </button>
 
-<button
-  class="admin-tab"
-  onclick="showPayments()"
->
-  💳 Payments
-</button>
+<div class="admin-dropdown">
 
+  <button
+    class="admin-tab-btn"
+    onclick="togglePaymentsMenu()"
+  >
+    Payments
+  </button>
+
+  <div
+    id="paymentsDropdown"
+    class="admin-dropdown-content"
+    style="display:none;"
+  >
+
+    <button
+      onclick="loadTermFees()"
+    >
+      Term Fees
+    </button>
+
+    <button
+      onclick="loadAllPayments()"
+    >
+      All Payments
+    </button>
+
+  </div>
+
+</div>
     <button
       class="admin-tab"
       onclick="adminLogout()"
@@ -1758,6 +1781,171 @@ window.openTermReport =
 
 window.shareResult =
   shareResult;
+  
+function togglePaymentsMenu() {
+
+  const menu =
+    document.getElementById(
+      "paymentsDropdown"
+    );
+
+  menu.style.display =
+    menu.style.display === "block"
+      ? "none"
+      : "block";
+
+}
+
+async function loadTermFees() {
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+    <div
+      style="
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        align-items:center;
+        margin-bottom:15px;
+      "
+    >
+
+      <input
+        type="text"
+        id="feeSearch"
+        placeholder="Search Class"
+        onkeyup="filterTermFees()"
+      >
+
+      <button
+        class="admin-btn"
+      >
+        Print Fees
+      </button>
+
+      <button
+        class="admin-btn danger-btn"
+      >
+        Clear ALL Fees
+      </button>
+
+    </div>
+
+    <table
+      class="admin-table"
+    >
+
+      <thead>
+
+        <tr>
+
+          <th>Class</th>
+
+          <th>Term Fee</th>
+
+          <th>Action</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody
+        id="termFeesBody"
+      >
+      </tbody>
+
+    </table>
+
+  `;
+
+  await loadTermFeesData();
+
+}
+
+async function loadTermFeesData() {
+
+  const department =
+    currentDepartment;
+
+  const schoolCode =
+    currentSchoolCode;
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("students")
+      .select("class")
+      .eq(
+        "school_code",
+        schoolCode
+      )
+      .eq(
+        "department",
+        department
+      );
+
+  if (error) {
+
+    console.error(error);
+
+    return;
+
+  }
+
+  const classes =
+    [
+      ...new Set(
+        data.map(
+          x => x.class
+        )
+      )
+    ];
+
+  const body =
+    document.getElementById(
+      "termFeesBody"
+    );
+
+  body.innerHTML = "";
+
+  classes.forEach(
+    className => {
+
+      body.innerHTML += `
+
+        <tr>
+
+          <td>
+            ${className}
+          </td>
+
+          <td>
+            ₦0
+          </td>
+
+          <td>
+
+            <button
+              class="admin-btn"
+            >
+              Edit
+            </button>
+
+          </td>
+
+        </tr>
+
+      `;
+
+    }
+  );
+
+}
+
 // ==========================
 // FOOTER YEAR
 // ==========================
