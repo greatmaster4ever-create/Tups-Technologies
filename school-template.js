@@ -386,22 +386,31 @@ const adminDashboardHTML = `
   </button>
 
   <div
-    id="paymentsDropdown"
-    class="admin-dropdown-content"
-    style="display:none;"
-  >
+  id="paymentsDropdown"
+  style="
+    display:none;
+    position:absolute;
+    background:#fff;
+    padding:10px;
+    border-radius:10px;
+    box-shadow:0 3px 12px rgba(0,0,0,.15);
+    z-index:999;
+  "
+>
 
-    <button
-      onclick="loadTermFees()"
-    >
-      Term Fees
-    </button>
+   <button
+  class="admin-btn"
+  onclick="loadTermFees()"
+>
+  Term Fees
+</button>
 
-    <button
-      onclick="loadAllPayments()"
-    >
-      All Payments
-    </button>
+<button
+  class="admin-btn"
+  onclick="loadAllPayments()"
+>
+  All Payments
+</button>
 
   </div>
 
@@ -1797,66 +1806,79 @@ function togglePaymentsMenu() {
 }
 
 async function loadTermFees() {
+console.log(
+  "Department:",
+  currentDepartment
+);
 
+console.log(
+  "School:",
+  currentSchoolCode
+);
   document.getElementById(
     "adminContent"
   ).innerHTML = `
 
     <div
-      style="
-        display:flex;
-        gap:10px;
-        flex-wrap:wrap;
-        align-items:center;
-        margin-bottom:15px;
-      "
-    >
+  style="
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:nowrap;
+    margin-bottom:15px;
+  "
+>
 
-      <input
-        type="text"
-        id="feeSearch"
-        placeholder="Search Class"
-        onkeyup="filterTermFees()"
-      >
+  <input
+    type="text"
+    id="feeSearch"
+    placeholder="Search Class"
+    style="
+      flex:1;
+      height:40px;
+      font-size:14px;
+    "
+  >
 
-      <button
-        class="admin-btn"
-      >
-        Print Fees
-      </button>
+  <button
+    class="admin-btn"
+    style="
+      height:40px;
+      padding:0 15px;
+      font-size:13px;
+      white-space:nowrap;
+    "
+  >
+    Print Fees
+  </button>
 
-      <button
-        class="admin-btn danger-btn"
-      >
-        Clear ALL Fees
-      </button>
+  <button
+    class="admin-btn"
+    style="
+      height:40px;
+      padding:0 15px;
+      font-size:13px;
+      white-space:nowrap;
+    "
+  >
+    Clear All Fees
+  </button>
 
-    </div>
+</div>
 
-    <table
-      class="admin-table"
-    >
+<table class="admin-table">
 
-      <thead>
+<thead>
 
-        <tr>
+<tr>
 
-          <th>Class</th>
+<th>Class</th>
+<th>Term Fee</th>
+<th>Action</th>
 
-          <th>Term Fee</th>
+</tr>
 
-          <th>Action</th>
-
-        </tr>
-
-      </thead>
-
-      <tbody
-        id="termFeesBody"
-      >
-      </tbody>
-
-    </table>
+</thead>
 
   `;
 
@@ -1865,6 +1887,16 @@ async function loadTermFees() {
 }
 
 async function loadTermFeesData() {
+
+console.log(
+  "Department:",
+  currentDepartment
+);
+
+console.log(
+  "School:",
+  currentSchoolCode
+);
 
   const department =
     currentDepartment;
