@@ -1953,15 +1953,14 @@ async function loadTermFeesData() {
 
         <td>₦0</td>
 
-        <td>
-
-          <button
-            class="admin-btn"
-          >
-            Edit
-          </button>
-
-        </td>
+     <td>
+  <button
+    class="admin-btn"
+    onclick="editClassFee('${className}')"
+  >
+    Edit
+  </button>
+</td>
 
       </tr>
 
@@ -1970,6 +1969,82 @@ async function loadTermFeesData() {
   });
 
 }
+
+function editClassFee(className) {
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+    <div class="fee-form-card">
+
+      <h3>
+        Edit Term Fee
+      </h3>
+
+      <br>
+
+      <label>
+        Class
+      </label>
+
+      <input
+        type="text"
+        value="${className}"
+        readonly
+      >
+
+      <br><br>
+
+      <label>
+        Term Fee
+      </label>
+
+      <input
+        type="number"
+        id="termFeeAmount"
+        placeholder="Enter Amount"
+      >
+
+      <br><br>
+
+      <button
+        class="admin-btn"
+        onclick="
+          saveTermFee(
+            '${className}'
+          )
+        "
+      >
+        Save Fee
+      </button>
+
+    </div>
+
+  `;
+
+}
+window.editClassFee =
+  editClassFee;
+  
+  async function saveTermFee(
+  className
+) {
+
+  const amount =
+    document.getElementById(
+      "termFeeAmount"
+    ).value;
+
+  alert(
+    `${className}
+     = ₦${amount}`
+  );
+
+}window.saveTermFee =
+  saveTermFee;
+  
+  
 // ==========================
 // FOOTER YEAR
 // ==========================
