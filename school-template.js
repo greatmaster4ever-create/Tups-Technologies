@@ -385,34 +385,33 @@ const adminDashboardHTML = `
     Payments
   </button>
 
+  
   <div
   id="paymentsDropdown"
   style="
     display:none;
     position:absolute;
-    background:#fff;
-    padding:10px;
-    border-radius:10px;
-    box-shadow:0 3px 12px rgba(0,0,0,.15);
-    z-index:999;
+    margin-top:5px;
+    width:160px;
+    z-index:1000;
   "
 >
 
-   <button
-  class="admin-btn"
-  onclick="loadTermFees()"
->
-  Term Fees
-</button>
+  <button
+    class="admin-btn payment-item"
+	onclick="loadTermFees()"
+  >
+    Term Fees
+  </button>
 
-<button
-  class="admin-btn"
-  onclick="loadAllPayments()"
->
-  All Payments
-</button>
+  <button
+    class="admin-btn payment-item"
+	onclick="loadAllPayments()"
+  >
+    All Payments
+  </button>
 
-  </div>
+</div>
 
 </div>
     <button
@@ -1808,7 +1807,7 @@ function togglePaymentsMenu() {
 async function loadTermFees() {
 console.log(
   "Department:",
-  selectedDepartment
+  currentDepartment
 );
 
 console.log(
@@ -1893,9 +1892,9 @@ console.log(
 async function loadTermFeesData() {
 
   console.log(
-    "Department:",
-    selectedDepartment
-  );
+  "Department:",
+  currentDepartment
+);
 
   console.log(
     "School:",
@@ -1903,7 +1902,7 @@ async function loadTermFeesData() {
   );
 
   const department =
-    selectedDepartment;
+    currentDepartment;
 
   const schoolCode =
     currentSchoolCode;
