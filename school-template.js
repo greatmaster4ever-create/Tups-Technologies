@@ -2095,98 +2095,40 @@ window.saveTermFee =
   saveTermFee;
   
   
-  function printFeesTable() {
+function printFeesTable() {
 
- const table =
-  document.querySelector(
-    ".admin-table"
-  );
+  const table =
+    document.querySelector(".admin-table");
 
-if (!table) {
-  alert("No fee table found.");
-  return;
-}
+  const clonedTable =
+    table.cloneNode(true);
 
-// Clone table for printing
-const clonedTable =
-  table.cloneNode(true);
+  clonedTable
+    .querySelectorAll("tr")
+    .forEach(row => {
 
-clonedTable
-  .querySelectorAll("tr")
-  .forEach(row => {
+      if (row.cells.length > 2) {
+        row.deleteCell(2);
+      }
 
-    if (
-      row.cells.length > 2
-    ) {
+    });
 
-      row.deleteCell(2);
+  const printWindow =
+    window.open("", "", "width=900,height=700");
 
-    }
-
-  });
-
-const printWindow =
-  window.open(
-    "",
-    "",
-    "width=900,height=700"
-  );
-
-const clonedTable =
-  table.cloneNode(true);
-
-clonedTable
-  .querySelectorAll("tr")
-  .forEach(row => {
-    if (row.cells.length > 2) {
-      row.deleteCell(2);
-    }
-  });
-  
   printWindow.document.write(`
     <html>
       <head>
-        <title>Class Fees</title>
-
-        <style>
-          body{
-            font-family:Arial;
-            padding:20px;
-          }
-
-          table{
-            width:100%;
-            border-collapse:collapse;
-          }
-
-          th,td{
-            border:1px solid #000;
-            padding:8px;
-            text-align:left;
-          }
-
-          th{
-            background:#f2f2f2;
-          }
-        </style>
+        <title>Term Fees</title>
       </head>
-
       <body>
-
-        <h2>
-          Class Fees
-        </h2>
-
         ${clonedTable.outerHTML}
-
       </body>
     </html>
   `);
 
   printWindow.document.close();
-
   printWindow.print();
-
 }
 window.printFeesTable =
   printFeesTable;
