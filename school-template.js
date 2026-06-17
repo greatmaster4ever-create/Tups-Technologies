@@ -1900,49 +1900,75 @@ console.log(
 
 async function loadTermFeesData() {
 
-  console.log("Department (STATE):", currentDepartment);
-  console.log("School:", currentSchoolCode);
+  console.log(
+    "School:",
+    currentSchoolCode
+  );
 
-  const department = currentDepartment;
-  const schoolCode = currentSchoolCode;
-
-  if (!department) {
-    console.warn("Department not loaded yet (currentDepartment is empty)");
-    return;
-  }
-
-  const { data, error } = await supabaseClient
-    .from("students")
-    .select("class")
-    .eq("school_code", schoolCode)
-    .eq("department", department);
+  const { data, error } =
+    await supabaseClient
+      .from("students")
+      .select("class")
+      .eq(
+        "school_code",
+        currentSchoolCode
+      );
 
   if (error) {
     console.error(error);
     return;
   }
 
-  const classes = [...new Set((data || []).map(x => x.class))];
+  console.log(
+    "STUDENTS RETURNED:",
+    data
+  );
 
-  const body = document.getElementById("termFeesBody");
-  if (!body) {
-    console.error("termFeesBody not found in DOM");
-    return;
-  }
+  const classes =
+    [...new Set(
+      data
+        .map(x => x.class)
+        .filter(Boolean)
+    )];
+
+  console.log(
+    "UNIQUE CLASSES:",
+    classes
+  );
+
+  const body =
+    document.getElementById(
+      "termFeesBody"
+    );
 
   body.innerHTML = "";
 
   classes.forEach(className => {
+
     body.innerHTML += `
+
       <tr>
+
         <td>${className}</td>
+
         <td>₦0</td>
+
         <td>
-          <button class="admin-btn">Edit</button>
+
+          <button
+            class="admin-btn"
+          >
+            Edit
+          </button>
+
         </td>
+
       </tr>
+
     `;
+
   });
+
 }
 // ==========================
 // FOOTER YEAR
