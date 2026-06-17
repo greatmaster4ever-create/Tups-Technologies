@@ -65,7 +65,9 @@ async function loadSchoolInfo() {
       .select("*")
       .eq("school_code", schoolCode)
       .single();
-
+  
+  console.log("SCHOOL RECORD:", data);
+  
   if (error || !data) {
     console.error(error);
     alert("School not found");
