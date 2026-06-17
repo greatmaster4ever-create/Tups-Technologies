@@ -1896,7 +1896,7 @@ console.log(
 
 }
 
-aasync function loadTermFeesData() {
+async function loadTermFeesData() {
 
   console.log("Department (STATE):", currentDepartment);
   console.log("School:", currentSchoolCode);
