@@ -387,12 +387,10 @@ const adminDashboardHTML = `
 
 <div class="admin-dropdown">
 
-  <button
-    class="admin-tab-btn"
-    onclick="togglePaymentsMenu()"
-  >
-    Payments
-  </button>
+<button class="admin-tab-btn" 
+onclick="togglePaymentsMenu()">
+  Payments
+</button>
 
   
   <div

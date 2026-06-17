@@ -406,21 +406,33 @@ button:hover {
 
 /* ADMIN BUTTON */
 .admin-btn {
-  width: 100%;
-  padding: 12px;
+  background: var(--primary-color);
   color: white;
   border: none;
-  border-radius: 8px;
+  padding: 8px 14px;
+  border-radius: 6px;
   cursor: pointer;
-  flex: 0;
-  width: 100%;
-  background: var(--primary-color);
 }
 
 .admin-btn:hover {
   opacity: 0.9;
 }
-
+.admin-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.admin-tab-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
 .admin-text {
   color: #555;
   text-align: center;
@@ -884,28 +896,16 @@ button:hover {
 
 }
 #paymentsDropdown {
-
+  display: none;
   position: absolute;
-
-  top: 55px;
-
+  top: 100%;   /* 👈 forces it directly under button */
   left: 0;
-
-  background: white;
-
+  margin-top: 6px;
+  width: 140px;  /* smaller size */
+  background: #fff;
   border-radius: 8px;
-
-  padding: 6px;
-
-  min-width: 140px;
-
-  box-shadow:
-    0 3px 12px rgba(
-      0,0,0,.15
-    );
-
-  z-index: 1000;
-
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  overflow: hidden;
 }
 .payment-menu-btn {
 
@@ -923,15 +923,22 @@ button:hover {
 
 }
 .payment-item {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 13px;
+  background: white;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid #eee; 
+}
 
-  width:160px;
+.payment-item:last-child {
+  border-bottom: none;
+}
 
-  height:38px;
-
-  font-size:13px;
-
-  margin-bottom:4px;
-
+.payment-item:hover {
+  background: rgba(0,0,0,0.05);
 }
 .admin-table {
 
@@ -977,6 +984,10 @@ button:hover {
   font-size: 12px;
   min-height: auto;
 
+}
+.admin-dropdown {
+  position: relative;
+  display: inline-block;
 }
 .fee-form-card {
 
