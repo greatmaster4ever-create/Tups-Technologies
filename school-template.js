@@ -1,5 +1,8 @@
 console.log("SCHOOL TEMPLATE JS LOADED");
 
+let currentDepartment = "";
+let currentSchoolCode = "";
+
 // ==========================
 // SUPABASE INIT
 // ==========================
@@ -68,6 +71,10 @@ async function loadSchoolInfo() {
     alert("School not found");
     return;
   }
+  
+  currentDepartment = data.department;
+  currentSchoolCode = data.school_code;
+
 
   document.getElementById("schoolName").textContent = data.School_name;
   document.title =
