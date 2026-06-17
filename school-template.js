@@ -1898,92 +1898,45 @@ console.log(
 
 async function loadTermFeesData() {
 
-  console.log(
-  "Department:",
-  currentDepartment
-);
+  const department =
+    document.getElementById("department")?.value;
 
-  console.log(
-    "School:",
-    currentSchoolCode
-  );
+  const schoolCode = currentSchoolCode;
 
- const department =
-  currentDepartment ||
-  document.getElementById("department")?.value ||
-  "";
-const schoolCode = currentSchoolCode;
+  console.log("Department (UI):", department);
+  console.log("School:", schoolCode);
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("students")
-      .select("class")
-      .eq(
-        "school_code",
-        schoolCode
-      )
-      .eq(
-        "department",
-        department
-      );
-
-  if (error) {
-
-    console.error(error);
-
+  if (!department) {
+    console.warn("No department selected yet");
     return;
-
   }
 
-  const classes =
-    [
-      ...new Set(
-        data.map(
-          x => x.class
-        )
-      )
-    ];
+  const { data, error } = await supabaseClient
+    .from("students")
+    .select("class")
+    .eq("school_code", schoolCode)
+    .eq("department", department);
 
-  const body =
-    document.getElementById(
-      "termFeesBody"
-    );
+  if (error) {
+    console.error(error);
+    return;
+  }
 
+  const classes = [...new Set(data.map(x => x.class))];
+
+  const body = document.getElementById("termFeesBody");
   body.innerHTML = "";
 
-  classes.forEach(
-    className => {
-
-      body.innerHTML += `
-
-        <tr>
-
-          <td>${className}</td>
-
-          <td>₦0</td>
-
-          <td>
-
-            <button
-              class="admin-btn"
-            >
-              Edit
-            </button>
-
-          </td>
-
-        </tr>
-
-      `;
-
-    }
-  );
-
+  classes.forEach(className => {
+    body.innerHTML += `
+      <tr>
+        <td>${className}</td>
+        <td>₦0</td>
+        <td><button class="admin-btn">Edit</button></td>
+      </tr>
+    `;
+  });
 }
-
 // ==========================
 // FOOTER YEAR
 // ==========================
