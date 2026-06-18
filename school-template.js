@@ -1894,6 +1894,12 @@ console.log(
   `;
 
   await loadTermFeesData();
+  document
+  .getElementById("feeSearch")
+  .addEventListener(
+    "keyup",
+    filterFeesTable
+  );
 
 }
 
@@ -2173,6 +2179,34 @@ window.printFeesTable =
 
 window.clearAllFees =
   clearAllFees;
+  
+function filterFeesTable() {
+
+  const searchValue =
+    document
+      .getElementById("feeSearch")
+      .value
+      .toLowerCase();
+
+  const rows =
+    document.querySelectorAll(
+      "#termFeesBody tr"
+    );
+
+  rows.forEach(row => {
+
+    const rowText =
+      row.innerText
+        .toLowerCase();
+
+    row.style.display =
+      rowText.includes(searchValue)
+        ? ""
+        : "none";
+
+  });
+
+}
 // ==========================
 // FOOTER YEAR
 // ==========================
