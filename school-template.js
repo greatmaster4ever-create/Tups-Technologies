@@ -1348,6 +1348,57 @@ async function saveStudentInfo(
   const updatedTotal =
     currentTotal +
     newAmount;
+	
+	// SAVE PAYMENT HISTORY
+if (newAmount > 0) {
+
+  const {
+    data: studentData,
+    error: studentError
+  } =
+    await supabaseClient
+      .from("students")
+      .select(
+        "student_name,department,class"
+      )
+      .eq(
+        "id",
+        studentId
+      )
+      .single();
+
+  if (!studentError) {
+
+    await supabaseClient
+      .from("payment_history")
+      .insert({
+
+        student_id:
+          studentId,
+
+        school_code:
+          currentSchoolCode,
+
+        department:
+          studentData.department,
+
+        class:
+          studentData.class,
+
+        student_name:
+          studentData.student_name,
+
+        amount_paid:
+          newAmount,
+
+        total_paid:
+          updatedTotal
+
+      });
+
+  }
+
+}
 
   const {
     error: updateError
@@ -2180,6 +2231,283 @@ window.printFeesTable =
 window.clearAllFees =
   clearAllFees;
  
+ async function viewPaymentHistory(
+  studentId
+) {
+
+  const {
+    data: student
+  } =
+    await supabaseClient
+      .from("students")
+      .select("*")
+      .eq(
+        "id",
+        studentId
+      )
+      .single();
+
+  const {
+    data: history
+  } =
+    await supabaseClient
+      .from(
+        "payment_history"
+      )
+      .select("*")
+      .eq(
+        "student_id",
+        studentId
+      )
+      .order(
+        "payment_date",
+        {
+          ascending:false
+        }
+      );
+
+  let passportUrl = "";
+
+  if (
+    student.passport_url
+  ) {
+
+    const fileId =
+      student.passport_url
+        .split("id=")[1];
+
+    passportUrl =
+      `https://drive.google.com/thumbnail?id=${fileId}&sz=w300`;
+
+  }
+
+  const totalPaid =
+    Number(
+      student.total_fees_paid
+    ) || 0;
+
+  const classFeeRecord =
+    await supabaseClient
+      .from("class_fees")
+      .select("term_fee")
+      .eq(
+        "school_code",
+        currentSchoolCode
+      )
+      .eq(
+        "class_name",
+        student.class
+      )
+      .single();
+
+  const expectedFee =
+    Number(
+      classFeeRecord
+        .data
+        ?.term_fee
+    ) || 0;
+
+  const balance =
+    expectedFee -
+    totalPaid;
+
+  let rows = "";
+
+  history.forEach(row => {
+
+    rows += `
+
+      <tr>
+
+        <td>
+          ${new Date(
+            row.payment_date
+          ).toLocaleDateString()}
+        </td>
+
+        <td>
+          ${new Date(
+            row.payment_date
+          ).toLocaleTimeString()}
+        </td>
+
+        <td>
+          ₦${Number(
+            row.amount_paid
+          ).toLocaleString()}
+        </td>
+
+        <td>
+          ₦${Number(
+            row.total_paid
+          ).toLocaleString()}
+        </td>
+
+      </tr>
+
+    `;
+
+  });
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+<div
+  class="history-card"
+>
+
+<div
+  style="
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    margin-bottom:20px;
+  "
+>
+
+<div
+  style="
+    display:flex;
+    align-items:center;
+    gap:12px;
+  "
+>
+
+<img
+  src="${passportUrl}"
+  style="
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    object-fit:cover;
+  "
+>
+
+<div>
+
+<h3>
+  ${student.student_name}
+</h3>
+
+<p>
+  Total Paid:
+  ₦${totalPaid.toLocaleString()}
+</p>
+
+<p>
+  Balance:
+  ₦${balance.toLocaleString()}
+</p>
+
+</div>
+
+</div>
+
+<div>
+
+<button
+  class="admin-btn"
+  onclick="printHistory()"
+>
+  Print
+</button>
+
+<button
+  class="admin-btn"
+  onclick="loadAllPayments()"
+>
+  ✕
+</button>
+
+</div>
+
+</div>
+
+<table
+  class="admin-table"
+  id="historyTable"
+>
+
+<thead>
+
+<tr>
+
+<th>Date</th>
+
+<th>Time</th>
+
+<th>Amount Paid</th>
+
+<th>Total Paid</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+${rows}
+
+</tbody>
+
+</table>
+
+</div>
+
+`;
+
+}
+
+function printHistory() {
+
+  const table =
+    document.getElementById(
+      "historyTable"
+    );
+
+  const win =
+    window.open(
+      "",
+      "",
+      "width=900,height=700"
+    );
+
+  win.document.write(`
+
+    <html>
+
+    <head>
+
+      <title>
+        Payment History
+      </title>
+
+    </head>
+
+    <body>
+
+      ${table.outerHTML}
+
+    </body>
+
+    </html>
+
+  `);
+
+  win.document.close();
+
+  win.print();
+
+}
+
+window.printHistory =
+  printHistory;
+
+window.viewPaymentHistory =
+  viewPaymentHistory;
+ 
 async function loadAllPayments() {
 
   document.getElementById(
@@ -2295,6 +2623,7 @@ async function loadAllPaymentsData() {
           <th>Paid</th>
           <th>Balance</th>
           <th>Status</th>
+		  <th>History</th>
 
         </tr>
 
@@ -2342,50 +2671,64 @@ async function loadAllPaymentsData() {
       balance <= 0
         ? "Completed"
         : "Owing";
+html += `
 
-    html += `
+  <tr>
 
-      <tr>
+    <td>
+      ${student.student_name}
+    </td>
 
-        <td>
-          ${student.student_name}
-        </td>
+    <td>
+      ${student.class || ""}
+    </td>
 
-        <td>
-          ${student.class || ""}
-        </td>
+    <td>
+      ₦${expectedFee.toLocaleString()}
+    </td>
 
-        <td>
-          ₦${expectedFee.toLocaleString()}
-        </td>
+    <td>
+      ₦${paid.toLocaleString()}
+    </td>
 
-        <td>
-          ₦${paid.toLocaleString()}
-        </td>
+    <td>
+      ₦${balance.toLocaleString()}
+    </td>
 
-        <td>
-          ₦${balance.toLocaleString()}
-        </td>
+    <td>
 
-        <td>
+      <span
+        class="${
+          balance <= 0
+            ? "status-completed"
+            : "status-owing"
+        }"
+      >
 
-          <span
-            class="${
-              balance <= 0
-                ? "status-completed"
-                : "status-owing"
-            }"
-          >
+        ${status}
 
-            ${status}
+      </span>
 
-          </span>
+    </td>
 
-        </td>
+    <td>
 
-      </tr>
+      <button
+        class="admin-btn"
+        onclick="viewPaymentHistory(${student.id})"
+        style="
+          padding:4px 10px;
+          font-size:12px;
+        "
+      >
+        History
+      </button>
 
-    `;
+    </td>
+
+  </tr>
+
+`;
 
   });
 
