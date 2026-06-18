@@ -1013,3 +1013,98 @@ button:hover {
   border-radius: 6px;
 
 }
+.payment-toolbar {
+
+  display:flex;
+
+  gap:10px;
+
+  margin-bottom:15px;
+
+}
+
+.payment-toolbar input {
+
+  flex:1;
+
+}
+
+.payment-summary {
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(180px,1fr)
+    );
+
+  gap:15px;
+
+  margin-bottom:20px;
+
+}
+
+.summary-card {
+
+  background:#fff;
+
+  padding:15px;
+
+  border-radius:10px;
+
+  text-align:center;
+
+  box-shadow:
+    0 2px 8px rgba(0,0,0,.08);
+
+}
+
+.summary-card h4 {
+
+  color:
+    var(--primary-color);
+
+  margin-bottom:10px;
+
+}
+
+.summary-card p {
+
+  font-size:20px;
+
+  font-weight:700;
+
+}
+
+.status-completed {
+
+  background:#d4edda;
+
+  color:#155724;
+
+  padding:6px 12px;
+
+  border-radius:20px;
+
+  font-size:12px;
+
+  font-weight:600;
+
+}
+
+.status-owing {
+
+  background:#f8d7da;
+
+  color:#721c24;
+
+  padding:6px 12px;
+
+  border-radius:20px;
+
+  font-size:12px;
+
+  font-weight:600;
+
+}

@@ -2179,6 +2179,370 @@ window.printFeesTable =
 
 window.clearAllFees =
   clearAllFees;
+ 
+async function loadAllPayments() {
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+    <div
+      class="payment-toolbar"
+    >
+
+      <input
+        type="text"
+        id="paymentSearch"
+        placeholder="Search Student..."
+      >
+
+      <button
+        class="admin-btn"
+        onclick="printPaymentsTable()"
+      >
+        Print Payments
+      </button>
+
+    </div>
+
+    <div
+      id="paymentSummary"
+    ></div>
+
+    <div
+      id="paymentsTableContainer"
+    ></div>
+
+  `;
+
+  await loadAllPaymentsData();
+
+  document
+    .getElementById(
+      "paymentSearch"
+    )
+    .addEventListener(
+      "keyup",
+      filterPaymentsTable
+    );
+
+}
+
+window.loadAllPayments =
+  loadAllPayments;
+  
+async function loadAllPaymentsData() {
+
+  const {
+    data: students,
+    error: studentError
+  } =
+    await supabaseClient
+      .from("students")
+      .select("*")
+      .eq(
+        "school_code",
+        currentSchoolCode
+      );
+
+  if (studentError) {
+
+    console.error(studentError);
+
+    return;
+
+  }
+
+  const {
+    data: fees,
+    error: feeError
+  } =
+    await supabaseClient
+      .from("class_fees")
+      .select("*")
+      .eq(
+        "school_code",
+        currentSchoolCode
+      );
+
+  if (feeError) {
+
+    console.error(feeError);
+
+    return;
+
+  }
+
+  let totalStudents = 0;
+  let totalExpected = 0;
+  let totalCollected = 0;
+  let totalOutstanding = 0;
+
+  let html = `
+
+    <table
+      class="admin-table"
+      id="paymentsTable"
+    >
+
+      <thead>
+
+        <tr>
+
+          <th>Student</th>
+          <th>Class</th>
+          <th>Fee</th>
+          <th>Paid</th>
+          <th>Balance</th>
+          <th>Status</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+  `;
+
+  students.forEach(student => {
+
+    const feeRecord =
+      fees.find(
+        x =>
+          x.class_name
+            ?.trim()
+            .toLowerCase() ===
+          student.class
+            ?.trim()
+            .toLowerCase()
+      );
+
+    const expectedFee =
+      Number(
+        feeRecord?.term_fee
+      ) || 0;
+
+    const paid =
+      Number(
+        student.total_fees_paid
+      ) || 0;
+
+    const balance =
+      expectedFee - paid;
+
+    totalStudents++;
+
+    totalExpected += expectedFee;
+
+    totalCollected += paid;
+
+    totalOutstanding += balance;
+
+    const status =
+      balance <= 0
+        ? "Completed"
+        : "Owing";
+
+    html += `
+
+      <tr>
+
+        <td>
+          ${student.student_name}
+        </td>
+
+        <td>
+          ${student.class || ""}
+        </td>
+
+        <td>
+          ₦${expectedFee.toLocaleString()}
+        </td>
+
+        <td>
+          ₦${paid.toLocaleString()}
+        </td>
+
+        <td>
+          ₦${balance.toLocaleString()}
+        </td>
+
+        <td>
+
+          <span
+            class="${
+              balance <= 0
+                ? "status-completed"
+                : "status-owing"
+            }"
+          >
+
+            ${status}
+
+          </span>
+
+        </td>
+
+      </tr>
+
+    `;
+
+  });
+
+  html += `
+      </tbody>
+    </table>
+  `;
+
+  document.getElementById(
+    "paymentSummary"
+  ).innerHTML = `
+
+    <div
+      class="payment-summary"
+    >
+
+      <div
+        class="summary-card"
+      >
+
+        <h4>
+          Total Students
+        </h4>
+
+        <p>
+          ${totalStudents}
+        </p>
+
+      </div>
+
+      <div
+        class="summary-card"
+      >
+
+        <h4>
+          Expected Revenue
+        </h4>
+
+        <p>
+          ₦${totalExpected.toLocaleString()}
+        </p>
+
+      </div>
+
+      <div
+        class="summary-card"
+      >
+
+        <h4>
+          Total Collected
+        </h4>
+
+        <p>
+          ₦${totalCollected.toLocaleString()}
+        </p>
+
+      </div>
+
+      <div
+        class="summary-card"
+      >
+
+        <h4>
+          Outstanding
+        </h4>
+
+        <p>
+          ₦${totalOutstanding.toLocaleString()}
+        </p>
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.getElementById(
+    "paymentsTableContainer"
+  ).innerHTML =
+    html;
+
+}
+
+function filterPaymentsTable() {
+
+  const searchValue =
+    document
+      .getElementById(
+        "paymentSearch"
+      )
+      .value
+      .toLowerCase();
+
+  const rows =
+    document.querySelectorAll(
+      "#paymentsTable tbody tr"
+    );
+
+  rows.forEach(row => {
+
+    row.style.display =
+      row.innerText
+        .toLowerCase()
+        .includes(searchValue)
+          ? ""
+          : "none";
+
+  });
+
+}
+
+function printPaymentsTable() {
+
+  const table =
+    document.getElementById(
+      "paymentsTable"
+    );
+
+  const printWindow =
+    window.open(
+      "",
+      "",
+      "width=900,height=700"
+    );
+
+  printWindow.document.write(`
+
+    <html>
+
+      <head>
+
+        <title>
+          All Payments
+        </title>
+
+      </head>
+
+      <body>
+
+        ${table.outerHTML}
+
+      </body>
+
+    </html>
+
+  `);
+
+  printWindow.document.close();
+
+  printWindow.print();
+
+}
+
+window.printPaymentsTable =
+  printPaymentsTable;
+  
+ 
   
 function filterFeesTable() {
 
