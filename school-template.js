@@ -2328,7 +2328,10 @@ window.clearAllFees =
   let rows = "";
 
 history.forEach(row => {
-
+	 console.log(
+  "RAW PAYMENT DATE:",
+  row.payment_date
+);
   const paymentDate =
     new Date(
       row.payment_date
