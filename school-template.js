@@ -2334,16 +2334,38 @@ window.clearAllFees =
       <tr>
 
         <td>
-          ${new Date(
-            row.payment_date
-          ).toLocaleDateString()}
-        </td>
+  ${new Date(
+    row.payment_date
+  ).toLocaleString(
+    "en-NG",
+    {
+      timeZone: "Africa/Lagos",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    }
+  )}
+</td>
 
-        <td>
-          ${new Date(
-            row.payment_date
-          ).toLocaleTimeString()}
-        </td>
+       <td>
+  ${new Date(
+    row.payment_date
+  ).toLocaleString(
+    "en-NG",
+    {
+      timeZone: "Africa/Lagos",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit"
+    }
+  )}
+</td>
 
         <td>
           ₦${Number(
