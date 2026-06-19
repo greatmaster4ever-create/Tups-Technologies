@@ -2327,57 +2327,62 @@ window.clearAllFees =
 
   let rows = "";
 
-  history.forEach(row => {
+history.forEach(row => {
 
-    rows += `
+  const paymentDate =
+    new Date(
+      row.payment_date
+    );
 
-      <tr>
+  const dateOnly =
+    paymentDate.toLocaleDateString(
+      "en-NG",
+      {
+        timeZone: "Africa/Lagos"
+      }
+    );
 
-        <td>
-  ${new Date(
-    row.payment_date
-  ).toLocaleString(
-    "en-NG",
-    {
-      timeZone: "Africa/Lagos",
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit"
-    }
-  )}
-</td>
+  const timeOnly =
+    paymentDate.toLocaleTimeString(
+      "en-NG",
+      {
+        timeZone: "Africa/Lagos",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true
+      }
+    );
 
-       <td>
-  ${new Date(
-    row.payment_date
-  ).toLocaleString(
-    "en-NG",
-    {
-      timeZone: "Africa/Lagos"
-    }
-  )}
-</td>
+  rows += `
 
-        <td>
-          ₦${Number(
-            row.amount_paid
-          ).toLocaleString()}
-        </td>
+    <tr>
 
-        <td>
-          ₦${Number(
-            row.total_paid
-          ).toLocaleString()}
-        </td>
+      <td>
+        ${dateOnly}
+      </td>
 
-      </tr>
+      <td>
+        ${timeOnly}
+      </td>
 
-    `;
+      <td>
+        ₦${Number(
+          row.amount_paid
+        ).toLocaleString()}
+      </td>
 
-  });
+      <td>
+        ₦${Number(
+          row.total_paid
+        ).toLocaleString()}
+      </td>
+
+    </tr>
+
+  `;
+
+});
 
   document.getElementById(
     "adminContent"
