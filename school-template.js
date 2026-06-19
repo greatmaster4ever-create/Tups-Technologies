@@ -1067,18 +1067,55 @@ if (
     "adminContent"
   ).innerHTML = `
 
-    <div
-      class="student-info-card"
-    >
-
-   <img
-  src="${passportUrl}"
-  class="student-passport"
+   <div
+  class="student-info-card"
 >
 
-      <h3>
-        ${data.student_name}
-      </h3>
+<div
+  style="
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:15px;
+  "
+>
+
+  <div
+    style="
+      display:flex;
+      align-items:center;
+      gap:12px;
+    "
+  >
+
+    <img
+      src="${passportUrl}"
+      class="student-passport"
+    >
+
+    <h3
+      style="margin:0;"
+    >
+      ${data.student_name}
+    </h3>
+
+  </div>
+
+  <button
+    onclick="showStudentsFees()"
+    style="
+      border:none;
+      background:none;
+      font-size:24px;
+      cursor:pointer;
+      color:#666;
+      font-weight:bold;
+    "
+  >
+    ✕
+  </button>
+
+</div>
 
       <table
         class="student-info-table"
