@@ -1775,12 +1775,38 @@ async function openTermReport(
     "adminContent"
   ).innerHTML = `
 
-    <h3 style="
-      margin-bottom:15px;
-      text-align:center;
-    ">
-      ${data.student_name}
-    </h3>
+    <div
+  style="
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:15px;
+  "
+>
+
+  <h3
+    style="
+      margin:0;
+    "
+  >
+    ${data.student_name}
+  </h3>
+
+  <button
+    onclick="showStudentsFees()"
+    style="
+      border:none;
+      background:none;
+      font-size:24px;
+      cursor:pointer;
+      color:#666;
+      font-weight:bold;
+    "
+  >
+    ✕
+  </button>
+
+</div>
 
     <iframe
       src="${data.result_url.replace('/view','/preview')}"
