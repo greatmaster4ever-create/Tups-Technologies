@@ -1367,8 +1367,12 @@ if (newAmount > 0) {
       )
       .single();
 
-  if (!studentError) {
+if (!studentError) {
 
+  const {
+    data: historyData,
+    error: historyError
+  } =
     await supabaseClient
       .from("payment_history")
       .insert({
@@ -1396,7 +1400,17 @@ if (newAmount > 0) {
 
       });
 
-  }
+  console.log(
+    "PAYMENT HISTORY INSERT:",
+    historyData
+  );
+
+  console.log(
+    "PAYMENT HISTORY ERROR:",
+    historyError
+  );
+
+}
 
 }
 
