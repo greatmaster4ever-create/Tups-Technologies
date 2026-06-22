@@ -138,6 +138,14 @@
   >
     View School Details
   </button>
+  
+  <button
+  id="viewFinanceBtn"
+  class="action-btn"
+  data-action="View"
+   >
+     View School Financial Overview
+   </button>
 
 </div>
 
@@ -257,33 +265,39 @@
 >
 </div>
 
+<div
+  id="financeSection"
+  style="display:none; margin-top:20px;"
+>
+
+  <h2 style="margin-bottom:10px;">
+    School Financial Overview
+  </h2>
+
+  <div class="table-wrapper">
+
+    <table id="financeTable">
+
+      <thead>
+        <tr>
+          <th>School Code</th>
+          <th>Total Students</th>
+          <th>Amount per Student</th>
+          <th>Total Amount</th>
+        </tr>
+      </thead>
+
+      <tbody id="financeTableBody"></tbody>
+
+    </table>
+
+  </div>
+
+</div>
 
 </section>
 
-<div class="table-wrapper" style="margin-top:30px;">
 
-  <h2 style="margin-bottom:10px;">
-    School Finance Overview
-  </h2>
-
-  <table id="financeTable">
-
-    <thead>
-      <tr>
-        <th>School Code</th>
-        <th>Total Students</th>
-        <th>Amount per Student</th>
-        <th>Total Amount</th>
-      </tr>
-    </thead>
-
-    <tbody id="financeTableBody">
-      <!-- JS will populate this -->
-    </tbody>
-
-  </table>
-
-</div>
 
     <!-- SCHOOLS -->
    <section id="schools" class="tab-content">

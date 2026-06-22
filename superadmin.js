@@ -2465,6 +2465,32 @@ if (viewSchoolDetailsBtn) {
 
 }
 
+const viewFinanceBtn =
+  document.getElementById("viewFinanceBtn");
+
+if (viewFinanceBtn) {
+
+  viewFinanceBtn.addEventListener("click", async () => {
+
+    const section =
+      document.getElementById("financeSection");
+
+    if (section.style.display === "none") {
+
+      await loadFinanceTable(); // refresh data
+
+      section.style.display = "block";
+
+    } else {
+
+      section.style.display = "none";
+
+    }
+
+  });
+
+}
+
 loadDashboardStats();
 loadSchools();
 loadSubjects();
