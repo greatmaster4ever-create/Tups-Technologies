@@ -53,8 +53,8 @@
   position: absolute;
   top: 10px;
   right: 10px;
-  width: 32px;
-  height: 32px;
+  width: 5px;
+  height: 5px;
   border: none;
   border-radius: 50%;
   background: red;
@@ -147,7 +147,8 @@ body {
 }
 
 /* Login card */
-.login-card {
+.
+ {
   width: 360px;
   background: #ffffff; /* plain white */
   padding: 30px;
