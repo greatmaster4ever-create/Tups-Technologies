@@ -2493,6 +2493,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+// =====================
+// FINANCE TABLE LOADER
+// =====================
+
+async function loadFinanceTable() {
+
+  const tbody = document.getElementById("financeTableBody");
+
+  if (!tbody) return;
+
+  tbody.innerHTML = "";
+
+  const { data, error } = await supabase
+    .from("schools")
+    .select("school_code, total_students, amount_per_student");
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  data.forEach((school) => {
+
+    const total =
+      (school.total_students || 0) *
+      (school.amount_per_student || 0);
+
+    const row = `
+      <tr>
+        <td>${school.school_code}</td>
+        <td>${school.total_students || 0}</td>
+        <td>${school.amount_per_student || 0}</td>
+        <td>${total}</td>
+      </tr>
+    `;
+
+    tbody.insertAdjacentHTML("beforeend", row);
+  });
+}
+
 loadDashboardStats();
 loadSchools();
 loadSubjects();
