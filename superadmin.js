@@ -2473,23 +2473,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const section =
     document.getElementById("financeSection");
 
-  if (viewFinanceBtn && section) {
+  if (!viewFinanceBtn || !section) return;
 
-    viewFinanceBtn.addEventListener("click", async () => {
+  viewFinanceBtn.addEventListener("click", async () => {
 
-      if (section.style.display === "none" || section.style.display === "") {
+    const isHidden =
+      section.style.display === "none" ||
+      section.style.display === "";
 
-        await loadFinanceTable(); // must exist
-        section.style.display = "block";
+    if (isHidden) {
 
-      } else {
+      await loadSchoolFinance(); // ✅ ONLY SOURCE OF TRUTH
+      section.style.display = "block";
 
-        section.style.display = "none";
-      }
+    } else {
+      section.style.display = "none";
+    }
 
-    });
-
-  }
+  });
 
 });
 
@@ -2497,41 +2498,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // FINANCE TABLE LOADER
 // =====================
 
-async function loadFinanceTable() {
 
-  const tbody = document.getElementById("financeTableBody");
-
-  if (!tbody) return;
-
-  tbody.innerHTML = "";
-
-  const { data, error } = await supabaseClient
-    .from("schools")
-    .select("school_code, total_students, amount_per_student");
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  data.forEach((school) => {
-
-    const total =
-      (school.total_students || 0) *
-      (school.amount_per_student || 0);
-
-    const row = `
-      <tr>
-        <td>${school.school_code}</td>
-        <td>${school.total_students || 0}</td>
-        <td>${school.amount_per_student || 0}</td>
-        <td>${total}</td>
-      </tr>
-    `;
-
-    tbody.insertAdjacentHTML("beforeend", row);
-  });
-}
 
 loadDashboardStats();
 loadSchools();
