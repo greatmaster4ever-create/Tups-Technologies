@@ -291,6 +291,7 @@ async function loadDashboardStats() {
       "totalSubjects"
     ).textContent =
       totalSubjects || 0;
+	  
 
   } catch (err) {
 
@@ -303,6 +304,80 @@ async function loadDashboardStats() {
     hideLoader(); // IMPORTANT
   }
 
+}
+
+    // ==========================
+    // SCHOOL FINANCE TABLE LOGIC
+    // ==========================
+async function loadSchoolFinance() {
+
+  const { data: students } =
+    await supabaseClient
+      .from("students")
+      .select("school_code");
+
+  const { data: schools } =
+    await supabaseClient
+      .from("schools")
+      .select("school_code, amount_per_student");
+
+  const studentCounts = {};
+
+  students.forEach(s => {
+    studentCounts[s.school_code] =
+      (studentCounts[s.school_code] || 0) + 1;
+  });
+
+  let financeRows = [];
+  let totalIncome = 0;
+
+  schools.forEach(school => {
+
+    const count =
+      studentCounts[school.school_code] || 0;
+
+    const amountPerStudent =
+      school.amount_per_student || 0;
+
+    const total =
+      count * amountPerStudent;
+
+    totalIncome += total;
+
+    financeRows.push({
+      school_code: school.school_code,
+      total_students: count,
+      amount_per_student: amountPerStudent,
+      total_amount: total
+    });
+
+  });
+
+  // ✅ expected income display (THIS ANSWERS YOUR QUESTION)
+  document.getElementById("expectedIncome").textContent =
+    totalIncome.toLocaleString();
+
+  const tbody =
+    document.getElementById("financeTableBody");
+
+  if (tbody) {
+
+    tbody.innerHTML = "";
+
+    financeRows.forEach(row => {
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${row.school_code}</td>
+          <td>${row.total_students}</td>
+          <td>${row.amount_per_student.toLocaleString()}</td>
+          <td><b>${row.total_amount.toLocaleString()}</b></td>
+        </tr>
+      `;
+
+    });
+
+  }
 }
 
 async function loadSchools() {
@@ -1277,6 +1352,10 @@ document
           "schoolNameInput"
         )
         .value.trim();
+		
+	  const amountPerStudent =
+        document.getElementById(
+		"amountPerStudent").value.trim();
 
       const password =
         document
@@ -1347,6 +1426,9 @@ const phone =
 
   School_name:
     schoolName,
+
+  amount_per_student:
+  amountPerStudent || 0,
 
   status:
     status,
@@ -1450,6 +1532,11 @@ document.getElementById(
   document.getElementById(
     "editSchoolName"
   ).value = data.School_name;
+  
+  
+  document.getElementById(
+  "editAmountPerStudent").value =
+  data.amount_per_student || 0;
 
   document.getElementById(
     "editSchoolStatus"
@@ -2378,6 +2465,7 @@ loadDashboardStats();
 loadSchools();
 loadSubjects();
 loadSheets();
+loadSchoolFinance();
 
 // ==========================
 // ACTION REGISTRY (FREEZE LAYER)

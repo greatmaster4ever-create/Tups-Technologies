@@ -104,6 +104,11 @@
       <h3>Total Subjects</h3>
       <p id="totalSubjects">0</p>
     </div>
+	
+	<div class="card">
+       <h3>Expected Income</h3>
+       <p id="expectedIncome">0</p>
+</div>
 
   </div>
 
@@ -254,6 +259,31 @@
 
 
 </section>
+
+<div class="table-wrapper" style="margin-top:30px;">
+
+  <h2 style="margin-bottom:10px;">
+    School Finance Overview
+  </h2>
+
+  <table id="financeTable">
+
+    <thead>
+      <tr>
+        <th>School Code</th>
+        <th>Total Students</th>
+        <th>Amount per Student</th>
+        <th>Total Amount</th>
+      </tr>
+    </thead>
+
+    <tbody id="financeTableBody">
+      <!-- JS will populate this -->
+    </tbody>
+
+  </table>
+
+</div>
 
     <!-- SCHOOLS -->
    <section id="schools" class="tab-content">
@@ -446,6 +476,12 @@
       placeholder="School Name"
     >
 
+	<input
+      type="number"
+      id="amountPerStudent"
+      placeholder="Amount per Student"
+    >
+
     <input
       type="text"
       id="schoolPasswordInput"
@@ -515,6 +551,12 @@
       placeholder="School Name"
     >
 
+    <input
+     type="number"
+     id="editAmountPerStudent"
+     placeholder="Amount per Student"
+      />
+	  
     <select id="editSchoolStatus">
 
       <option value="Active">
