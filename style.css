@@ -320,13 +320,23 @@ form button:hover {
   border: none;
   border-radius: 8px;
   font-weight: 700;
-  animation: blink 5s infinite;
-  margin-bottom: 15px;
+   margin-bottom: 15px;
   cursor: pointer;
 }
 
-@keyframes blink {
-  50% {
+.blink-text {
+  animation: glowText 1s infinite alternate;
+}
+
+@keyframes glowText {
+  from {
+    opacity: 1;
+  }
+
+  to {
     opacity: 0.4;
+    text-shadow:
+      0 0 5px white,
+      0 0 10px white;
   }
 }

@@ -88,7 +88,7 @@
     </button>
 
     <h3>
-      Check Result
+      Student's Result Checker
     </h3>
 
     <input
@@ -103,11 +103,14 @@
       placeholder="Admission Number"
     >
 
-    <button
-      onclick="checkStudentResult()"
-    >
-      Check Result
-    </button>
+     <button
+       class="result-checker-btn"
+       onclick="openResultChecker()"
+     >
+       <span class="blink-text">
+         Result Checker
+       </span>
+     </button>
 
     <div id="resultViewer"></div>
 
