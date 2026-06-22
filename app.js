@@ -67,13 +67,27 @@ function closeResultChecker() {
   document.getElementById("resultViewer").innerHTML = "";
 }
 
-function downloadResult(fileUrl, fileName) {
-  const a = document.createElement("a");
-  a.href = fileUrl;
-  a.download = fileName || "result.pdf";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+async function downloadResult(fileUrl, fileName) {
+  try {
+    const response = await fetch(fileUrl);
+    const blob = await response.blob();
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = fileName || "student-result.pdf";
+
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+
+  } catch (err) {
+    console.error("Download failed:", err);
+    alert("Download failed. Try again.");
+  }
 }
 
 async function checkStudentResult() {
