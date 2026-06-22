@@ -46,11 +46,18 @@ window.addEventListener("DOMContentLoaded", () => {
 
 function openResultChecker() {
 
+  console.log(
+    "RESULT BUTTON CLICKED"
+  );
+
   document.getElementById(
     "resultModal"
   ).style.display = "flex";
 
 }
+
+window.openResultChecker =
+  openResultChecker;
 
 function closeResultChecker() {
 
