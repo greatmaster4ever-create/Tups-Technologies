@@ -67,6 +67,15 @@ function closeResultChecker() {
   document.getElementById("resultViewer").innerHTML = "";
 }
 
+function downloadResult(fileUrl, fileName) {
+  const a = document.createElement("a");
+  a.href = fileUrl;
+  a.download = fileName || "result.pdf";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
 async function checkStudentResult() {
 
   const schoolCode =
@@ -143,7 +152,7 @@ async function checkStudentResult() {
         font-weight:bold;
       ">
         Result unavailable.
-        Please contact the school administrator.
+        Please contact the school administrator/accounts.
       </p>
 
     `;
@@ -152,35 +161,17 @@ async function checkStudentResult() {
 
   }
 
-  document.getElementById(
-    "resultViewer"
-  ).innerHTML = `
+ const previewUrl = data.result_url.replace("/view", "/preview");
 
-    <iframe
-      src="${
-        data.result_url.replace(
-          "/view",
-          "/preview"
-        )
-      }"
-      style="
-        width:100%;
-        height:500px;
-        border:none;
-      "
-    ></iframe>
+document.getElementById("resultViewer").innerHTML = `
+  <iframe
+    src="${previewUrl}"
+    style="width:100%; height:500px; border:none;"
+  ></iframe>
 
-    <br><br>
+  <br><br>
 
-    <button
-      onclick="
-        window.open(
-          '${data.result_url}'
-        )
-      "
-    >
-      Download Result
-    </button>
-
-  `;
-}
+  <button onclick="downloadResult('${data.result_url}', 'student-result.pdf')">
+    Download Result
+  </button>
+`;}
