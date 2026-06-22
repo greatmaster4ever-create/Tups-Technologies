@@ -322,11 +322,10 @@ form button:hover {
   font-weight: 700;
    margin-bottom: 15px;
   cursor: pointer;
-  animation: glowText 5s infinite alternate;
+
 }
 
-.blink-text {
-  animation: glowText 1s infinite alternate;
+
 }
 
 @keyframes glowText {
