@@ -43,3 +43,137 @@ window.addEventListener("DOMContentLoaded", () => {
     // window.location.href = data.school_page;
   });
 });
+
+function openResultChecker() {
+
+  document.getElementById(
+    "resultModal"
+  ).style.display = "flex";
+
+}
+
+function closeResultChecker() {
+
+  document.getElementById(
+    "resultModal"
+  ).style.display = "none";
+
+}
+
+async function checkStudentResult() {
+
+  const schoolCode =
+    document.getElementById(
+      "resultSchoolCode"
+    ).value.trim();
+
+  const regNo =
+    document.getElementById(
+      "resultRegNo"
+    ).value.trim();
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("students")
+      .select("*")
+      .eq(
+        "school_code",
+        schoolCode
+      )
+      .eq(
+        "reg_no",
+        regNo
+      )
+      .single();
+
+  if (error || !data) {
+
+    alert(
+      "Student not found."
+    );
+
+    return;
+
+  }
+
+  const {
+    data: fee
+  } =
+    await supabaseClient
+      .from("class_fees")
+      .select("term_fee")
+      .eq(
+        "school_code",
+        schoolCode
+      )
+      .eq(
+        "class_name",
+        data.class
+      )
+      .single();
+
+  const expected =
+    Number(
+      fee?.term_fee
+    ) || 0;
+
+  const paid =
+    Number(
+      data.total_fees_paid
+    ) || 0;
+
+  if (paid < expected) {
+
+    document.getElementById(
+      "resultViewer"
+    ).innerHTML = `
+
+      <p style="
+        color:red;
+        font-weight:bold;
+      ">
+        Result unavailable.
+        Please contact the school administrator.
+      </p>
+
+    `;
+
+    return;
+
+  }
+
+  document.getElementById(
+    "resultViewer"
+  ).innerHTML = `
+
+    <iframe
+      src="${
+        data.result_url.replace(
+          "/view",
+          "/preview"
+        )
+      }"
+      style="
+        width:100%;
+        height:500px;
+        border:none;
+      "
+    ></iframe>
+
+    <br><br>
+
+    <button
+      onclick="
+        window.open(
+          '${data.result_url}'
+        )
+      "
+    >
+      Download Result
+    </button>
+
+  `;
+}

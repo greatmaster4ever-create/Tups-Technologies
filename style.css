@@ -237,3 +237,22 @@ form button:hover {
   backdrop-filter: blur(8px);
   z-index: 999;
 }
+
+.result-checker-btn {
+  width: 100%;
+  padding: 14px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  animation: blink 1s infinite;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.4;
+  }
+}
