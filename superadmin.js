@@ -1354,9 +1354,9 @@ document
         .value.trim();
 		
 	  const amountPerStudent =
-        document.getElementById(
-		"amountPerStudent").value.trim();
-
+      Number(document.getElementById(
+	  "amountPerStudent").value) || 0;
+   
       const password =
         document
         .getElementById(
@@ -1645,7 +1645,11 @@ const phone =
     email,
 
   phone:
-    phone
+    phone,
+
+  amount_per_student: Number(
+  document.getElementById("editAmountPerStudent").value
+) || 0
 
 })
           .eq("id", id);
