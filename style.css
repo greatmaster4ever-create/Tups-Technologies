@@ -306,14 +306,14 @@ form button:hover {
 }
 
 .result-checker-btn {
-  width: 50%;
+  width: 100%;
   padding: 14px;
   background: #05eeff;
   color: black;
   border: none;
   border-radius: 8px;
   font-weight: 700;
-  animation: blink 1s infinite;
+  animation: blink 5s infinite;
   margin-bottom: 15px;
   cursor: pointer;
 }
