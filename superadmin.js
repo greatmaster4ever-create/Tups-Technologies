@@ -2465,31 +2465,33 @@ if (viewSchoolDetailsBtn) {
 
 }
 
-const viewFinanceBtn =
-  document.getElementById("viewFinanceBtn");
+document.addEventListener("DOMContentLoaded", () => {
 
-if (viewFinanceBtn) {
+  const viewFinanceBtn =
+    document.getElementById("viewFinanceBtn");
 
-  viewFinanceBtn.addEventListener("click", async () => {
+  const section =
+    document.getElementById("financeSection");
 
-    const section =
-      document.getElementById("financeSection");
+  if (viewFinanceBtn && section) {
 
-    if (section.style.display === "none") {
+    viewFinanceBtn.addEventListener("click", async () => {
 
-      await loadFinanceTable(); // refresh data
+      if (section.style.display === "none" || section.style.display === "") {
 
-      section.style.display = "block";
+        await loadFinanceTable(); // must exist
+        section.style.display = "block";
 
-    } else {
+      } else {
 
-      section.style.display = "none";
+        section.style.display = "none";
+      }
 
-    }
+    });
 
-  });
+  }
 
-}
+});
 
 loadDashboardStats();
 loadSchools();
