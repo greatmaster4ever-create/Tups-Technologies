@@ -2505,7 +2505,7 @@ async function loadFinanceTable() {
 
   tbody.innerHTML = "";
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("schools")
     .select("school_code, total_students, amount_per_student");
 
