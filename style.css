@@ -239,10 +239,10 @@ form button:hover {
 }
 
 .result-checker-btn {
-  width: 100%;
+  width: 50%;
   padding: 14px;
-  background: red;
-  color: white;
+  background: #05eeff;
+  color: black;
   border: none;
   border-radius: 8px;
   font-weight: 700;
