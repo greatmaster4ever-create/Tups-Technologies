@@ -60,11 +60,15 @@ window.openResultChecker =
   openResultChecker;
 
 function closeResultChecker() {
+  // 1. Hide modal
+  document.getElementById("resultModal").style.display = "none";
 
-  document.getElementById(
-    "resultModal"
-  ).style.display = "none";
+  // 2. Clear input fields
+  document.getElementById("resultSchoolCode").value = "";
+  document.getElementById("resultAdmissionNo").value = "";
 
+  // 3. Clear previous result display
+  document.getElementById("resultViewer").innerHTML = "";
 }
 
 async function checkStudentResult() {
