@@ -45,15 +45,11 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 function openResultChecker() {
+  document.getElementById("resultModal").style.display = "flex";
 
-  console.log(
-    "RESULT BUTTON CLICKED"
-  );
-
-  document.getElementById(
-    "resultModal"
-  ).style.display = "flex";
-
+  document.getElementById("resultSchoolCode").value = "";
+  document.getElementById("resultAdmissionNo").value = "";
+  document.getElementById("resultViewer").innerHTML = "";
 }
 
 window.openResultChecker =
