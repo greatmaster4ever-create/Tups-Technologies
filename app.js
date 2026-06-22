@@ -67,27 +67,28 @@ function closeResultChecker() {
   document.getElementById("resultViewer").innerHTML = "";
 }
 
-async function downloadResult(fileUrl, fileName) {
-  try {
-    const response = await fetch(fileUrl);
-    const blob = await response.blob();
+function downloadResult(fileUrl) {
 
-    const url = window.URL.createObjectURL(blob);
+  const match =
+    fileUrl.match(/\/d\/(.*?)\//);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileName || "student-result.pdf";
-
-    document.body.appendChild(a);
-    a.click();
-
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-
-  } catch (err) {
-    console.error("Download failed:", err);
-    alert("Download failed. Try again.");
+  if (!match) {
+    alert("Invalid Google Drive link.");
+    return;
   }
+
+  const fileId = match[1];
+
+  const downloadUrl =
+    `https://drive.google.com/uc?export=download&id=${fileId}`;
+
+  const a = document.createElement("a");
+  a.href = downloadUrl;
+  a.target = "_self";
+
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 async function checkStudentResult() {
@@ -175,17 +176,47 @@ async function checkStudentResult() {
 
   }
 
- const previewUrl = data.result_url.replace("/view", "/preview");
+console.log(data.result_url);
+const previewUrl =
+  data.result_url.replace(
+    "/view",
+    "/preview"
+  );
 
-document.getElementById("resultViewer").innerHTML = `
+document.getElementById(
+  "resultViewer"
+).innerHTML = `
   <iframe
     src="${previewUrl}"
-    style="width:100%; height:500px; border:none;"
+    style="
+      width:100%;
+      height:500px;
+      border:none;
+    "
   ></iframe>
 
   <br><br>
 
-  <button onclick="downloadResult('${data.result_url}', 'student-result.pdf')">
+  <button
+    type="button"
+    id="downloadBtn"
+  >
     Download Result
   </button>
-`;}
+`;
+
+document.getElementById(
+  "downloadBtn"
+).addEventListener(
+  "click",
+  function (e) {
+
+    e.preventDefault();
+
+    downloadResult(
+      data.result_url
+    );
+
+  }
+);
+}
