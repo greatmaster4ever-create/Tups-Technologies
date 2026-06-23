@@ -1686,7 +1686,7 @@ const phone =
       }
 
       alert(
-        "School Password Updated Successfully"
+        "School Updated Successfully"
       );
 
       document.getElementById(
