@@ -271,6 +271,14 @@ async function loadDashboardStats() {
         count: "exact",
         head: true
       });
+	  
+	const { count: totalStudents } =
+      await supabaseClient
+       .from("students")
+       .select("*", {
+         count: "exact",
+         head: true
+      });
 
     document.getElementById(
       "totalSchools"
@@ -291,6 +299,11 @@ async function loadDashboardStats() {
       "totalSubjects"
     ).textContent =
       totalSubjects || 0;
+	  
+	document.getElementById(
+      "totalStudents"
+    ).textContent =
+     (totalStudents || 0).toLocaleString();
 	  
 
   } catch (err) {
@@ -327,6 +340,16 @@ async function loadSchoolFinance() {
     studentCounts[s.school_code] =
       (studentCounts[s.school_code] || 0) + 1;
   });
+  
+    // TOTAL STUDENTS ACROSS ALL SCHOOLS
+
+  const totalStudents =
+    students.length;
+
+  document.getElementById(
+    "totalStudents"
+  ).textContent =
+    totalStudents.toLocaleString();
 
   let financeRows = [];
   let totalIncome = 0;
