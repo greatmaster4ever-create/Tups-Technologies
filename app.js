@@ -48,7 +48,7 @@ function openResultChecker() {
   document.getElementById("resultModal").style.display = "flex";
 
   document.getElementById("resultSchoolCode").value = "";
-  document.getElementById("resultAdmissionNo").value = "";
+  document.getElementById("resultRegNo").value = "";
   document.getElementById("resultViewer").innerHTML = "";
 }
 
@@ -61,7 +61,7 @@ function closeResultChecker() {
 
   // 2. Clear input fields
   document.getElementById("resultSchoolCode").value = "";
-  document.getElementById("resultAdmissionNo").value = "";
+  document.getElementById("resultRegNo").value = "";
 
   // 3. Clear previous result display
   document.getElementById("resultViewer").innerHTML = "";
