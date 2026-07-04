@@ -399,27 +399,47 @@ onclick="togglePaymentsMenu()">
     display:none;
     position:absolute;
     margin-top:5px;
-    width:160px;
+    width:180px;
     z-index:1000;
   "
 >
 
   <button
     class="admin-btn payment-item"
-	onclick="loadTermFees()"
+    onclick="loadTermFees()"
   >
     Term Fees
   </button>
 
   <button
     class="admin-btn payment-item"
-	onclick="loadAllPayments()"
+    onclick="loadAllPayments()"
   >
     All Payments
   </button>
 
-</div>
+  <button
+    class="admin-btn payment-item"
+    onclick="loadPaymentHistory()"
+  >
+    Payment History
+  </button>
 
+  <button
+    class="admin-btn payment-item"
+    onclick="loadOutstandingPayments()"
+  >
+    Outstanding Fees
+  </button>
+
+  <button
+    class="admin-btn payment-item"
+    onclick="clearCurrentTermPayments()"
+  >
+    Clear Payments
+  </button>
+
+</div>
 </div>
     <button
       class="admin-tab"
@@ -1366,6 +1386,21 @@ async function saveStudentInfo(
         studentId
       )
       .single();
+	  
+   const {
+  data: studentData,
+  error: studentError
+} =
+await supabaseClient
+  .from("students")
+  .select(
+    "student_name,department,class,reg_no"
+  )
+  .eq(
+    "id",
+    studentId
+  )
+  .single();
 
   if (error) {
 
@@ -1377,32 +1412,168 @@ async function saveStudentInfo(
 
   }
 
-  const currentTotal =
-    Number(
-      data.total_fees_paid
-    ) || 0;
+// ========================================
+// PAYMENT ALLOCATION ENGINE
+// ========================================
 
-  const updatedTotal =
-    currentTotal +
-    newAmount;
-	
+const currentTotal =
+  Number(
+    data.total_fees_paid
+  ) || 0;
+
+let appliedToOutstanding = 0;
+let appliedToCurrentTerm = newAmount;
+let remarks = "Current Term Payment";
+
+// ========================================
+// CHECK OUTSTANDING FEES
+// ========================================
+
+const {
+  data: outstanding
+} =
+await supabaseClient
+  .from(
+    "student_outstanding_fees"
+  )
+  .select("*")
+  .eq(
+    "school_code",
+    currentSchoolCode
+  )
+  .eq(
+    "reg_no",
+    studentData.reg_no
+  )
+  .eq(
+    "status",
+    "Outstanding"
+  )
+  .maybeSingle();
+
+if (outstanding) {
+
+  const debt =
+    Number(
+      outstanding.remaining_amount
+    );
+
+  if (
+    newAmount >= debt
+  ) {
+
+    appliedToOutstanding =
+      debt;
+
+    appliedToCurrentTerm =
+      newAmount - debt;
+
+    remarks =
+      `Outstanding (${outstanding.term} ${outstanding.session}) cleared. Balance credited to current term.`;
+
+    await supabaseClient
+      .from(
+        "student_outstanding_fees"
+      )
+      .update({
+
+        remaining_amount: 0,
+
+        status: "Paid"
+
+      })
+      .eq(
+        "id",
+        outstanding.id
+      );
+
+  } else {
+
+    appliedToOutstanding =
+      newAmount;
+
+    appliedToCurrentTerm = 0;
+
+    remarks =
+      `Part payment towards Outstanding (${outstanding.term} ${outstanding.session}).`;
+
+    await supabaseClient
+      .from(
+        "student_outstanding_fees"
+      )
+      .update({
+
+        remaining_amount:
+          debt - newAmount
+
+      })
+      .eq(
+        "id",
+        outstanding.id
+      );
+
+  }
+
+}
+
+const updatedTotal =
+  currentTotal +
+  appliedToCurrentTerm;
 	// SAVE PAYMENT HISTORY
 if (newAmount > 0) {
 
+// ========================================
+// SAVE CURRENT TERM PAYMENT
+// ========================================
+
+if (appliedToCurrentTerm > 0) {
+
   const {
-    data: studentData,
-    error: studentError
+    error: paymentError
   } =
-    await supabaseClient
-      .from("students")
-      .select(
-        "student_name,department,class"
-      )
-      .eq(
-        "id",
-        studentId
-      )
-      .single();
+  await supabaseClient
+    .from("student_payments")
+    .insert({
+
+      student_id:
+        studentId,
+
+      school_code:
+        currentSchoolCode,
+
+      department:
+        studentData.department,
+
+      class:
+        studentData.class,
+
+      student_name:
+        studentData.student_name,
+
+      reg_no:
+        studentData.reg_no,
+
+      amount_paid:
+        appliedToCurrentTerm,
+
+      session:
+        currentSession,
+
+      term:
+        currentTerm
+
+    });
+
+  if (paymentError) {
+
+    console.error(
+      "STUDENT PAYMENT ERROR:",
+      paymentError
+    );
+
+  }
+
+}
 
 if (!studentError) {
 
@@ -1428,12 +1599,24 @@ if (!studentError) {
 
         student_name:
           studentData.student_name,
+		  
+		reg_no:
+          studentData.reg_no,
 
-        amount_paid:
-          newAmount,
+       amount_paid:
+  newAmount,
 
-        total_paid:
-          updatedTotal
+applied_to_outstanding:
+  appliedToOutstanding,
+
+applied_to_current_term:
+  appliedToCurrentTerm,
+
+total_paid:
+  updatedTotal,
+
+remarks:
+  remarks
 
       });
 
@@ -1526,6 +1709,49 @@ window.openStudentUpdateForm =
 window.saveStudentInfo =
   saveStudentInfo;
 
+
+async function loadPaymentHistory() {
+
+  alert(
+    "Payment History module coming next."
+  );
+
+}
+
+async function loadOutstandingPayments() {
+
+  alert(
+    "Outstanding Fees module coming next."
+  );
+
+}
+
+async function clearCurrentTermPayments() {
+
+  const proceed =
+    confirm(
+
+`This action will:
+
+• Generate Outstanding Fees
+
+• Reset Current Term Payments
+
+• Clear Current Payment Records
+
+Payment History will NOT be affected.
+
+Do you want to continue?`
+
+    );
+
+  if (!proceed) return;
+
+  alert(
+    "Finance rollover engine will be connected next."
+  );
+
+}
 
 function wireStudentsModule() {
 
