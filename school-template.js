@@ -1945,7 +1945,33 @@ ${studentsPaid}
   </select>
 
 </div>
+<div class="payment-quick-filters">
 
+<button onclick="historyToday()">
+Today
+</button>
+
+<button onclick="historyThisWeek()">
+This Week
+</button>
+
+<button onclick="historyThisMonth()">
+This Month
+</button>
+
+<button onclick="historyThisTerm()">
+This Term
+</button>
+
+<button onclick="historyThisSession()">
+This Session
+</button>
+
+<button onclick="historyReset()">
+Reset
+</button>
+
+</div>
 
   <table
     class="admin-table"
@@ -2100,6 +2126,70 @@ Next ▶
     );
 }
 
+function historyToday(){
+
+const today =
+
+new Date()
+
+.toISOString()
+
+.substring(0,10);
+
+document.getElementById(
+
+"historyFrom"
+
+).value = today;
+
+document.getElementById(
+
+"historyTo"
+
+).value = today;
+
+filterPaymentHistory();
+
+}
+
+function historyReset(){
+
+document.getElementById(
+
+"historyFrom"
+
+).value = "";
+
+document.getElementById(
+
+"historyTo"
+
+).value = "";
+
+document.getElementById(
+
+"historySearch"
+
+).value = "";
+
+document.getElementById(
+
+"historyDepartment"
+
+).value = "";
+
+document.getElementById(
+
+"historyClass"
+
+).value = "";
+
+paymentHistoryCurrentPage = 1;
+
+filterPaymentHistory();
+
+}
+
 function previousPaymentPage(){
 
 if(
@@ -2171,7 +2261,7 @@ function filterPaymentHistory() {
     ).value;
 
   const filtered =
-    window.paymentHistoryData.filter(
+    paymentHistoryData.filter(
       row => {
 
         const matchesSearch =

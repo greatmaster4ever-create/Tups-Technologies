@@ -1272,3 +1272,53 @@ cursor:not-allowed;
 font-weight:bold;
 
 }
+
+.payment-quick-filters{
+
+display:flex;
+
+gap:10px;
+
+margin-bottom:20px;
+
+flex-wrap:wrap;
+
+}
+
+.payment-quick-filters button{
+
+padding:8px 15px;
+
+background:#000066;
+
+color:#fff;
+
+border:none;
+
+border-radius:6px;
+
+cursor:pointer;
+
+}
+
+.payment-quick-filters button:hover{
+
+background:#0099ff;
+
+}
+
+@media(max-width:768px){
+
+.payment-quick-filters{
+
+justify-content:center;
+
+}
+
+.payment-quick-filters button{
+
+flex:1 1 40%;
+
+}
+
+}
