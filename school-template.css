@@ -1311,7 +1311,35 @@ background:#0099ff;
 
 .payment-quick-filters{
 
-justify-content:center;
+justify-content:flex-start;
+
+overflow-x:auto;
+
+-webkit-overflow-scrolling:touch;
+
+}
+
+.payment-quick-filters button{
+
+flex:0 0 auto;
+
+font-size:12px;
+
+padding:6px 10px;
+
+}
+
+}
+
+.payment-quick-filters button:hover{
+
+background:#0099ff;
+
+}
+
+.payment-quick-filters button:active{
+
+transform:scale(0.97);
 
 }
 
