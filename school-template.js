@@ -1780,13 +1780,87 @@ function renderPaymentHistory(
   data
 ) {
 
+	const totalAmount =
+
+data.reduce(
+
+  (sum, row) =>
+
+    sum +
+
+    Number(
+
+      row.amount_paid || 0
+
+    ),
+
+  0
+
+);
+
+const totalTransactions =
+
+data.length;
+
+const studentsPaid =
+
+new Set(
+
+  data.map(
+
+    row => row.reg_no
+
+  )
+
+).size;
+
   let html = `
 
-  <h3>
+<h3>
 
-    📜 Payment History
+📜 Payment History
 
-  </h3>
+</h3>
+
+<div class="payment-summary">
+
+<div class="summary-card">
+
+<h4>Total Payments</h4>
+
+<p>
+
+₦${totalAmount.toLocaleString()}
+
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h4>Transactions</h4>
+
+<p>
+
+${totalTransactions}
+
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h4>Students Paid</h4>
+
+<p>
+
+${studentsPaid}
+
+</p>
+
+</div>
+
+</div>
 
   <table
     class="admin-table"
