@@ -1156,3 +1156,29 @@ font-weight:bold;
 color:#009933;
 
 }
+
+
+.payment-filters{
+
+display:flex;
+
+gap:15px;
+
+margin:20px 0;
+
+flex-wrap:wrap;
+
+}
+
+.payment-filters input,
+.payment-filters select{
+
+padding:10px;
+
+border:1px solid #ccc;
+
+border-radius:6px;
+
+min-width:220px;
+
+}

@@ -1862,6 +1862,36 @@ ${studentsPaid}
 
 </div>
 
+<div class="payment-filters">
+
+  <input
+    type="text"
+    id="historySearch"
+    placeholder="🔍 Search Student / Reg No..."
+    onkeyup="filterPaymentHistory()"
+  >
+
+  <select
+    id="historyDepartment"
+    onchange="filterPaymentHistory()"
+  >
+    <option value="">
+      All Departments
+    </option>
+  </select>
+
+  <select
+    id="historyClass"
+    onchange="filterPaymentHistory()"
+  >
+    <option value="">
+      All Classes
+    </option>
+  </select>
+
+</div>
+window.paymentHistoryData = data;
+
   <table
     class="admin-table"
   >
@@ -1961,6 +1991,143 @@ ${studentsPaid}
   document.getElementById(
     "adminContent"
   ).innerHTML = html;
+
+}
+
+function filterPaymentHistory() {
+
+  const keyword =
+    document
+      .getElementById(
+        "historySearch"
+      )
+      .value
+      .toLowerCase();
+
+  const dept =
+    document.getElementById(
+      "historyDepartment"
+    ).value;
+
+  const cls =
+    document.getElementById(
+      "historyClass"
+    ).value;
+
+  const filtered =
+    window.paymentHistoryData.filter(
+      row => {
+
+        const matchesSearch =
+
+          row.student_name
+            .toLowerCase()
+            .includes(keyword)
+
+          ||
+
+          row.reg_no
+            .toLowerCase()
+            .includes(keyword);
+
+        const matchesDept =
+
+          !dept ||
+
+          row.department === dept;
+
+        const matchesClass =
+
+          !cls ||
+
+          row.class === cls;
+
+        return (
+
+          matchesSearch &&
+
+          matchesDept &&
+
+          matchesClass
+
+        );
+
+      }
+
+    );
+
+  renderPaymentHistory(
+    filtered
+  );
+  populateHistoryFilters(
+  data
+    );
+}
+
+function populateHistoryFilters(data) {
+
+  const deptSelect =
+    document.getElementById(
+      "historyDepartment"
+    );
+
+  const classSelect =
+    document.getElementById(
+      "historyClass"
+    );
+
+  if (!deptSelect || !classSelect)
+    return;
+
+  const departments =
+
+    [...new Set(
+      data.map(
+        x => x.department
+      )
+    )].sort();
+
+  const classes =
+
+    [...new Set(
+      data.map(
+        x => x.class
+      )
+    )].sort();
+
+  deptSelect.innerHTML =
+    `<option value="">
+      All Departments
+    </option>`;
+
+  departments.forEach(
+
+    d =>
+
+      deptSelect.innerHTML +=
+
+      `<option value="${d}">
+        ${d}
+      </option>`
+
+  );
+
+  classSelect.innerHTML =
+    `<option value="">
+      All Classes
+    </option>`;
+
+  classes.forEach(
+
+    c =>
+
+      classSelect.innerHTML +=
+
+      `<option value="${c}">
+        ${c}
+      </option>`
+
+  );
 
 }
 
