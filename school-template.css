@@ -1157,10 +1157,11 @@ color:#009933;
 
 }
 
-
 .payment-filters{
 
 display:flex;
+
+align-items:center;
 
 gap:15px;
 
@@ -1170,15 +1171,58 @@ flex-wrap:wrap;
 
 }
 
-.payment-filters input,
+.payment-filters input{
+
+flex:2;
+
+min-width:280px;
+
+padding:12px;
+
+border:1px solid #dcdcdc;
+
+border-radius:8px;
+
+font-size:15px;
+
+}
+
 .payment-filters select{
 
-padding:10px;
+flex:1;
 
-border:1px solid #ccc;
+min-width:180px;
 
-border-radius:6px;
+padding:12px;
 
-min-width:220px;
+border:1px solid #dcdcdc;
+
+border-radius:8px;
+
+font-size:15px;
+
+background:#fff;
+
+}
+
+@media(max-width:768px){
+
+.payment-filters{
+
+flex-direction:column;
+
+align-items:stretch;
+
+}
+
+.payment-filters input,
+
+.payment-filters select{
+
+width:100%;
+
+min-width:unset;
+
+}
 
 }

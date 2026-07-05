@@ -1992,6 +1992,9 @@ window.paymentHistoryData = data;
     "adminContent"
   ).innerHTML = html;
 
+  populateHistoryFilters(
+  data
+    );
 }
 
 function filterPaymentHistory() {
@@ -2059,9 +2062,7 @@ function filterPaymentHistory() {
   renderPaymentHistory(
     filtered
   );
-  populateHistoryFilters(
-  data
-    );
+  
 }
 
 function populateHistoryFilters(data) {
