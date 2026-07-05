@@ -1712,9 +1712,181 @@ window.saveStudentInfo =
 
 async function loadPaymentHistory() {
 
-  alert(
-    "Payment History module coming next."
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+    <h3>
+      📜 Payment History
+    </h3>
+
+    <p>
+      Loading payment history...
+    </p>
+
+  `;
+
+  const {
+    data,
+    error
+  } =
+  await supabaseClient
+
+    .from(
+      "payment_history"
+    )
+
+    .select("*")
+
+    .eq(
+      "school_code",
+      currentSchoolCode
+    )
+
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
+    );
+
+  if (error) {
+
+    document.getElementById(
+      "adminContent"
+    ).innerHTML = `
+
+      <h3>
+        📜 Payment History
+      </h3>
+
+      <p>
+        ${error.message}
+      </p>
+
+    `;
+
+    return;
+
+  }
+
+  renderPaymentHistory(
+    data
   );
+
+}
+
+function renderPaymentHistory(
+  data
+) {
+
+  let html = `
+
+  <h3>
+
+    📜 Payment History
+
+  </h3>
+
+  <table
+    class="admin-table"
+  >
+
+    <thead>
+
+      <tr>
+
+        <th>Date</th>
+
+        <th>Name</th>
+
+        <th>Reg No</th>
+
+        <th>Class</th>
+
+        <th>Amount</th>
+
+        <th>Remarks</th>
+
+      </tr>
+
+    </thead>
+
+    <tbody>
+
+  `;
+
+  data.forEach(
+
+    row => {
+
+      html += `
+
+      <tr>
+
+        <td>
+
+          ${new Date(
+
+            row.created_at
+
+          ).toLocaleString()}
+
+        </td>
+
+        <td>
+
+          ${row.student_name}
+
+        </td>
+
+        <td>
+
+          ${row.reg_no}
+
+        </td>
+
+        <td>
+
+          ${row.class}
+
+        </td>
+
+        <td>
+
+          ₦${Number(
+
+            row.amount_paid
+
+          ).toLocaleString()}
+
+        </td>
+
+        <td>
+
+          ${row.remarks}
+
+        </td>
+
+      </tr>
+
+      `;
+
+    }
+
+  );
+
+  html += `
+
+    </tbody>
+
+  </table>
+
+  `;
+
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = html;
 
 }
 
