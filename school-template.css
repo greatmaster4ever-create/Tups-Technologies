@@ -1273,21 +1273,31 @@ font-weight:bold;
 
 }
 
+/* ===========================
+   QUICK FILTER BUTTONS
+=========================== */
+
 .payment-quick-filters{
 
 display:flex;
 
-gap:10px;
+align-items:center;
 
-margin-bottom:20px;
+gap:6px;
 
-flex-wrap:wrap;
+margin:8px 0 16px;
+
+flex-wrap:nowrap;
 
 }
 
 .payment-quick-filters button{
 
-padding:8px 15px;
+padding:4px 10px;
+
+font-size:11px;
+
+font-weight:500;
 
 background:#000066;
 
@@ -1295,39 +1305,15 @@ color:#fff;
 
 border:none;
 
-border-radius:6px;
+border-radius:4px;
 
 cursor:pointer;
 
-}
+min-width:65px;
 
-.payment-quick-filters button:hover{
+line-height:1.2;
 
-background:#0099ff;
-
-}
-
-@media(max-width:768px){
-
-.payment-quick-filters{
-
-justify-content:flex-start;
-
-overflow-x:auto;
-
--webkit-overflow-scrolling:touch;
-
-}
-
-.payment-quick-filters button{
-
-flex:0 0 auto;
-
-font-size:12px;
-
-padding:6px 10px;
-
-}
+transition:.2s;
 
 }
 
@@ -1339,13 +1325,31 @@ background:#0099ff;
 
 .payment-quick-filters button:active{
 
-transform:scale(0.97);
+transform:scale(.96);
+
+}
+
+@media(max-width:768px){
+
+.payment-quick-filters{
+
+display:grid;
+
+grid-template-columns:repeat(3,1fr);
+
+gap:6px;
 
 }
 
 .payment-quick-filters button{
 
-flex:1 1 40%;
+width:100%;
+
+padding:5px;
+
+font-size:10px;
+
+min-width:unset;
 
 }
 

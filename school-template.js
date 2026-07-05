@@ -1952,19 +1952,19 @@ Today
 </button>
 
 <button onclick="historyThisWeek()">
-This Week
+Week
 </button>
 
 <button onclick="historyThisMonth()">
-This Month
+Month
 </button>
 
 <button onclick="historyThisTerm()">
-This Term
+Term
 </button>
 
 <button onclick="historyThisSession()">
-This Session
+Session
 </button>
 
 <button onclick="historyReset()">
