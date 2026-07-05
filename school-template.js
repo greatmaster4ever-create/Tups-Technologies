@@ -1814,6 +1814,7 @@ new Set(
 
 ).size;
 
+window.paymentHistoryData = data;
   let html = `
 
 <h3>
@@ -1890,7 +1891,7 @@ ${studentsPaid}
   </select>
 
 </div>
-window.paymentHistoryData = data;
+
 
   <table
     class="admin-table"
