@@ -1,3 +1,13 @@
+// ======================================
+// PAYMENT HISTORY PAGINATION
+// ======================================
+
+let paymentHistoryData = [];
+
+let paymentHistoryCurrentPage = 1;
+
+const paymentHistoryRowsPerPage = 20;
+
 console.log("SCHOOL TEMPLATE JS LOADED");
 
 let currentDepartment = "";
@@ -1814,7 +1824,51 @@ new Set(
 
 ).size;
 
-window.paymentHistoryData = data;
+paymentHistoryData = data;
+
+const totalPages = Math.ceil(
+
+  paymentHistoryData.length /
+
+  paymentHistoryRowsPerPage
+
+);
+
+if (
+
+paymentHistoryCurrentPage >
+
+totalPages
+
+){
+
+paymentHistoryCurrentPage = 1;
+
+}
+
+const start =
+
+(paymentHistoryCurrentPage - 1)
+
+*
+
+paymentHistoryRowsPerPage;
+
+const end =
+
+start +
+
+paymentHistoryRowsPerPage;
+
+const pageData =
+
+paymentHistoryData.slice(
+
+start,
+
+end
+
+);
   let html = `
 
 <h3>
@@ -1921,7 +1975,7 @@ ${studentsPaid}
 
   `;
 
-  data.forEach(
+  pageData.forEach(
 
     row => {
 
@@ -1988,6 +2042,54 @@ ${studentsPaid}
   </table>
 
   `;
+  
+ html += `
+
+<div class="payment-pagination">
+
+<button
+
+onclick="previousPaymentPage()"
+
+${paymentHistoryCurrentPage===1?
+
+"disabled":""}
+
+>
+
+◀ Previous
+
+</button>
+
+<span>
+
+Page
+
+${paymentHistoryCurrentPage}
+
+of
+
+${Math.max(totalPages,1)}
+
+</span>
+
+<button
+
+onclick="nextPaymentPage()"
+
+${paymentHistoryCurrentPage>=totalPages?
+
+"disabled":""}
+
+>
+
+Next ▶
+
+</button>
+
+</div>
+
+`;
 
   document.getElementById(
     "adminContent"
@@ -1996,6 +2098,56 @@ ${studentsPaid}
   populateHistoryFilters(
   data
     );
+}
+
+function previousPaymentPage(){
+
+if(
+
+paymentHistoryCurrentPage>1
+
+){
+
+paymentHistoryCurrentPage--;
+
+renderPaymentHistory(
+
+paymentHistoryData
+
+);
+
+}
+
+}
+
+function nextPaymentPage(){
+
+const totalPages=
+
+Math.ceil(
+
+paymentHistoryData.length/
+
+paymentHistoryRowsPerPage
+
+);
+
+if(
+
+paymentHistoryCurrentPage<totalPages
+
+){
+
+paymentHistoryCurrentPage++;
+
+renderPaymentHistory(
+
+paymentHistoryData
+
+);
+
+}
+
 }
 
 function filterPaymentHistory() {
