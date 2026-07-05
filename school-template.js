@@ -8,6 +8,8 @@ let paymentHistoryCurrentPage = 1;
 
 const paymentHistoryRowsPerPage = 20;
 
+let paymentHistoryFilter = "all";
+
 console.log("SCHOOL TEMPLATE JS LOADED");
 
 let currentDepartment = "";
@@ -2128,65 +2130,73 @@ Next ▶
 
 function historyToday(){
 
-const today =
+    paymentHistoryFilter = "today";
 
-new Date()
+    paymentHistoryCurrentPage = 1;
 
-.toISOString()
+    filterPaymentHistory();
 
-.substring(0,10);
+}
 
-document.getElementById(
+function historyThisWeek(){
 
-"historyFrom"
+    paymentHistoryFilter = "week";
 
-).value = today;
+    paymentHistoryCurrentPage = 1;
 
-document.getElementById(
+    filterPaymentHistory();
 
-"historyTo"
+}
 
-).value = today;
+function historyThisMonth(){
 
-filterPaymentHistory();
+    paymentHistoryFilter = "month";
+
+    paymentHistoryCurrentPage = 1;
+
+    filterPaymentHistory();
+
+}
+
+function historyThisTerm(){
+
+    paymentHistoryFilter = "term";
+
+    paymentHistoryCurrentPage = 1;
+
+    filterPaymentHistory();
+
+}
+
+function historyThisSession(){
+
+    paymentHistoryFilter = "session";
+
+    paymentHistoryCurrentPage = 1;
+
+    filterPaymentHistory();
 
 }
 
 function historyReset(){
 
-document.getElementById(
+    paymentHistoryFilter = "all";
 
-"historyFrom"
+    paymentHistoryCurrentPage = 1;
 
-).value = "";
+    document.getElementById(
+        "historySearch"
+    ).value = "";
 
-document.getElementById(
+    document.getElementById(
+        "historyDepartment"
+    ).value = "";
 
-"historyTo"
+    document.getElementById(
+        "historyClass"
+    ).value = "";
 
-).value = "";
-
-document.getElementById(
-
-"historySearch"
-
-).value = "";
-
-document.getElementById(
-
-"historyDepartment"
-
-).value = "";
-
-document.getElementById(
-
-"historyClass"
-
-).value = "";
-
-paymentHistoryCurrentPage = 1;
-
-filterPaymentHistory();
+    filterPaymentHistory();
 
 }
 
@@ -2288,15 +2298,86 @@ function filterPaymentHistory() {
 
           row.class === cls;
 
-        return (
 
-          matchesSearch &&
+let matchesDate = true;
 
-          matchesDept &&
+const paymentDate =
 
-          matchesClass
+new Date(row.created_at);
 
-        );
+const today = new Date();
+
+switch(paymentHistoryFilter){
+
+case "today":
+
+    matchesDate =
+
+        paymentDate.toDateString() ===
+
+        today.toDateString();
+
+break;
+
+case "week":
+
+    const weekStart = new Date(today);
+
+    weekStart.setDate(
+
+        today.getDate() -
+
+        (today.getDay() === 0 ?
+
+        6 :
+
+        today.getDay()-1)
+
+    );
+
+    weekStart.setHours(0,0,0,0);
+
+    matchesDate =
+
+        paymentDate >= weekStart;
+
+break;
+
+case "month":
+
+    matchesDate =
+
+        paymentDate.getMonth() ===
+
+        today.getMonth()
+
+        &&
+
+        paymentDate.getFullYear() ===
+
+        today.getFullYear();
+
+break;
+
+case "all":
+
+default:
+
+    matchesDate = true;
+
+}
+
+        return(
+
+matchesSearch &&
+
+matchesDept &&
+
+matchesClass &&
+
+matchesDate
+
+);
 
       }
 
