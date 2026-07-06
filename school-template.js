@@ -2,6 +2,8 @@
 // PAYMENT HISTORY PAGINATION
 // ======================================
 
+let paymentHistoryMasterData = [];
+
 let paymentHistoryData = [];
 
 let paymentHistoryCurrentPage = 1;
@@ -1782,9 +1784,14 @@ async function loadPaymentHistory() {
 
   }
 
-  renderPaymentHistory(
-    data
-  );
+  // Store the complete dataset ONLY ONCE
+paymentHistoryMasterData = data;
+
+// Working dataset
+paymentHistoryData = data;
+
+// Render
+renderPaymentHistory(data);
 
 }
 
@@ -1826,7 +1833,8 @@ new Set(
 
 ).size;
 
-paymentHistoryData = data;
+
+
 
 const totalPages = Math.ceil(
 
@@ -2196,7 +2204,9 @@ function historyReset(){
         "historyClass"
     ).value = "";
 
-    filterPaymentHistory();
+    paymentHistoryData = paymentHistoryMasterData;
+
+    renderPaymentHistory(paymentHistoryMasterData);
 
 }
 
@@ -2271,7 +2281,7 @@ function filterPaymentHistory() {
     ).value;
 
   const filtered =
-    paymentHistoryData.filter(
+    paymentHistoryMasterData.filter(
       row => {
 
         const matchesSearch =
@@ -2382,10 +2392,11 @@ matchesDate
       }
 
     );
+	
+paymentHistoryData = filtered;
 
-  renderPaymentHistory(
-    filtered
-  );
+renderPaymentHistory(filtered);
+
   
 }
 
