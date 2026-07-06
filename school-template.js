@@ -2843,6 +2843,28 @@ Paid
 
 </div>
 
+<div class="payment-quick-filters">
+
+<button
+class="admin-btn"
+onclick="exportOutstandingFees()"
+>
+
+📥 Export Outstanding List
+
+</button>
+
+<button
+class="admin-btn"
+onclick="printOutstandingFees()"
+>
+
+🖨️ Print Outstanding List
+
+</button>
+
+</div>
+
 <div id="outstandingTableContainer"></div>
 `;
 
@@ -3188,6 +3210,100 @@ statusMatch
 outstandingCurrentPage = 1;
 
 renderOutstandingTable();
+
+}
+
+function exportOutstandingFees(){
+
+let csv =
+
+"Student,Reg No,Department,Class,Term Fee,Paid,Outstanding,Status\n";
+
+outstandingFeesData.forEach(row=>{
+
+csv +=
+
+`"${row.student_name}",`
+
++
+
+`"${row.reg_no}",`
+
++
+
+`"${row.department}",`
+
++
+
+`"${row.class}",`
+
++
+
+`${row.termFee},`
+
++
+
+`${row.paid},`
+
++
+
+`${row.outstanding},`
+
++
+
+`"${row.status}"\n`;
+
+});
+
+const blob =
+
+new Blob(
+
+[csv],
+
+{
+
+type:
+
+"text/csv;charset=utf-8;"
+
+}
+
+);
+
+const url =
+
+URL.createObjectURL(
+
+blob
+
+);
+
+const link =
+
+document.createElement(
+
+"a"
+
+);
+
+link.href = url;
+
+link.download =
+
+"Outstanding_Fees.csv";
+
+document.body.appendChild(
+
+link
+
+);
+
+link.click();
+
+document.body.removeChild(
+
+link);
 
 }
 
