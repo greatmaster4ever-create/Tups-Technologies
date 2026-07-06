@@ -8,7 +8,7 @@ let paymentHistoryData = [];
 
 let paymentHistoryCurrentPage = 1;
 
-const paymentHistoryRowsPerPage = 20;
+const paymentHistoryRowsPerPage = 12;
 
 let paymentHistoryFilter = "all";
 
@@ -18,7 +18,7 @@ let outstandingFeesMasterData = [];
 
 let outstandingCurrentPage = 1;
 
-const outstandingRowsPerPage = 20;
+const outstandingRowsPerPage = 12;
 
 console.log("SCHOOL TEMPLATE JS LOADED");
 
@@ -2775,6 +2775,7 @@ ${partialPaid}
 
 </div>
 
+<div id="outstandingTableContainer"></div>
 `;
 
 
@@ -2961,16 +2962,8 @@ Next ▶
 `;
 
 document.getElementById(
-
-"adminContent"
-
-).insertAdjacentHTML(
-
-"beforeend",
-
-tableHtml
-
-);
+    "outstandingTableContainer"
+).innerHTML = tableHtml;
 
 }
 
