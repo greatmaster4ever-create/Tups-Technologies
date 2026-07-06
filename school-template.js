@@ -2777,129 +2777,6 @@ ${partialPaid}
 
 `;
 
-html += `
-
-<table class="admin-table">
-
-<thead>
-
-<tr>
-
-<th>Student</th>
-
-<th>Reg No</th>
-
-<th>Class</th>
-
-<th>Term Fee</th>
-
-<th>Paid</th>
-
-<th>Outstanding</th>
-
-<th>Status</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-`;
-
-const totalPages = Math.ceil(
-
-outstandingFeesData.length /
-
-outstandingRowsPerPage
-
-);
-
-if(
-
-outstandingCurrentPage >
-
-totalPages
-
-){
-
-    outstandingCurrentPage = 1;
-
-}
-
-const start =
-
-(outstandingCurrentPage-1)
-
-*
-
-outstandingRowsPerPage;
-
-const end =
-
-start +
-
-outstandingRowsPerPage;
-
-const pageData =
-
-outstandingFeesData.slice(
-
-start,
-
-end
-
-);
-
-pageData.forEach(row=>{
-
-html += `
-
-<tr>
-
-<td>${row.student_name}</td>
-
-<td>${row.reg_no}</td>
-
-<td>${row.class}</td>
-
-<td>
-
-₦${row.termFee.toLocaleString()}
-
-</td>
-
-<td>
-
-₦${row.paid.toLocaleString()}
-
-</td>
-
-<td>
-
-₦${row.outstanding.toLocaleString()}
-
-</td>
-
-<td>
-
-${row.status}
-
-</td>
-
-</tr>
-
-`;
-
-});
-
-html += `
-
-</tbody>
-
-</table>
-
-`;
 
 html += `
 
@@ -2954,8 +2831,196 @@ document.getElementById(
 "adminContent"
 
 ).innerHTML = html;
+renderOutstandingTable();
 }
 
+function renderOutstandingTable(){
+
+const totalPages = Math.ceil(
+
+outstandingFeesData.length/
+
+outstandingRowsPerPage
+
+);
+
+if(
+
+outstandingCurrentPage>
+
+totalPages
+
+){
+
+outstandingCurrentPage=1;
+
+}
+
+const start =
+
+(outstandingCurrentPage-1)
+
+*
+
+outstandingRowsPerPage;
+
+const end =
+
+start+
+
+outstandingRowsPerPage;
+
+const pageData =
+
+outstandingFeesData.slice(
+
+start,
+
+end
+
+);
+
+let tableHtml = `
+
+<table class="admin-table">
+
+<thead>
+
+<tr>
+
+<th>Student</th>
+
+<th>Reg No</th>
+
+<th>Class</th>
+
+<th>Term Fee</th>
+
+<th>Paid</th>
+
+<th>Outstanding</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+`;
+
+pageData.forEach(row=>{
+
+tableHtml += `
+
+<tr>
+
+<td>${row.student_name}</td>
+
+<td>${row.reg_no}</td>
+
+<td>${row.class}</td>
+
+<td>
+
+₦${row.termFee.toLocaleString()}
+
+</td>
+
+<td>
+
+₦${row.paid.toLocaleString()}
+
+</td>
+
+<td>
+
+₦${row.outstanding.toLocaleString()}
+
+</td>
+
+<td>
+
+${row.status}
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+tableHtml += `
+
+</tbody>
+
+</table>
+
+`;
+
+tableHtml += `
+
+<div class="payment-pagination">
+
+<button
+
+onclick="previousOutstandingPage()"
+
+${outstandingCurrentPage===1?
+
+"disabled":""}
+
+>
+
+◀ Previous
+
+</button>
+
+<span>
+
+Page
+
+${outstandingCurrentPage}
+
+of
+
+${Math.max(totalPages,1)}
+
+</span>
+
+<button
+
+onclick="nextOutstandingPage()"
+
+${outstandingCurrentPage>=totalPages?
+
+"disabled":""}
+
+>
+
+Next ▶
+
+</button>
+
+</div>
+
+`;
+
+document.getElementById(
+
+"adminContent"
+
+).insertAdjacentHTML(
+
+"beforeend",
+
+tableHtml
+
+);
+
+}
 
 function previousOutstandingPage(){
 
