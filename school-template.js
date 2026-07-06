@@ -1569,7 +1569,7 @@ if (appliedToCurrentTerm > 0) {
 
       amount_paid:
         appliedToCurrentTerm,
-
+	
 
 
     });
@@ -2465,11 +2465,263 @@ function populateHistoryFilters(data) {
 
 async function loadOutstandingPayments() {
 
-  alert(
-    "Outstanding Fees module coming next."
+  document.getElementById(
+    "adminContent"
+  ).innerHTML = `
+
+  <h3>
+
+  💰 Outstanding Fees
+
+  </h3>
+
+  <p>
+
+  Loading Outstanding Fees...
+
+  </p>
+
+  `;
+
+  // ------------------------
+  // LOAD STUDENTS
+  // ------------------------
+
+  const {
+
+    data: students,
+
+    error: studentsError
+
+  } = await supabaseClient
+
+    .from("students")
+
+    .select("*")
+
+    .eq(
+      "school_code",
+      currentSchoolCode
+    );
+
+  if (studentsError) {
+
+    document.getElementById(
+      "adminContent"
+    ).innerHTML =
+
+      studentsError.message;
+
+    return;
+
+  }
+
+  // ------------------------
+  // LOAD CLASS FEES
+  // ------------------------
+
+  const {
+
+    data: fees,
+
+    error: feesError
+
+  } = await supabaseClient
+
+    .from("class_fees")
+
+    .select("*")
+
+    .eq(
+      "school_code",
+      currentSchoolCode
+    );
+
+  if (feesError) {
+
+    document.getElementById(
+      "adminContent"
+    ).innerHTML =
+
+      feesError.message;
+
+    return;
+
+  }
+
+  renderOutstandingFees(
+
+    students,
+
+    fees
+
   );
 
 }
+
+function renderOutstandingFees(
+
+  students,
+
+  fees
+
+){
+
+let studentsOwing = 0;
+
+let amountOwing = 0;
+
+let fullyPaid = 0;
+
+let partialPaid = 0;
+
+students.forEach(student=>{
+
+    const feeRecord =
+
+    fees.find(
+
+        fee =>
+
+        fee.class_name ===
+
+        student.class
+
+    );
+
+    const classFee =
+
+    Number(
+
+      feeRecord?.term_fee || 0
+
+    );
+
+    const paid =
+
+    Number(
+
+      student.total_fees_paid || 0
+
+    );
+
+    const outstanding =
+
+    Math.max(
+
+      classFee - paid,
+
+      0
+
+    );
+
+    if(outstanding===0){
+
+        fullyPaid++;
+
+    }
+
+    else{
+
+        studentsOwing++;
+
+        amountOwing += outstanding;
+
+        if(paid>0){
+
+            partialPaid++;
+
+        }
+
+    }
+
+});
+
+document.getElementById(
+
+"adminContent"
+
+).innerHTML = `
+
+<h3>
+
+💰 Outstanding Fees
+
+</h3>
+
+<div class="payment-summary">
+
+<div class="summary-card">
+
+<h4>
+
+Students Owing
+
+</h4>
+
+<p>
+
+${studentsOwing}
+
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h4>
+
+Amount Owing
+
+</h4>
+
+<p>
+
+₦${amountOwing.toLocaleString()}
+
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h4>
+
+Fully Paid
+
+</h4>
+
+<p>
+
+${fullyPaid}
+
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h4>
+
+Partial Paid
+
+</h4>
+
+<p>
+
+${partialPaid}
+
+</p>
+
+</div>
+
+</div>
+
+`;
+
+}
+
+
 
 async function clearCurrentTermPayments() {
 
