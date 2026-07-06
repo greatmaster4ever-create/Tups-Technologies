@@ -12,6 +12,14 @@ const paymentHistoryRowsPerPage = 20;
 
 let paymentHistoryFilter = "all";
 
+let outstandingFeesData = [];
+
+let outstandingFeesMasterData = [];
+
+let outstandingCurrentPage = 1;
+
+const outstandingRowsPerPage = 20;
+
 console.log("SCHOOL TEMPLATE JS LOADED");
 
 let currentDepartment = "";
@@ -2687,6 +2695,10 @@ outstandingData.push({
 
 });
 
+outstandingFeesMasterData = outstandingData;
+
+outstandingFeesData = outstandingData;
+
 let html = `
 
 <h3>
@@ -2795,7 +2807,51 @@ html += `
 
 `;
 
-outstandingData.forEach(row=>{
+const totalPages = Math.ceil(
+
+outstandingFeesData.length /
+
+outstandingRowsPerPage
+
+);
+
+if(
+
+outstandingCurrentPage >
+
+totalPages
+
+){
+
+    outstandingCurrentPage = 1;
+
+}
+
+const start =
+
+(outstandingCurrentPage-1)
+
+*
+
+outstandingRowsPerPage;
+
+const end =
+
+start +
+
+outstandingRowsPerPage;
+
+const pageData =
+
+outstandingFeesData.slice(
+
+start,
+
+end
+
+);
+
+pageData.forEach(row=>{
 
 html += `
 
@@ -2845,6 +2901,54 @@ html += `
 
 `;
 
+html += `
+
+<div class="payment-pagination">
+
+<button
+
+onclick="previousOutstandingPage()"
+
+${outstandingCurrentPage===1?
+
+"disabled":""}
+
+>
+
+◀ Previous
+
+</button>
+
+<span>
+
+Page
+
+${outstandingCurrentPage}
+
+of
+
+${Math.max(totalPages,1)}
+
+</span>
+
+<button
+
+onclick="nextOutstandingPage()"
+
+${outstandingCurrentPage>=totalPages?
+
+"disabled":""}
+
+>
+
+Next ▶
+
+</button>
+
+</div>
+
+`;
+
 document.getElementById(
 
 "adminContent"
@@ -2853,6 +2957,37 @@ document.getElementById(
 }
 
 
+function previousOutstandingPage(){
+
+if(outstandingCurrentPage>1){
+
+    outstandingCurrentPage--;
+
+    renderOutstandingTable();
+
+}
+
+}
+
+function nextOutstandingPage(){
+
+const totalPages = Math.ceil(
+
+outstandingFeesData.length/
+
+outstandingRowsPerPage
+
+);
+
+if(outstandingCurrentPage<totalPages){
+
+    outstandingCurrentPage++;
+
+    renderOutstandingTable();
+
+}
+
+}
 
 async function clearCurrentTermPayments() {
 
