@@ -1570,11 +1570,7 @@ if (appliedToCurrentTerm > 0) {
       amount_paid:
         appliedToCurrentTerm,
 
-      session:
-        currentSession,
 
-      term:
-        currentTerm
 
     });
 
