@@ -2575,6 +2575,8 @@ let fullyPaid = 0;
 
 let partialPaid = 0;
 
+const outstandingData = [];
+
 students.forEach(student=>{
 
     const feeRecord =
@@ -2615,6 +2617,54 @@ students.forEach(student=>{
 
     );
 
+	let status = "";
+
+if (outstanding === 0) {
+
+    status = "🟢 Paid";
+
+}
+
+else if (paid === 0) {
+
+    status = "🔴 Outstanding";
+
+}
+
+else {
+
+    status = "🟡 Partial";
+
+}
+
+outstandingData.push({
+
+    student_name:
+        student.student_name,
+
+    reg_no:
+        student.reg_no,
+
+    department:
+        student.department,
+
+    class:
+        student.class,
+
+    termFee:
+        classFee,
+
+    paid:
+        paid,
+
+    outstanding:
+        outstanding,
+
+    status:
+        status
+
+});
+
     if(outstanding===0){
 
         fullyPaid++;
@@ -2637,11 +2687,7 @@ students.forEach(student=>{
 
 });
 
-document.getElementById(
-
-"adminContent"
-
-).innerHTML = `
+let html = `
 
 <h3>
 
@@ -2719,6 +2765,91 @@ ${partialPaid}
 
 `;
 
+html += `
+
+<table class="admin-table">
+
+<thead>
+
+<tr>
+
+<th>Student</th>
+
+<th>Reg No</th>
+
+<th>Class</th>
+
+<th>Term Fee</th>
+
+<th>Paid</th>
+
+<th>Outstanding</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+`;
+
+outstandingData.forEach(row=>{
+
+html += `
+
+<tr>
+
+<td>${row.student_name}</td>
+
+<td>${row.reg_no}</td>
+
+<td>${row.class}</td>
+
+<td>
+
+₦${row.termFee.toLocaleString()}
+
+</td>
+
+<td>
+
+₦${row.paid.toLocaleString()}
+
+</td>
+
+<td>
+
+₦${row.outstanding.toLocaleString()}
+
+</td>
+
+<td>
+
+${row.status}
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+html += `
+
+</tbody>
+
+</table>
+
+`;
+
+document.getElementById(
+
+"adminContent"
+
+).innerHTML = html;
 }
 
 
