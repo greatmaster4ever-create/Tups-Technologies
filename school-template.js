@@ -2775,6 +2775,74 @@ ${partialPaid}
 
 </div>
 
+<div class="payment-filters">
+
+<input
+type="text"
+id="outstandingSearch"
+placeholder="🔍 Search Student / Reg No..."
+onkeyup="filterOutstandingFees()"
+>
+
+<select
+id="outstandingDepartment"
+onchange="filterOutstandingFees()"
+>
+
+<option value="">
+
+All Departments
+
+</option>
+
+</select>
+
+<select
+id="outstandingClass"
+onchange="filterOutstandingFees()"
+>
+
+<option value="">
+
+All Classes
+
+</option>
+
+</select>
+
+<select
+id="outstandingStatus"
+onchange="filterOutstandingFees()"
+>
+
+<option value="">
+
+All Status
+
+</option>
+
+<option value="Outstanding">
+
+Outstanding
+
+</option>
+
+<option value="Partial">
+
+Partial
+
+</option>
+
+<option value="Paid">
+
+Paid
+
+</option>
+
+</select>
+
+</div>
+
 <div id="outstandingTableContainer"></div>
 `;
 
@@ -2785,6 +2853,7 @@ document.getElementById(
 
 ).innerHTML = html;
 renderOutstandingTable();
+populateOutstandingFilters();
 }
 
 function renderOutstandingTable(){
@@ -2964,6 +3033,161 @@ Next ▶
 document.getElementById(
     "outstandingTableContainer"
 ).innerHTML = tableHtml;
+
+}
+
+function populateOutstandingFilters(){
+
+const deptSelect =
+
+document.getElementById(
+"outstandingDepartment"
+);
+
+const classSelect =
+
+document.getElementById(
+"outstandingClass"
+);
+
+const departments =
+
+[
+...new Set(
+
+outstandingFeesMasterData.map(
+
+row=>row.department
+
+)
+
+)
+
+].sort();
+
+const classes =
+
+[
+...new Set(
+
+outstandingFeesMasterData.map(
+
+row=>row.class
+
+)
+
+)
+
+].sort();
+
+departments.forEach(dept=>{
+
+deptSelect.innerHTML +=
+
+`<option value="${dept}">${dept}</option>`;
+
+});
+
+classes.forEach(cls=>{
+
+classSelect.innerHTML +=
+
+`<option value="${cls}">${cls}</option>`;
+
+});
+
+}
+
+
+function filterOutstandingFees(){
+
+const keyword =
+
+document.getElementById(
+"outstandingSearch"
+)
+
+.value
+
+.toLowerCase();
+
+const dept =
+
+document.getElementById(
+"outstandingDepartment"
+).value;
+
+const cls =
+
+document.getElementById(
+"outstandingClass"
+).value;
+
+const status =
+
+document.getElementById(
+"outstandingStatus"
+).value;
+
+outstandingFeesData =
+
+outstandingFeesMasterData.filter(
+
+row=>{
+
+const searchMatch =
+
+row.student_name
+
+.toLowerCase()
+
+.includes(keyword)
+
+||
+
+row.reg_no
+
+.toLowerCase()
+
+.includes(keyword);
+
+const deptMatch =
+
+!dept ||
+
+row.department===dept;
+
+const classMatch =
+
+!cls ||
+
+row.class===cls;
+
+const statusMatch =
+
+!status ||
+
+row.status.includes(status);
+
+return(
+
+searchMatch &&
+
+deptMatch &&
+
+classMatch &&
+
+statusMatch
+
+);
+
+}
+
+);
+
+outstandingCurrentPage = 1;
+
+renderOutstandingTable();
 
 }
 
