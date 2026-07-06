@@ -2778,54 +2778,6 @@ ${partialPaid}
 `;
 
 
-html += `
-
-<div class="payment-pagination">
-
-<button
-
-onclick="previousOutstandingPage()"
-
-${outstandingCurrentPage===1?
-
-"disabled":""}
-
->
-
-◀ Previous
-
-</button>
-
-<span>
-
-Page
-
-${outstandingCurrentPage}
-
-of
-
-${Math.max(totalPages,1)}
-
-</span>
-
-<button
-
-onclick="nextOutstandingPage()"
-
-${outstandingCurrentPage>=totalPages?
-
-"disabled":""}
-
->
-
-Next ▶
-
-</button>
-
-</div>
-
-`;
-
 document.getElementById(
 
 "adminContent"
