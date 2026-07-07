@@ -3771,31 +3771,62 @@ async function generateOutstandingRecords(){
 
     if(outstanding > 0){
 
-      const {
+     const {
   data: upsertData,
   error: upsertError
 } = await supabaseClient
-  .from("student_outstanding_fees")
-  .upsert(
-    {
-      school_code: currentSchoolCode,
-      student_id: student.id,
-      reg_no: student.reg_no,
-      student_name: student.student_name,
-      class_name: student.class,
-      session: "N/A",
-      term: "N/A",
-      original_amount: outstanding,
-      remaining_amount: outstanding,
-      status: "Outstanding"
-    },
-    {
-      onConflict: "school_code,student_id"
-    }
-  );
+.from("student_outstanding_fees")
+.upsert({
 
-console.log("Outstanding Insert:", upsertData);
-console.log("Outstanding Error:", upsertError);
+    school_code:
+        currentSchoolCode,
+
+    student_id:
+        student.id,
+
+    reg_no:
+        student.reg_no,
+
+    student_name:
+        student.student_name,
+
+    class_name:
+        student.class,
+
+    session:
+        "N/A",
+
+    term:
+        "N/A",
+
+    original_amount:
+        outstanding,
+
+    remaining_amount:
+        outstanding,
+
+    status:
+        "Outstanding"
+
+},
+{
+    onConflict:
+    "school_code,reg_no"
+});
+
+console.log(
+"Outstanding Insert:",
+upsertData
+);
+
+console.log(
+"Outstanding Error:",
+upsertError
+);
+
+if(upsertError){
+    throw upsertError;
+}
 
 generated++;
 
