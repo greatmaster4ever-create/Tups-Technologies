@@ -3532,7 +3532,7 @@ if(!proceed) return;
 try{
 
 // STEP 1
-const archived =
+const archiveResult =
 await archiveStudentPayments();
 
 // STEP 2
@@ -3590,7 +3590,7 @@ alert(
 `Finance Rollover Completed Successfully
 
 Archived Records:
-${archived}
+${archiveResult.count}
 
 Outstanding Records:
 ${outstanding}
@@ -3771,45 +3771,31 @@ async function generateOutstandingRecords(){
 
     if(outstanding > 0){
 
-      await supabaseClient
-.from("student_outstanding_fees")
-.upsert({
+      const {
+  data: upsertData,
+  error: upsertError
+} = await supabaseClient
+  .from("student_outstanding_fees")
+  .upsert(
+    {
+      school_code: currentSchoolCode,
+      student_id: student.id,
+      reg_no: student.reg_no,
+      student_name: student.student_name,
+      class_name: student.class,
+      session: "N/A",
+      term: "N/A",
+      original_amount: outstanding,
+      remaining_amount: outstanding,
+      status: "Outstanding"
+    },
+    {
+      onConflict: "school_code,student_id"
+    }
+  );
 
-    school_code:
-        currentSchoolCode,
-
-    student_id:
-        student.id,
-
-    reg_no:
-        student.reg_no,
-
-    student_name:
-        student.student_name,
-
-    class_name:
-        student.class,
-
-    session:
-        "N/A",
-
-    term:
-        "N/A",
-
-    original_amount:
-        outstanding,
-
-    remaining_amount:
-        outstanding,
-
-    status:
-        "Outstanding"
-
-},
-{
-    onConflict:
-    "school_code,student_id"
-});
+console.log("Outstanding Insert:", upsertData);
+console.log("Outstanding Error:", upsertError);
 
 generated++;
 
@@ -5312,12 +5298,12 @@ function filterFeesTable() {
 
 async function archiveStudentPayments(){
 
+const archiveBatchId =
+`ROLL-${Date.now()}`;
+
 const {
-
 data: payments,
-
 error: fetchError
-
 } = await supabaseClient
 
 .from("student_payments")
@@ -5325,90 +5311,85 @@ error: fetchError
 .select("*")
 
 .eq(
-
 "school_code",
-
 currentSchoolCode
-
 );
 
 if(fetchError){
-
 throw fetchError;
-
 }
 
 if(!payments.length){
 
-return 0;
+return{
+
+count:0,
+
+batchId:null
+
+};
 
 }
 
 const archiveRows = payments.map(
-
 row=>({
 
-source_table:
+archive_batch_id:
+archiveBatchId,
 
+source_table:
 "student_payments",
 
 school_code:
-
 row.school_code,
 
 student_id:
-
 row.student_id,
 
 student_name:
-
 row.student_name,
 
 reg_no:
-
 row.reg_no,
 
 department:
-
 row.department,
 
 class:
-
 row.class,
 
 amount_paid:
-
-row.amount_paid,
+Number(row.amount_paid||0),
 
 created_at:
-
 row.created_at
 
 })
-
 );
 
-const {
-
+const{
 error: archiveError
-
-} = await supabaseClient
+}=await supabaseClient
 
 .from("finance_archive")
 
 .insert(
-
 archiveRows
-
 );
 
 if(archiveError){
-
 throw archiveError;
-
 }
 
-return archiveRows.length;
+return{
+
+count:
+archiveRows.length,
+
+batchId:
+archiveBatchId
+
+};
 
 }
 
