@@ -3497,30 +3497,123 @@ if(outstandingCurrentPage<totalPages){
 
 async function clearCurrentTermPayments() {
 
-  const proceed =
-    confirm(
+  try {
 
-`This action will:
+    const archived =
+      await archiveStudentPayments();
 
-• Generate Outstanding Fees
+    alert(
 
-• Reset Current Term Payments
-
-• Clear Current Payment Records
-
-Payment History will NOT be affected.
-
-Do you want to continue?`
+      `${archived} payment records archived successfully.`
 
     );
 
-  if (!proceed) return;
+  }
 
-  alert(
-    "Finance rollover engine will be connected next."
-  );
+  catch(err) {
+
+    alert(
+
+      "Archive Failed.\n\n" +
+
+      err.message
+
+    );
+
+  }
 
 }
+
+async function archiveStudentPayments() {
+
+  // Fetch all current term payments
+  const {
+    data: payments,
+    error: fetchError
+  } = await supabaseClient
+    .from("student_payments")
+    .select("*")
+    .eq(
+      "school_code",
+      currentSchoolCode
+    );
+
+  if (fetchError) {
+
+    console.error(
+      "Archive Fetch Error:",
+      fetchError
+    );
+
+    throw fetchError;
+
+  }
+
+  // Nothing to archive
+  if (!payments || payments.length === 0) {
+
+    return 0;
+
+  }
+
+  // Build archive rows
+  const archiveRows =
+    payments.map(row => ({
+
+      source_table:
+        "student_payments",
+
+      school_code:
+        row.school_code,
+
+      student_id:
+        row.student_id,
+
+      student_name:
+        row.student_name,
+
+      reg_no:
+        row.reg_no,
+
+      department:
+        row.department,
+
+      class:
+        row.class,
+
+      amount_paid:
+        Number(row.amount_paid || 0),
+
+      created_at:
+        row.created_at
+
+    }));
+
+  // Insert archive
+  const {
+    error: archiveError
+  } = await supabaseClient
+    .from("finance_archive")
+    .insert(
+      archiveRows
+    );
+
+  if (archiveError) {
+
+    console.error(
+      "Archive Insert Error:",
+      archiveError
+    );
+
+    throw archiveError;
+
+  }
+
+  return archiveRows.length;
+
+}
+
+
 
 function wireStudentsModule() {
 
@@ -5010,6 +5103,110 @@ function filterFeesTable() {
   });
 
 }
+
+async function archiveStudentPayments(){
+
+const {
+
+data: payments,
+
+error: fetchError
+
+} = await supabaseClient
+
+.from("student_payments")
+
+.select("*")
+
+.eq(
+
+"school_code",
+
+currentSchoolCode
+
+);
+
+if(fetchError){
+
+throw fetchError;
+
+}
+
+if(!payments.length){
+
+return 0;
+
+}
+
+const archiveRows = payments.map(
+
+row=>({
+
+source_table:
+
+"student_payments",
+
+school_code:
+
+row.school_code,
+
+student_id:
+
+row.student_id,
+
+student_name:
+
+row.student_name,
+
+reg_no:
+
+row.reg_no,
+
+department:
+
+row.department,
+
+class:
+
+row.class,
+
+amount_paid:
+
+row.amount_paid,
+
+created_at:
+
+row.created_at
+
+})
+
+);
+
+const {
+
+error: archiveError
+
+} = await supabaseClient
+
+.from("finance_archive")
+
+.insert(
+
+archiveRows
+
+);
+
+if(archiveError){
+
+throw archiveError;
+
+}
+
+return archiveRows.length;
+
+}
+
+
 // ==========================
 // FOOTER YEAR
 // ==========================
