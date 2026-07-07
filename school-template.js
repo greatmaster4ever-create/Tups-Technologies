@@ -460,6 +460,18 @@ onclick="togglePaymentsMenu()">
   >
     Clear Payments
   </button>
+  
+  <button
+
+class="admin-btn payment-item"
+
+onclick="restoreLastRollover()"
+
+>
+
+Restore Last Rollover
+
+</button>
 
 </div>
 </div>
@@ -3495,36 +3507,122 @@ if(outstandingCurrentPage<totalPages){
 
 }
 
-async function clearCurrentTermPayments() {
+async function clearCurrentTermPayments(){
 
-  try {
+const proceed = confirm(
 
-    const archived =
-      await archiveStudentPayments();
+`This action will:
 
-    alert(
+• Archive Current Payments
 
-      `${archived} payment records archived successfully.`
+• Generate Outstanding Fees
 
-    );
+• Reset Student Payments
 
-  }
+• Clear Current Payment Records
 
-  catch(err) {
+Payment History will NOT be affected.
 
-    alert(
+Do you want to continue?`
 
-      "Archive Failed.\n\n" +
+);
 
-      err.message
+if(!proceed) return;
 
-    );
+try{
 
-  }
+// STEP 1
+const archived =
+await archiveStudentPayments();
+
+// STEP 2
+const outstanding =
+await generateOutstandingRecords();
+
+// STEP 3
+const {
+error:updateError
+} =
+await supabaseClient
+
+.from("students")
+
+.update({
+
+total_fees_paid:0
+
+})
+
+.eq(
+
+"school_code",
+
+currentSchoolCode
+
+);
+
+if(updateError)
+throw updateError;
+
+// STEP 4
+const {
+error:deleteError
+} =
+await supabaseClient
+
+.from("student_payments")
+
+.delete()
+
+.eq(
+
+"school_code",
+
+currentSchoolCode
+
+);
+
+if(deleteError)
+throw deleteError;
+
+alert(
+
+`Finance Rollover Completed Successfully
+
+Archived Records:
+${archived}
+
+Outstanding Records:
+${outstanding}
+
+Student Payments Reset
+
+Payment History Preserved.`
+
+);
+
+}
+catch(err){
+
+alert(
+
+"Finance rollover failed.\n\n"
+
++
+
+err.message
+
+);
+
+console.error(err);
+
+}
 
 }
 
 async function archiveStudentPayments() {
+	const archiveBatchId =
+`ROLL-${Date.now()}`;
 
   // Fetch all current term payments
   const {
@@ -3559,6 +3657,9 @@ async function archiveStudentPayments() {
   // Build archive rows
   const archiveRows =
     payments.map(row => ({
+	
+	archive_batch_id:
+    archiveBatchId,
 
       source_table:
         "student_payments",
@@ -3609,11 +3710,116 @@ async function archiveStudentPayments() {
 
   }
 
-  return archiveRows.length;
+  return{
+
+count:
+archiveRows.length,
+
+batchId:
+archiveBatchId
+
+};
 
 }
 
+async function generateOutstandingRecords(){
 
+  // Get all students
+  const {
+    data: students,
+    error: studentError
+  } = await supabaseClient
+    .from("students")
+    .select("*")
+    .eq(
+      "school_code",
+      currentSchoolCode
+    );
+
+  if(studentError) throw studentError;
+
+  // Get class fees
+  const {
+    data: fees,
+    error: feeError
+  } = await supabaseClient
+    .from("class_fees")
+    .select("*")
+    .eq(
+      "school_code",
+      currentSchoolCode
+    );
+
+  if(feeError) throw feeError;
+
+  let generated = 0;
+
+  for(const student of students){
+
+    const feeRecord = fees.find(
+      fee => fee.class_name === student.class
+    );
+
+    const classFee =
+      Number(feeRecord?.term_fee || 0);
+
+    const paid =
+      Number(student.total_fees_paid || 0);
+
+    const outstanding =
+      Math.max(classFee - paid, 0);
+
+    if(outstanding > 0){
+
+      await supabaseClient
+.from("student_outstanding_fees")
+.upsert({
+
+    school_code:
+        currentSchoolCode,
+
+    student_id:
+        student.id,
+
+    reg_no:
+        student.reg_no,
+
+    student_name:
+        student.student_name,
+
+    class_name:
+        student.class,
+
+    session:
+        "N/A",
+
+    term:
+        "N/A",
+
+    original_amount:
+        outstanding,
+
+    remaining_amount:
+        outstanding,
+
+    status:
+        "Outstanding"
+
+},
+{
+    onConflict:
+    "school_code,student_id"
+});
+
+generated++;
+
+    }
+
+  }
+
+  return generated;
+
+}
 
 function wireStudentsModule() {
 
@@ -5203,6 +5409,150 @@ throw archiveError;
 }
 
 return archiveRows.length;
+
+}
+
+async function restoreLastRollover(){
+
+// Find latest batch
+
+const{
+
+data:lastBatch,
+
+error:lastBatchError
+
+}=await supabaseClient
+
+.from("finance_archive")
+
+.select("archive_batch_id")
+
+.order(
+
+"archived_at",
+
+{ascending:false}
+
+)
+
+.limit(1)
+
+.single();
+
+if(lastBatchError){
+
+alert(
+
+"No archive found."
+
+);
+
+return;
+
+}
+
+const batchId=
+
+lastBatch.archive_batch_id;
+
+// Load archive
+
+const{
+
+data:archiveRows,
+
+error:archiveError
+
+}=await supabaseClient
+
+.from("finance_archive")
+
+.select("*")
+
+.eq(
+
+"archive_batch_id",
+
+batchId
+
+);
+
+if(archiveError){
+
+alert(
+
+archiveError.message
+
+);
+
+return;
+
+}
+
+// Rebuild student_payments
+
+const paymentRows=
+
+archiveRows.map(row=>({
+
+school_code:
+
+row.school_code,
+
+student_id:
+
+row.student_id,
+
+student_name:
+
+row.student_name,
+
+reg_no:
+
+row.reg_no,
+
+department:
+
+row.department,
+
+class:
+
+row.class,
+
+amount_paid:
+
+row.amount_paid
+
+}));
+
+const{
+
+error:insertError
+
+}=await supabaseClient
+
+.from("student_payments")
+
+.insert(paymentRows);
+
+if(insertError){
+
+alert(
+
+insertError.message
+
+);
+
+return;
+
+}
+
+alert(
+
+"Latest rollover restored successfully."
+
+);
 
 }
 
