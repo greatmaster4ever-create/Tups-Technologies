@@ -5493,6 +5493,58 @@ error:insertError
 
 .insert(paymentRows);
 
+// ========================================
+// RESTORE TOTAL FEES PAID
+// ========================================
+
+const restoredStudents = {};
+
+archiveRows.forEach(row => {
+
+if(!restoredStudents[row.student_id]){
+
+restoredStudents[row.student_id] =
+
+Number(row.total_fees_paid || 0);
+
+}
+
+});
+
+for(const studentId in restoredStudents){
+
+const{
+
+error:updateError
+
+}=await supabaseClient
+
+.from("students")
+
+.update({
+
+total_fees_paid:
+
+restoredStudents[studentId]
+
+})
+
+.eq(
+
+"id",
+
+studentId
+
+);
+
+if(updateError){
+
+throw updateError;
+
+}
+
+}
+
 if(insertError){
 
 alert(
