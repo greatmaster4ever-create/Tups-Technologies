@@ -1591,12 +1591,13 @@ if (appliedToCurrentTerm > 0) {
 
   if (paymentError) {
 
-    console.error(
-      "STUDENT PAYMENT ERROR:",
-      paymentError
+    alert(
+      JSON.stringify(paymentError)
     );
 
-  }
+    throw paymentError;
+
+}
 
 }
 
@@ -3516,7 +3517,9 @@ const proceed = confirm(
 
 • Clear Current Payment Records
 
-Payment History will NOT be affected.
+Payment History will be preserved.
+
+Current Term payments will be marked as Previous Term payments.
 
 Do you want to continue?`
 
@@ -3529,6 +3532,47 @@ try{
 // STEP 1
 const archiveResult =
 await archiveStudentPayments();
+
+// STEP 1B
+// MARK CURRENT TERM PAYMENTS AS PREVIOUS TERM
+
+const {
+
+error: historyUpdateError
+
+} = await supabaseClient
+
+.from("payment_history")
+
+.update({
+
+remarks:
+
+"Previous Term Payment"
+
+})
+
+.eq(
+
+"school_code",
+
+currentSchoolCode
+
+)
+
+.eq(
+
+"remarks",
+
+"Current Term Payment"
+
+);
+
+if(historyUpdateError){
+
+throw historyUpdateError;
+
+}
 
 // STEP 2
 const outstanding =
