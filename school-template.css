@@ -1354,3 +1354,16 @@ min-width:unset;
 }
 
 }
+.restore-btn{
+
+background:#198754;
+
+color:#fff;
+
+}
+
+.restore-btn:hover{
+
+background:#157347;
+
+}

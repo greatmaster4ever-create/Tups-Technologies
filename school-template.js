@@ -462,15 +462,10 @@ onclick="togglePaymentsMenu()">
   </button>
   
   <button
-
-class="admin-btn payment-item"
-
-onclick="restoreLastRollover()"
-
+  class="admin-btn payment-item restore-btn"
+  onclick="restoreLastRollover()"
 >
-
-Restore Last Rollover
-
+  Restore Last Cleared Payments
 </button>
 
 </div>
@@ -5370,7 +5365,29 @@ function filterFeesTable() {
 
 
 async function restoreLastRollover(){
+const proceed = confirm(
 
+`This will restore the LAST cleared payment records.
+
+This action will:
+
+• Restore student payments
+
+• Restore total fees paid
+
+• Remove generated outstanding fees
+
+• Change Previous Term payments back to Current Term
+
+Do you want to continue?`
+
+);
+
+if(!proceed){
+
+return;
+
+}
 // Find latest batch
 
 const{
@@ -5582,6 +5599,48 @@ insertError.message
 );
 
 return;
+
+}
+
+// ========================================
+// RESTORE PAYMENT HISTORY REMARKS
+// ========================================
+
+const {
+
+error: historyRestoreError
+
+} = await supabaseClient
+
+.from("payment_history")
+
+.update({
+
+remarks:
+
+"Current Term"
+
+})
+
+.eq(
+
+"school_code",
+
+currentSchoolCode
+
+)
+
+.eq(
+
+"remarks",
+
+"Previous Term"
+
+);
+
+if(historyRestoreError){
+
+throw historyRestoreError;
 
 }
 
