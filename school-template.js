@@ -5545,6 +5545,34 @@ throw updateError;
 
 }
 
+// ========================================
+// REMOVE GENERATED OUTSTANDING FEES
+// ========================================
+
+const {
+
+error: deleteOutstandingError
+
+} = await supabaseClient
+
+.from("student_outstanding_fees")
+
+.delete()
+
+.eq(
+
+"school_code",
+
+currentSchoolCode
+
+);
+
+if(deleteOutstandingError){
+
+throw deleteOutstandingError;
+
+}
+
 if(insertError){
 
 alert(
