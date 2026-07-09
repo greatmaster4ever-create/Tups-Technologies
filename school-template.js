@@ -1562,7 +1562,38 @@ if (appliedToCurrentTerm > 0) {
   } =
   await supabaseClient
     .from("student_payments")
-    .insert({
+
+.upsert({
+
+    student_id:
+        studentId,
+
+    school_code:
+        currentSchoolCode,
+
+    department:
+        studentData.department,
+
+    class:
+        studentData.class,
+
+    student_name:
+        studentData.student_name,
+
+    reg_no:
+        studentData.reg_no,
+
+    amount_paid:
+        currentTotal + appliedToCurrentTerm
+
+},
+{
+
+onConflict:
+
+"school_code,student_id"
+
+});
 
       student_id:
         studentId,
