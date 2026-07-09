@@ -1595,31 +1595,6 @@ onConflict:
 
 });
 
-      student_id:
-        studentId,
-
-      school_code:
-        currentSchoolCode,
-
-      department:
-        studentData.department,
-
-      class:
-        studentData.class,
-
-      student_name:
-        studentData.student_name,
-
-      reg_no:
-        studentData.reg_no,
-
-      amount_paid:
-        appliedToCurrentTerm,
-	
-
-
-    });
-
   if (paymentError) {
 
     alert(
