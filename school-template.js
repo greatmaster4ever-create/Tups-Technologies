@@ -1555,8 +1555,19 @@ if (newAmount > 0) {
 // SAVE CURRENT TERM PAYMENT
 // ========================================
 
+console.log("========== PAYMENT DEBUG ==========");
+console.log("New Amount:", newAmount);
+console.log("Current Total:", currentTotal);
+console.log("Applied To Outstanding:", appliedToOutstanding);
+console.log("Applied To Current Term:", appliedToCurrentTerm);
+console.log("Updated Total:", updatedTotal);
+console.log("Outstanding Record:", outstanding);
+console.log("==================================");
+
 if (appliedToCurrentTerm > 0) {
 
+console.log("Attempting UPSERT into student_payments...");
+  
   const {
     error: paymentError
   } =
@@ -1587,6 +1598,7 @@ if (appliedToCurrentTerm > 0) {
         currentTotal + appliedToCurrentTerm
 
 },
+
 {
 
 onConflict:
@@ -1594,6 +1606,8 @@ onConflict:
 "school_code,student_id"
 
 });
+
+console.log("Payment Error:", paymentError);
 
   if (paymentError) {
 
