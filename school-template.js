@@ -1564,51 +1564,43 @@ console.log("Updated Total:", updatedTotal);
 console.log("Outstanding Record:", outstanding);
 console.log("==================================");
 
-if (appliedToCurrentTerm > 0) {
+if (newAmount > 0) {
 
-console.log("Attempting UPSERT into student_payments...");
-  
-  const {
-    error: paymentError
-  } =
-await supabaseClient
-.from("student_payments")
-.insert({
+    const {
+        error: paymentError
+    } = await supabaseClient
 
-    student_id:
-        studentId,
+    .from("student_payments")
 
-    school_code:
-        currentSchoolCode,
+    .insert({
 
-    department:
-        studentData.department,
+        student_id: studentId,
 
-    class:
-        studentData.class,
+        school_code: currentSchoolCode,
 
-    student_name:
-        studentData.student_name,
+        department: studentData.department,
 
-    reg_no:
-        studentData.reg_no,
+        class: studentData.class,
 
-    amount_paid:
-        appliedToCurrentTerm
+        student_name: studentData.student_name,
 
-});
+        reg_no: studentData.reg_no,
 
-console.log("Payment Error:", paymentError);
+        amount_paid: newAmount,
 
-  if (paymentError) {
+        term: currentTerm,
 
-    alert(
-      JSON.stringify(paymentError)
-    );
+        session: currentSession
 
-    throw paymentError;
+    });
 
-}
+    if (paymentError) {
+
+        alert(JSON.stringify(paymentError));
+
+        throw paymentError;
+
+    }
 
 }
 
