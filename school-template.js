@@ -1571,10 +1571,9 @@ console.log("Attempting UPSERT into student_payments...");
   const {
     error: paymentError
   } =
-  await supabaseClient
-    .from("student_payments")
-
-.upsert({
+await supabaseClient
+.from("student_payments")
+.insert({
 
     student_id:
         studentId,
@@ -1595,15 +1594,7 @@ console.log("Attempting UPSERT into student_payments...");
         studentData.reg_no,
 
     amount_paid:
-        currentTotal + appliedToCurrentTerm
-
-},
-
-{
-
-onConflict:
-
-"school_code,student_id"
+        appliedToCurrentTerm
 
 });
 
