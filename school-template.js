@@ -1548,55 +1548,65 @@ if (outstanding) {
 const updatedTotal =
   currentTotal +
   appliedToCurrentTerm;
-	// SAVE PAYMENT HISTORY
-if (newAmount > 0) {
 
 // ========================================
 // SAVE CURRENT TERM PAYMENT
 // ========================================
 
-console.log("========== PAYMENT DEBUG ==========");
-console.log("New Amount:", newAmount);
-console.log("Current Total:", currentTotal);
-console.log("Applied To Outstanding:", appliedToOutstanding);
-console.log("Applied To Current Term:", appliedToCurrentTerm);
-console.log("Updated Total:", updatedTotal);
-console.log("Outstanding Record:", outstanding);
-console.log("==================================");
-
 if (newAmount > 0) {
 
+    console.log("Saving payment into student_payments...");
+
     const {
+        data: paymentData,
         error: paymentError
-    } = await supabaseClient
+    } =
+    await supabaseClient
 
     .from("student_payments")
 
     .insert({
 
-        student_id: studentId,
+        student_id:
+            studentId,
 
-        school_code: currentSchoolCode,
+        school_code:
+            currentSchoolCode,
 
-        department: studentData.department,
+        department:
+            studentData.department,
 
-        class: studentData.class,
+        class:
+            studentData.class,
 
-        student_name: studentData.student_name,
+        student_name:
+            studentData.student_name,
 
-        reg_no: studentData.reg_no,
+        reg_no:
+            studentData.reg_no,
 
-        amount_paid: newAmount,
+        amount_paid:
+            newAmount
 
-        term: currentTerm,
+    })
 
-        session: currentSession
+    .select();
 
-    });
+    console.log(
+        "Student Payments Insert:",
+        paymentData
+    );
+
+    console.log(
+        "Student Payments Error:",
+        paymentError
+    );
 
     if (paymentError) {
 
-        alert(JSON.stringify(paymentError));
+        alert(
+            JSON.stringify(paymentError)
+        );
 
         throw paymentError;
 
