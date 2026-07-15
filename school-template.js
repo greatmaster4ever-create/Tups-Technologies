@@ -5735,6 +5735,36 @@ alert(
 
 );
 
+const {
+
+data: remainingOutstanding,
+
+error: remainingError
+
+} = await supabaseClient
+
+.from("student_outstanding_fees")
+
+.select("*")
+
+.eq(
+
+"school_code",
+
+currentSchoolCode
+
+);
+
+console.log(
+"Outstanding Remaining After Restore:",
+remainingOutstanding
+);
+
+console.log(
+"Remaining Error:",
+remainingError
+);
+
 }
 
 
