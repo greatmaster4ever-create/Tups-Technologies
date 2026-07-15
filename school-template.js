@@ -5675,7 +5675,7 @@ error: historyRestoreError
 
 remarks:
 
-"Current Term"
+"Current Term Payment"
 
 })
 
@@ -5691,13 +5691,41 @@ currentSchoolCode
 
 "remarks",
 
-"Previous Term"
+"Previous Term Payment"
 
 );
 
 if(historyRestoreError){
 
 throw historyRestoreError;
+
+}
+
+// ========================================
+// DELETE RESTORED ARCHIVE
+// ========================================
+
+const {
+
+error: archiveDeleteError
+
+} = await supabaseClient
+
+.from("finance_archive")
+
+.delete()
+
+.eq(
+
+"archive_batch_id",
+
+batchId
+
+);
+
+if(archiveDeleteError){
+
+throw archiveDeleteError;
 
 }
 
