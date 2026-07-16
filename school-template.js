@@ -1681,6 +1681,12 @@ if (newAmount > 0) {
       .from("students")
       .update({
 
+console.log("Current Total:", currentTotal);
+
+console.log("Applied To Current Term:", appliedToCurrentTerm);
+
+console.log("Updated Total:", updatedTotal);
+
         parent_contact1:
           parent1,
 
