@@ -1674,37 +1674,31 @@ if (newAmount > 0) {
 }
 
 
-  const {
-    error: updateError
-  } =
-    await supabaseClient
-      .from("students")
-      .update({
+const {
+  error: updateError
+} =
+await supabaseClient
+  .from("students")
+  .update({
 
-console.log("Current Total:", currentTotal);
+    parent_contact1:
+      parent1,
 
-console.log("Applied To Current Term:", appliedToCurrentTerm);
+    parent_contact2:
+      parent2,
 
-console.log("Updated Total:", updatedTotal);
+    address:
+      address,
 
-        parent_contact1:
-          parent1,
+    total_fees_paid:
+      updatedTotal
 
-        parent_contact2:
-          parent2,
-
-        address:
-          address,
-
-        total_fees_paid:
-          updatedTotal
-
-      })
-      .eq(
-        "id",
-        studentId
-      );
-
+  })
+  .eq(
+    "id",
+    studentId
+  );
+  
   console.log(
     "Update Error:",
     updateError
