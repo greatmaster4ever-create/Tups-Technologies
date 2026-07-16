@@ -1553,44 +1553,47 @@ const updatedTotal =
 // SAVE CURRENT TERM PAYMENT
 // ========================================
 
+// ========================================
+// SAVE PAYMENT RECORDS
+// ========================================
+
 if (newAmount > 0) {
 
     console.log("Saving payment into student_payments...");
 
+    // ----------------------------
+    // STEP 1: Save Current Payment
+    // ----------------------------
+
     const {
+
         data: paymentData,
+
         error: paymentError
-    } =
-    await supabaseClient
 
-    .from("student_payments")
+    } = await supabaseClient
 
-    .insert({
+        .from("student_payments")
 
-        student_id:
-            studentId,
+        .insert({
 
-        school_code:
-            currentSchoolCode,
+            student_id: studentId,
 
-        department:
-            studentData.department,
+            school_code: currentSchoolCode,
 
-        class:
-            studentData.class,
+            department: studentData.department,
 
-        student_name:
-            studentData.student_name,
+            class: studentData.class,
 
-        reg_no:
-            studentData.reg_no,
+            student_name: studentData.student_name,
 
-        amount_paid:
-            newAmount
+            reg_no: studentData.reg_no,
 
-    })
+            amount_paid: newAmount
 
-    .select();
+        })
+
+        .select();
 
     console.log(
         "Student Payments Insert:",
@@ -1612,65 +1615,63 @@ if (newAmount > 0) {
 
     }
 
+    // ----------------------------
+    // STEP 2: Save Payment History
+    // ----------------------------
+
+    const {
+
+        data: historyData,
+
+        error: historyError
+
+    } = await supabaseClient
+
+        .from("payment_history")
+
+        .insert({
+
+            student_id: studentId,
+
+            school_code: currentSchoolCode,
+
+            department: studentData.department,
+
+            class: studentData.class,
+
+            student_name: studentData.student_name,
+
+            reg_no: studentData.reg_no,
+
+            amount_paid: newAmount,
+
+            applied_to_outstanding: appliedToOutstanding,
+
+            applied_to_current_term: appliedToCurrentTerm,
+
+            total_paid: updatedTotal,
+
+            remarks: remarks
+
+        });
+
+    console.log(
+        "PAYMENT HISTORY INSERT:",
+        historyData
+    );
+
+    console.log(
+        "PAYMENT HISTORY ERROR:",
+        historyError
+    );
+
+    if (historyError) {
+
+        throw historyError;
+
+    }
+
 }
-
-if (!studentError) {
-
-  const {
-    data: historyData,
-    error: historyError
-  } =
-    await supabaseClient
-      .from("payment_history")
-      .insert({
-
-        student_id:
-          studentId,
-
-        school_code:
-          currentSchoolCode,
-
-        department:
-          studentData.department,
-
-        class:
-          studentData.class,
-
-        student_name:
-          studentData.student_name,
-		  
-		reg_no:
-          studentData.reg_no,
-
-       amount_paid:
-  newAmount,
-
-applied_to_outstanding:
-  appliedToOutstanding,
-
-applied_to_current_term:
-  appliedToCurrentTerm,
-
-total_paid:
-  updatedTotal,
-
-remarks:
-  remarks
-
-      });
-
-  console.log(
-    "PAYMENT HISTORY INSERT:",
-    historyData
-  );
-
-  console.log(
-    "PAYMENT HISTORY ERROR:",
-    historyError
-  );
-
-}
-
 
 
   const {
