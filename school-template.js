@@ -5422,7 +5422,8 @@ function filterFeesTable() {
 
 
 
-async function restoreLastRollover(){
+async function restoreLastRollover() {
+
 const proceed = confirm(
 
 `This will restore the LAST cleared payment records.
@@ -5441,132 +5442,113 @@ Do you want to continue?`
 
 );
 
-if(!proceed){
+if (!proceed) return;
 
-return;
 
-}
-// Find latest batch
+// ========================================
+// FIND LATEST ARCHIVE BATCH
+// ========================================
 
-const{
+const {
 
-data:lastBatch,
+data: lastBatch,
 
-error:lastBatchError
+error: lastBatchError
 
-}=await supabaseClient
+} = await supabaseClient
 
 .from("finance_archive")
 
 .select("archive_batch_id")
 
-.order(
-
-"archived_at",
-
-{ascending:false}
-
-)
+.order("archived_at", { ascending: false })
 
 .limit(1)
 
 .single();
 
-if(lastBatchError){
+if (lastBatchError) {
 
-alert(
-
-"No archive found."
-
-);
+alert("No archive found.");
 
 return;
 
 }
 
-const batchId=
+const batchId = lastBatch.archive_batch_id;
 
-lastBatch.archive_batch_id;
 
-// Load archive
+// ========================================
+// LOAD ARCHIVE RECORDS
+// ========================================
 
-const{
+const {
 
-data:archiveRows,
+data: archiveRows,
 
-error:archiveError
+error: archiveError
 
-}=await supabaseClient
+} = await supabaseClient
 
 .from("finance_archive")
 
 .select("*")
 
-.eq(
+.eq("archive_batch_id", batchId);
 
-"archive_batch_id",
+if (archiveError) {
 
-batchId
-
-);
-
-if(archiveError){
-
-alert(
-
-archiveError.message
-
-);
+alert(archiveError.message);
 
 return;
 
 }
 
-// Rebuild student_payments
 
-const paymentRows=
+// ========================================
+// REBUILD student_payments
+// ========================================
 
-archiveRows.map(row=>({
+const paymentRows = archiveRows.map(row => ({
 
-school_code:
+school_code: row.school_code,
 
-row.school_code,
+student_id: row.student_id,
 
-student_id:
+student_name: row.student_name,
 
-row.student_id,
+reg_no: row.reg_no,
 
-student_name:
+department: row.department,
 
-row.student_name,
+class: row.class,
 
-reg_no:
-
-row.reg_no,
-
-department:
-
-row.department,
-
-class:
-
-row.class,
-
-amount_paid:
-
-row.amount_paid
+amount_paid: row.amount_paid
 
 }));
 
-const{
+const {
 
-error:insertError
+error: insertError
 
-}=await supabaseClient
+} = await supabaseClient
 
 .from("student_payments")
 
 .insert(paymentRows);
+
+
+// IMPORTANT
+// CHECK IMMEDIATELY
+
+if (insertError) {
+
+alert(insertError.message);
+
+return;
+
+}
+
 
 // ========================================
 // RESTORE TOTAL FEES PAID
@@ -5576,7 +5558,7 @@ const restoredStudents = {};
 
 archiveRows.forEach(row => {
 
-if(!restoredStudents[row.student_id]){
+if (!restoredStudents[row.student_id]) {
 
 restoredStudents[row.student_id] =
 
@@ -5586,13 +5568,13 @@ Number(row.total_fees_paid || 0);
 
 });
 
-for(const studentId in restoredStudents){
+for (const studentId in restoredStudents) {
 
-const{
+const {
 
-error:updateError
+error: updateError
 
-}=await supabaseClient
+} = await supabaseClient
 
 .from("students")
 
@@ -5604,15 +5586,9 @@ restoredStudents[studentId]
 
 })
 
-.eq(
+.eq("id", studentId);
 
-"id",
-
-studentId
-
-);
-
-if(updateError){
+if (updateError) {
 
 throw updateError;
 
@@ -5620,45 +5596,6 @@ throw updateError;
 
 }
 
-// ========================================
-// REMOVE GENERATED OUTSTANDING FEES
-// ========================================
-
-const {
-
-error: deleteOutstandingError
-
-} = await supabaseClient
-
-.from("student_outstanding_fees")
-
-.delete()
-
-.eq(
-
-"school_code",
-
-currentSchoolCode
-
-);
-
-if(deleteOutstandingError){
-
-throw deleteOutstandingError;
-
-}
-
-if(insertError){
-
-alert(
-
-insertError.message
-
-);
-
-return;
-
-}
 
 // ========================================
 // RESTORE PAYMENT HISTORY REMARKS
@@ -5696,11 +5633,12 @@ currentSchoolCode
 
 );
 
-if(historyRestoreError){
+if (historyRestoreError) {
 
 throw historyRestoreError;
 
 }
+
 
 // ========================================
 // DELETE RESTORED ARCHIVE
@@ -5724,17 +5662,45 @@ batchId
 
 );
 
-if(archiveDeleteError){
+if (archiveDeleteError) {
 
 throw archiveDeleteError;
 
 }
 
-alert(
 
-"Latest rollover restored successfully."
+// ========================================
+// REMOVE GENERATED OUTSTANDING FEES
+// ========================================
+
+const {
+
+error: deleteOutstandingError
+
+} = await supabaseClient
+
+.from("student_outstanding_fees")
+
+.delete()
+
+.eq(
+
+"school_code",
+
+currentSchoolCode
 
 );
+
+if (deleteOutstandingError) {
+
+throw deleteOutstandingError;
+
+}
+
+
+// ========================================
+// VERIFY OUTSTANDING TABLE IS EMPTY
+// ========================================
 
 const {
 
@@ -5757,17 +5723,33 @@ currentSchoolCode
 );
 
 console.log(
+
 "Outstanding Remaining After Restore:",
+
 remainingOutstanding
+
 );
 
 console.log(
+
 "Remaining Error:",
+
 remainingError
+
+);
+
+
+// ========================================
+// SUCCESS
+// ========================================
+
+alert(
+
+"Latest rollover restored successfully."
+
 );
 
 }
-
 
 // ==========================
 // FOOTER YEAR
