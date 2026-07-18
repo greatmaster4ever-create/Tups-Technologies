@@ -1430,6 +1430,16 @@ await supabaseClient
     studentId
   )
   .single();
+  
+if (studentError) {
+
+    alert(
+        studentError.message
+    );
+
+    return;
+
+}
 
   if (error) {
 
@@ -1446,225 +1456,173 @@ await supabaseClient
 // ========================================
 
 const currentTotal =
-  Number(
-    data.total_fees_paid
-  ) || 0;
+  Number(data.total_fees_paid) || 0;
 
 let appliedToOutstanding = 0;
-let appliedToCurrentTerm = newAmount;
+let appliedToCurrentTerm = 0;
 let remarks = "Current Term Payment";
 
-// ========================================
-// CHECK PREVIOUS TERM OUTSTANDING FIRST
-// ========================================
-
+// Today's payment
 let amountRemaining = newAmount;
 
-// ---------- PREVIOUS TERM ----------
+// ----------------------------------------
+// CHECK PREVIOUS TERM OUTSTANDING
+// ----------------------------------------
 
 const {
-
-data: previousOutstanding
-
+  data: previousOutstanding
 } = await supabaseClient
+  .from("student_previous_outstanding_fees")
+  .select("*")
+  .eq("school_code", currentSchoolCode)
+  .eq("reg_no", studentData.reg_no)
+  .gt("remaining_amount", 0)
+  .eq("status", "Outstanding")
+  .maybeSingle();
 
-.from("student_previous_outstanding_fees")
-.select("*")
-.eq("school_code", currentSchoolCode)
-.eq("reg_no", studentData.reg_no)
-.gt("remaining_amount", 0)
-.eq("status", "Outstanding")
-.maybeSingle();
+// ----------------------------------------
+// IF STUDENT HAS PREVIOUS TERM DEBT
+// ----------------------------------------
 
-if(previousOutstanding && amountRemaining > 0){
+if (previousOutstanding) {
 
-const debt =
+  let previousDebt =
+    Number(previousOutstanding.remaining_amount);
 
-Number(
+  // Entire payment goes to previous debt
 
-previousOutstanding.remaining_amount
+  if (amountRemaining <= previousDebt) {
 
-);
+    await supabaseClient
+      .from("student_previous_outstanding_fees")
+      .update({
 
-if(amountRemaining >= debt){
+        remaining_amount:
+          previousDebt - amountRemaining,
 
-await supabaseClient
+        status:
+          previousDebt - amountRemaining === 0
+            ? "Paid"
+            : "Outstanding"
 
-.from("student_previous_outstanding_fees")
+      })
+      .eq("id", previousOutstanding.id);
 
-.update({
+    appliedToOutstanding =
+      amountRemaining;
 
-remaining_amount:0,
+    appliedToCurrentTerm = 0;
 
-status:"Paid"
-
-})
-
-.eq(
-
-"id",
-
-previousOutstanding.id
-
-);
-
-appliedToOutstanding += debt;
-
-amountRemaining -= debt;
-
-}else{
-
-await supabaseClient
-
-.from("student_previous_outstanding_fees")
-
-.update({
-
-remaining_amount:
-
-debt - amountRemaining
-
-})
-
-.eq(
-
-"id",
-
-previousOutstanding.id
-
-);
-
-appliedToOutstanding += amountRemaining;
-
-amountRemaining = 0;
-
-}
-
-}
-
-// ---------- CURRENT TERM ----------
-
-const {
-
-data: outstanding
-
-} = await supabaseClient
-
-.from("student_outstanding_fees")
-
-.select("*")
-.eq("school_code", currentSchoolCode)
-.eq("reg_no", studentData.reg_no)
-.gt("remaining_amount", 0)
-.eq("status", "Outstanding")
-.maybeSingle();
-
-if(outstanding && amountRemaining > 0){
-
-const debt =
-
-Number(
-
-outstanding.remaining_amount
-
-);
-
-if(amountRemaining >= debt){
-
-await supabaseClient
-
-.from("student_outstanding_fees")
-
-.update({
-
-remaining_amount:0,
-
-status:"Paid"
-
-})
-
-.eq(
-
-"id",
-
-outstanding.id
-
-);
-
-appliedToOutstanding += debt;
-
-amountRemaining -= debt;
-
-}else{
-
-await supabaseClient
-
-.from("student_outstanding_fees")
-
-.update({
-
-remaining_amount:
-
-debt - amountRemaining
-
-})
-
-.eq(
-
-"id",
-
-outstanding.id
-
-);
-
-appliedToOutstanding += amountRemaining;
-
-amountRemaining = 0;
-
-}
-
-}
-
-// Whatever remains becomes current term payment
-
-appliedToCurrentTerm = amountRemaining;
-
-if (
-
-    appliedToOutstanding > 0 &&
-
-    appliedToCurrentTerm > 0
-
-){
+    amountRemaining = 0;
 
     remarks =
+      "Previous Term Outstanding Payment";
 
-    "Outstanding cleared. Balance credited to Current Term.";
+  }
+
+  // Payment clears previous debt completely
+
+  else {
+
+    await supabaseClient
+      .from("student_previous_outstanding_fees")
+      .update({
+
+        remaining_amount: 0,
+
+        status: "Paid"
+
+      })
+      .eq("id", previousOutstanding.id);
+
+    appliedToOutstanding =
+      previousDebt;
+
+    amountRemaining =
+      amountRemaining - previousDebt;
+
+    appliedToCurrentTerm =
+      amountRemaining;
+
+    remarks =
+      "Outstanding Cleared. Balance Applied To Current Term";
+
+  }
 
 }
 
-else if(
+// ----------------------------------------
+// NO PREVIOUS TERM DEBT
+// ----------------------------------------
 
-    appliedToOutstanding > 0
+else {
 
-){
+  appliedToCurrentTerm =
+    amountRemaining;
 
-    remarks =
+  appliedToOutstanding = 0;
 
-    "Outstanding payment completed.";
-
-}
-
-else{
-
-    remarks =
-
+  remarks =
     "Current Term Payment";
 
 }
+
+// ----------------------------------------
+// CURRENT TERM TOTAL
+// ----------------------------------------
+
 const updatedTotal =
   currentTotal +
   appliedToCurrentTerm;
+  
+  // ========================================
+// UPDATE CURRENT TERM OUTSTANDING
+// ========================================
+
+if (appliedToCurrentTerm > 0) {
+
+    const {
+
+        data: currentOutstanding
+
+    } = await supabaseClient
+
+        .from("student_outstanding_fees")
+
+        .select("*")
+
+        .eq("school_code", currentSchoolCode)
+
+        .eq("reg_no", studentData.reg_no)
+
+        .maybeSingle();
+
+    if (currentOutstanding) {
+
+       const currentRemaining =
+    Number(currentOutstanding.remaining_amount) || 0;
+
+const newRemaining = Math.max(
+    0,
+    currentRemaining - appliedToCurrentTerm
+);
+
+await supabaseClient
+    .from("student_outstanding_fees")
+    .update({
+
+        remaining_amount: newRemaining,
+
+        status:
+            newRemaining === 0
+                ? "Paid"
+                : "Outstanding"
+
+    })
+    .eq("id", currentOutstanding.id);
+    }
+
+}
 
 // ========================================
 // SAVE CURRENT TERM PAYMENT
@@ -1797,36 +1755,39 @@ if (newAmount > 0) {
 
 
 
+// ----------------------------------------
+// UPDATE STUDENT RECORD
+// ----------------------------------------
+
+const studentUpdate = {
+
+    parent_contact1: parent1,
+
+    parent_contact2: parent2,
+
+    address: address
+
+};
+
+// ONLY increase total fees when current term received money
+
+if (appliedToCurrentTerm > 0) {
+
+    studentUpdate.total_fees_paid = updatedTotal;
+
+}
+
 const {
-  error: updateError
-} =
-await supabaseClient
-  .from("students")
-  .update({
 
-console.log("Current Total:", currentTotal);
+    error: updateError
 
-console.log("Applied To Current Term:", appliedToCurrentTerm);
+} = await supabaseClient
 
-console.log("Updated Total:", updatedTotal);
+    .from("students")
 
-    parent_contact1:
-      parent1,
+    .update(studentUpdate)
 
-    parent_contact2:
-      parent2,
-
-    address:
-      address,
-
-    total_fees_paid:
-      updatedTotal
-
-  })
-  .eq(
-    "id",
-    studentId
-  );
+    .eq("id", studentId);
   
   console.log(
     "Update Error:",
