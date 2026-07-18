@@ -1469,33 +1469,11 @@ data: previousOutstanding
 } = await supabaseClient
 
 .from("student_previous_outstanding_fees")
-
 .select("*")
-
-.eq(
-
-"school_code",
-
-currentSchoolCode
-
-)
-
-.eq(
-
-"reg_no",
-
-studentData.reg_no
-
-)
-
-.eq(
-
-"status",
-
-"Outstanding"
-
-)
-
+.eq("school_code", currentSchoolCode)
+.eq("reg_no", studentData.reg_no)
+.gt("remaining_amount", 0)
+.eq("status", "Outstanding")
 .maybeSingle();
 
 if(previousOutstanding && amountRemaining > 0){
@@ -1575,31 +1553,10 @@ data: outstanding
 .from("student_outstanding_fees")
 
 .select("*")
-
-.eq(
-
-"school_code",
-
-currentSchoolCode
-
-)
-
-.eq(
-
-"reg_no",
-
-studentData.reg_no
-
-)
-
-.eq(
-
-"status",
-
-"Outstanding"
-
-)
-
+.eq("school_code", currentSchoolCode)
+.eq("reg_no", studentData.reg_no)
+.gt("remaining_amount", 0)
+.eq("status", "Outstanding")
 .maybeSingle();
 
 if(outstanding && amountRemaining > 0){
@@ -1717,7 +1674,7 @@ const updatedTotal =
 // SAVE PAYMENT RECORDS
 // ========================================
 
-if (appliedToCurrentTerm > 0) {
+if (newAmount > 0) {
 
     console.log("Saving payment into student_payments...");
 
@@ -1749,7 +1706,7 @@ if (appliedToCurrentTerm > 0) {
 
             reg_no: studentData.reg_no,
 
-            amount_paid: appliedToCurrentTerm
+            amount_paid: newAmount
 
         })
 
