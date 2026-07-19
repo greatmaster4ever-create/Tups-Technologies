@@ -451,7 +451,13 @@ onclick="togglePaymentsMenu()">
     class="admin-btn payment-item"
     onclick="loadOutstandingPayments()"
   >
-    Outstanding Fees
+    Current Term Outstanding Fees
+  </button>
+  
+  <button
+    id="previousOutstandingBtn"
+    onclick="showPreviousOutstandingFees()">
+    Previous Term Outstanding Fees
   </button>
 
   <button
@@ -2679,6 +2685,70 @@ async function loadOutstandingPayments() {
 
 }
 
+async function showPreviousOutstandingFees() {
+
+    const {
+
+        data,
+
+        error
+
+    } = await supabaseClient
+
+        .from("student_previous_outstanding_fees")
+
+        .select("*")
+
+        .eq(
+
+            "school_code",
+
+            currentSchoolCode
+
+        )
+
+        .order(
+
+            "department",
+
+            { ascending: true }
+
+        )
+
+        .order(
+
+            "class_name",
+
+            { ascending: true }
+
+        )
+
+        .order(
+
+            "student_name",
+
+            { ascending: true }
+
+        );
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+
+            "Unable to load Previous Term Outstanding Fees."
+
+        );
+
+        return;
+
+    }
+
+    renderPreviousOutstandingFees(data);
+
+}
+
 function renderOutstandingFees(
 
   students,
@@ -2990,6 +3060,282 @@ renderOutstandingTable();
 populateOutstandingFilters();
 }
 
+function renderPreviousOutstandingFees(previousFees){
+
+let studentsOwing = 0;
+
+let amountOwing = 0;
+
+let fullyPaid = 0;
+
+let partialPaid = 0;
+
+const outstandingData = [];
+
+previousFees.forEach(record => {
+
+    outstandingData.push({
+
+        student_name: record.student_name,
+
+        reg_no: record.reg_no,
+
+        department: record.department,
+
+        class: record.class_name,
+
+        termFee: Number(record.original_amount),
+
+        paid:
+            Number(record.original_amount) -
+            Number(record.remaining_amount),
+
+        outstanding:
+            Number(record.remaining_amount),
+
+        status: record.status
+
+    });
+
+    if (Number(record.remaining_amount) === 0) {
+
+        fullyPaid++;
+
+    } else {
+
+        studentsOwing++;
+
+        amountOwing += Number(record.remaining_amount);
+
+        if (
+            Number(record.remaining_amount) <
+            Number(record.original_amount)
+        ) {
+
+            partialPaid++;
+
+        }
+
+    }
+
+});
+outstandingFeesMasterData = outstandingData;
+
+outstandingFeesData = outstandingData;
+
+let html = `
+
+<h3>
+
+💰 Previous Term Outstanding Fees
+
+</h3>
+
+<div class="payment-summary">
+
+<div class="summary-card">
+
+<h4>
+
+Students Owing
+
+</h4>
+
+<p>
+
+${studentsOwing}
+
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h4>
+
+Amount Owing
+
+</h4>
+
+<p>
+
+₦${amountOwing.toLocaleString()}
+
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h4>
+
+Fully Paid
+
+</h4>
+
+<p>
+
+${fullyPaid}
+
+</p>
+
+</div>
+
+<div class="summary-card">
+
+<h4>
+
+Partial Paid
+
+</h4>
+
+<p>
+
+${partialPaid}
+
+</p>
+
+</div>
+
+</div>
+
+<div class="payment-filters">
+
+<input
+type="text"
+id="previousOutstandingSearch"
+placeholder="🔍 Search Student / Reg No..."
+onkeyup="filterPreviousOutstandingFees()"
+>
+
+<select
+id="previousOutstandingDepartment"
+onchange="filterPreviousOutstandingFees()"
+>
+
+<option value="">
+
+All Departments
+
+</option>
+
+</select>
+
+<select
+id="previousOutstandingClass"
+onchange="filterPreviousOutstandingFees()"
+>
+
+<option value="">
+
+All Classes
+
+</option>
+
+</select>
+
+<select
+id="previousOutstandingStatus"
+onchange="filterPreviousOutstandingFees()"
+>
+
+<option value="">
+
+All Status
+
+</option>
+
+<option value="Outstanding">
+
+Outstanding
+
+</option>
+
+<option value="Partial">
+
+Partial
+
+</option>
+
+<option value="Paid">
+
+Paid
+
+</option>
+
+</select>
+
+</div>
+
+<div class="payment-quick-filters">
+
+<button
+class="admin-btn"
+onclick="exportPreviousOutstandingFees()"
+>
+
+📥 Export Previous Outstanding List
+
+</button>
+
+<button
+class="admin-btn"
+onclick="printPreviousOutstandingFees()"
+>
+
+🖨️ Print Previous Outstanding List
+
+</button>
+
+</div>
+
+<div id="previousOutstandingTableContainer"></div>
+`;
+
+
+document.getElementById(
+    "adminContent"
+).innerHTML = html;
+
+renderPreviousOutstandingTable();
+populatePreviousOutstandingFilters();
+}
+
+
+async function loadPreviousOutstandingFees() {
+
+    const { data, error } =
+    await supabaseClient
+
+        .from("student_previous_outstanding_fees")
+
+        .select("*")
+
+        .eq(
+            "school_code",
+            currentSchoolCode
+        )
+
+        .order(
+            "department"
+        );
+
+    if (error) {
+
+        console.error(error);
+
+        alert(
+            "Unable to load Previous Term Outstanding Fees."
+        );
+
+        return;
+
+    }
+
+    renderPreviousOutstandingFees(data);
+
+}
+
 function renderOutstandingTable(){
 
 const totalPages = Math.ceil(
@@ -3170,6 +3516,187 @@ document.getElementById(
 
 }
 
+function renderPreviousOutstandingTable(){
+
+const totalPages = Math.ceil(
+
+outstandingFeesData.length/
+
+outstandingRowsPerPage
+
+);
+
+if(
+
+outstandingCurrentPage>
+
+totalPages
+
+){
+
+outstandingCurrentPage=1;
+
+}
+
+const start =
+
+(outstandingCurrentPage-1)
+
+*
+
+outstandingRowsPerPage;
+
+const end =
+
+start+
+
+outstandingRowsPerPage;
+
+const pageData =
+
+outstandingFeesData.slice(
+
+start,
+
+end
+
+);
+
+let tableHtml = `
+
+<table class="admin-table">
+
+<thead>
+
+<tr>
+
+<th>Student</th>
+
+<th>Reg No</th>
+
+<th>Class</th>
+
+<th>Term Fee</th>
+
+<th>Paid</th>
+
+<th>Outstanding</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+`;
+
+pageData.forEach(row=>{
+
+tableHtml += `
+
+<tr>
+
+<td>${row.student_name}</td>
+
+<td>${row.reg_no}</td>
+
+<td>${row.class}</td>
+
+<td>
+
+₦${row.termFee.toLocaleString()}
+
+</td>
+
+<td>
+
+₦${row.paid.toLocaleString()}
+
+</td>
+
+<td>
+
+₦${row.outstanding.toLocaleString()}
+
+</td>
+
+<td>
+
+${row.status}
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+tableHtml += `
+
+</tbody>
+
+</table>
+
+`;
+
+tableHtml += `
+
+<div class="payment-pagination">
+
+<button
+
+onclick="previousOutstandingPage()"
+
+${outstandingCurrentPage===1?
+
+"disabled":""}
+
+>
+
+◀ Previous
+
+</button>
+
+<span>
+
+Page
+
+${outstandingCurrentPage}
+
+of
+
+${Math.max(totalPages,1)}
+
+</span>
+
+<button
+
+onclick="nextOutstandingPage()"
+
+${outstandingCurrentPage>=totalPages?
+
+"disabled":""}
+
+>
+
+Next ▶
+
+</button>
+
+</div>
+
+`;
+
+document.getElementById(
+    "previousOutstandingTableContainer"
+).innerHTML = tableHtml;
+
+}
+
+
 function populateOutstandingFilters(){
 
 const deptSelect =
@@ -3182,6 +3709,68 @@ const classSelect =
 
 document.getElementById(
 "outstandingClass"
+);
+
+const departments =
+
+[
+...new Set(
+
+outstandingFeesMasterData.map(
+
+row=>row.department
+
+)
+
+)
+
+].sort();
+
+const classes =
+
+[
+...new Set(
+
+outstandingFeesMasterData.map(
+
+row=>row.class
+
+)
+
+)
+
+].sort();
+
+departments.forEach(dept=>{
+
+deptSelect.innerHTML +=
+
+`<option value="${dept}">${dept}</option>`;
+
+});
+
+classes.forEach(cls=>{
+
+classSelect.innerHTML +=
+
+`<option value="${cls}">${cls}</option>`;
+
+});
+
+}
+
+function populatePreviousOutstandingFilters(){
+
+const deptSelect =
+
+document.getElementById(
+"previousOutstandingDepartment"
+);
+
+const classSelect =
+
+document.getElementById(
+"previousOutstandingClass"
 );
 
 const departments =
@@ -3325,6 +3914,99 @@ renderOutstandingTable();
 
 }
 
+function filterPreviousOutstandingFees(){
+
+const keyword =
+
+document.getElementById(
+"previousOutstandingSearch"
+)
+
+.value
+
+.toLowerCase();
+
+const dept =
+
+document.getElementById(
+"previousOutstandingDepartment"
+).value;
+
+const cls =
+
+document.getElementById(
+"outstandingClass"
+).value;
+
+const status =
+
+document.getElementById(
+"previousOutstandingStatus"
+).value;
+
+outstandingFeesData =
+
+outstandingFeesMasterData.filter(
+
+row=>{
+
+const searchMatch =
+
+row.student_name
+
+.toLowerCase()
+
+.includes(keyword)
+
+||
+
+row.reg_no
+
+.toLowerCase()
+
+.includes(keyword);
+
+const deptMatch =
+
+!dept ||
+
+row.department===dept;
+
+const classMatch =
+
+!cls ||
+
+row.class===cls;
+
+const statusMatch =
+
+!status ||
+
+row.status.includes(status);
+
+return(
+
+searchMatch &&
+
+deptMatch &&
+
+classMatch &&
+
+statusMatch
+
+);
+
+}
+
+);
+
+outstandingCurrentPage = 1;
+
+renderPreviousOutstandingTable();
+
+}
+
+
 function exportOutstandingFees(){
 
 let csv =
@@ -3332,6 +4014,100 @@ let csv =
 "Student,Reg No,Department,Class,Term Fee,Paid,Outstanding,Status\n";
 
 outstandingFeesData.forEach(row=>{
+
+csv +=
+
+`"${row.student_name}",`
+
++
+
+`"${row.reg_no}",`
+
++
+
+`"${row.department}",`
+
++
+
+`"${row.class}",`
+
++
+
+`${row.termFee},`
+
++
+
+`${row.paid},`
+
++
+
+`${row.outstanding},`
+
++
+
+`"${row.status}"\n`;
+
+});
+
+const blob =
+
+new Blob(
+
+[csv],
+
+{
+
+type:
+
+"text/csv;charset=utf-8;"
+
+}
+
+);
+
+const url =
+
+URL.createObjectURL(
+
+blob
+
+);
+
+const link =
+
+document.createElement(
+
+"a"
+
+);
+
+link.href = url;
+
+link.download =
+
+"Outstanding_Fees.csv";
+
+document.body.appendChild(
+
+link
+
+);
+
+link.click();
+
+document.body.removeChild(
+
+link);
+
+}
+
+function exportPreviousOutstandingFees(){
+
+let csv =
+
+"Student,Reg No,Department,Class,Term Fee,Paid,Outstanding,Status\n";
+
+outstandingFeesMasterData.forEach(row=>{
 
 csv +=
 
@@ -3574,6 +4350,163 @@ printWindow.print();
 printWindow.close();
 
 }
+
+function printPreviousOutstandingFees() {
+
+let printWindow = window.open("", "_blank");
+
+let html = `
+
+<html>
+
+<head>
+
+<title>
+
+Outstanding Fees
+
+</title>
+
+<style>
+
+body{
+
+font-family:Arial,sans-serif;
+
+padding:20px;
+
+}
+
+h2{
+
+text-align:center;
+
+margin-bottom:20px;
+
+}
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+th,td{
+
+border:1px solid #000;
+
+padding:8px;
+
+font-size:12px;
+
+text-align:left;
+
+}
+
+th{
+
+background:#f2f2f2;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>
+
+Outstanding Fees Report
+
+</h2>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Student</th>
+
+<th>Reg No</th>
+
+<th>Department</th>
+
+<th>Class</th>
+
+<th>Term Fee</th>
+
+<th>Paid</th>
+
+<th>Outstanding</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+`;
+
+outstandingFeesMasterData.forEach(row=>{
+
+html += `
+
+<tr>
+
+<td>${row.student_name}</td>
+
+<td>${row.reg_no}</td>
+
+<td>${row.department}</td>
+
+<td>${row.class}</td>
+
+<td>₦${row.termFee.toLocaleString()}</td>
+
+<td>₦${row.paid.toLocaleString()}</td>
+
+<td>₦${row.outstanding.toLocaleString()}</td>
+
+<td>${row.status}</td>
+
+</tr>
+
+`;
+
+});
+
+html += `
+
+</tbody>
+
+</table>
+
+</body>
+
+</html>
+
+`;
+
+printWindow.document.open();
+
+printWindow.document.write(html);
+
+printWindow.document.close();
+
+printWindow.focus();
+
+printWindow.print();
+
+printWindow.close();
+
+}
+
 
 function previousOutstandingPage(){
 
@@ -3882,6 +4815,18 @@ ${outstanding}
 Student Payments Reset
 
 Payment History Preserved.`
+
+);
+
+// ========================================
+// REFRESH CURRENT TERM OUTSTANDING
+// ========================================
+
+await loadOutstandingPayments();
+
+console.log(
+
+"Finance rollover completed. Outstanding tables refreshed."
 
 );
 
@@ -4320,7 +5265,7 @@ window.location.replace(
   "index.html"
 );
 
-  }, 60000); // 1 minute
+  }, 240000); // 4 minute
 
 }
 
@@ -5665,7 +6610,9 @@ This action will:
 
 • Restore total fees paid
 
-• Remove generated outstanding fees
+• Remove Current Term Outstanding Fees
+
+• Remove Previous Term Outstanding Fees
 
 • Change Previous Term payments back to Current Term
 
@@ -5969,6 +6916,33 @@ remainingError
 
 );
 
+// ========================================
+// REMOVE PREVIOUS TERM OUTSTANDING
+// ========================================
+
+const {
+
+error: deletePreviousOutstandingError
+
+} = await supabaseClient
+
+.from("student_previous_outstanding_fees")
+
+.delete()
+
+.eq(
+
+"school_code",
+
+currentSchoolCode
+
+);
+
+if (deletePreviousOutstandingError) {
+
+throw deletePreviousOutstandingError;
+
+}
 
 // ========================================
 // SUCCESS
@@ -6018,4 +6992,3 @@ document.addEventListener("click", async (e) => {
   }
 
 });
-
