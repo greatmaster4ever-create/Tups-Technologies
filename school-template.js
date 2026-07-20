@@ -443,48 +443,71 @@ onclick="togglePaymentsMenu()">
 
   <button
     class="admin-btn payment-item"
-    onclick="loadTermFees()"
+    onclick="
+togglePaymentsMenu();
+loadTermFees();
+"
   >
     Term Fees
   </button>
 
   <button
     class="admin-btn payment-item"
-    onclick="loadAllPayments()"
+    onclick="
+togglePaymentsMenu();
+loadAllPayments();
+"
   >
     All Payments
   </button>
 
   <button
     class="admin-btn payment-item"
-    onclick="loadPaymentHistory()"
+   onclick="
+togglePaymentsMenu();
+loadPaymentHistory();
+"
   >
     Payment History
   </button>
 
   <button
     class="admin-btn payment-item"
-    onclick="loadOutstandingPayments()"
+    onclick="
+togglePaymentsMenu();
+loadOutstandingPayments();
+"
   >
     Current Term Outstanding Fees
   </button>
   
   <button
-    id="previousOutstandingBtn"
-    onclick="showPreviousOutstandingFees()">
-    Previous Term Outstanding Fees
-  </button>
+  class="admin-btn payment-item"
+  onclick="
+    document.getElementById('paymentsDropdown').style.display='none';
+	togglePaymentsMenu();
+    showPreviousOutstandingFees();
+  "
+>
+  Previous Term Outstanding Fees
+</button>
 
   <button
     class="admin-btn payment-item"
-    onclick="clearCurrentTermPayments()"
+    onclick="
+togglePaymentsMenu();
+clearCurrentTermPayments();
+"
   >
     Clear Payments
   </button>
   
   <button
   class="admin-btn payment-item restore-btn"
-  onclick="restoreLastRollover()"
+  onclick="
+togglePaymentsMenu();
+restoreLastRollover();
+"
 >
   Restore Last Cleared Payments
 </button>
