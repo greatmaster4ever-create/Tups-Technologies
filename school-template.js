@@ -20,6 +20,21 @@ let outstandingCurrentPage = 1;
 
 const outstandingRowsPerPage = 12;
 
+
+
+let currentPreviousOutstandingPage = 1;
+// ========================================
+// PREVIOUS TERM PAGINATION
+// ========================================
+
+let previousOutstandingCurrentPage = 1;
+
+const previousOutstandingRowsPerPage = 12;
+
+let previousOutstandingMasterData = [];
+
+let previousOutstandingData = [];
+
 console.log("SCHOOL TEMPLATE JS LOADED");
 
 let currentDepartment = "";
@@ -3119,9 +3134,8 @@ previousFees.forEach(record => {
     }
 
 });
-outstandingFeesMasterData = outstandingData;
-
-outstandingFeesData = outstandingData;
+previousOutstandingMasterData = [...outstandingData];
+previousOutstandingData = [...outstandingData];
 
 let html = `
 
@@ -3297,6 +3311,7 @@ document.getElementById(
     "adminContent"
 ).innerHTML = html;
 
+previousOutstandingCurrentPage = 1;
 renderPreviousOutstandingTable();
 populatePreviousOutstandingFilters();
 }
@@ -3520,41 +3535,41 @@ function renderPreviousOutstandingTable(){
 
 const totalPages = Math.ceil(
 
-outstandingFeesData.length/
+previousOutstandingData.length /
 
-outstandingRowsPerPage
+previousOutstandingRowsPerPage
 
 );
 
 if(
 
-outstandingCurrentPage>
+previousOutstandingCurrentPage >
 
 totalPages
 
 ){
 
-outstandingCurrentPage=1;
+previousOutstandingCurrentPage = 1;
 
 }
 
 const start =
 
-(outstandingCurrentPage-1)
+(previousOutstandingCurrentPage - 1)
 
 *
 
-outstandingRowsPerPage;
+previousOutstandingRowsPerPage;
 
 const end =
 
-start+
+start +
 
-outstandingRowsPerPage;
+previousOutstandingRowsPerPage;
 
 const pageData =
 
-outstandingFeesData.slice(
+previousOutstandingData.slice(
 
 start,
 
@@ -3648,15 +3663,15 @@ tableHtml += `
 
 <button
 
-onclick="previousOutstandingPage()"
+onclick="previousOutstandingPrevPage()"
 
-${outstandingCurrentPage===1?
+${previousOutstandingCurrentPage===1 ?
 
 "disabled":""}
 
 >
 
-◀ Previous
+◀ Prev
 
 </button>
 
@@ -3664,7 +3679,7 @@ ${outstandingCurrentPage===1?
 
 Page
 
-${outstandingCurrentPage}
+${previousOutstandingCurrentPage}
 
 of
 
@@ -3674,9 +3689,9 @@ ${Math.max(totalPages,1)}
 
 <button
 
-onclick="nextOutstandingPage()"
+onclick="previousOutstandingNextPage()"
 
-${outstandingCurrentPage>=totalPages?
+${previousOutstandingCurrentPage>=totalPages ?
 
 "disabled":""}
 
@@ -3691,7 +3706,9 @@ Next ▶
 `;
 
 document.getElementById(
-    "previousOutstandingTableContainer"
+
+"previousOutstandingTableContainer"
+
 ).innerHTML = tableHtml;
 
 }
@@ -3778,7 +3795,7 @@ const departments =
 [
 ...new Set(
 
-outstandingFeesMasterData.map(
+previousOutstandingMasterData.map(
 
 row=>row.department
 
@@ -3793,7 +3810,7 @@ const classes =
 [
 ...new Set(
 
-outstandingFeesMasterData.map(
+previousOutstandingMasterData.map(
 
 row=>row.class
 
@@ -3935,7 +3952,7 @@ document.getElementById(
 const cls =
 
 document.getElementById(
-"outstandingClass"
+"previousOutstandingClass"
 ).value;
 
 const status =
@@ -3944,9 +3961,9 @@ document.getElementById(
 "previousOutstandingStatus"
 ).value;
 
-outstandingFeesData =
+previousOutstandingData =
 
-outstandingFeesMasterData.filter(
+previousOutstandingMasterData.filter(
 
 row=>{
 
@@ -4000,7 +4017,7 @@ statusMatch
 
 );
 
-outstandingCurrentPage = 1;
+previousOutstandingCurrentPage = 1;
 
 renderPreviousOutstandingTable();
 
@@ -4539,6 +4556,40 @@ if(outstandingCurrentPage<totalPages){
 }
 
 }
+
+function previousOutstandingPrevPage(){
+
+    if(previousOutstandingCurrentPage > 1){
+
+        previousOutstandingCurrentPage--;
+
+        renderPreviousOutstandingTable();
+
+    }
+
+}
+
+function previousOutstandingNextPage(){
+
+    const totalPages = Math.ceil(
+
+        previousOutstandingData.length /
+
+        previousOutstandingRowsPerPage
+
+    );
+
+    if(previousOutstandingCurrentPage < totalPages){
+
+        previousOutstandingCurrentPage++;
+
+        renderPreviousOutstandingTable();
+
+    }
+
+}
+
+
 
 async function clearCurrentTermPayments(){
 
