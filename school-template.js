@@ -485,7 +485,7 @@ loadOutstandingPayments();
   class="admin-btn payment-item"
   onclick="
     document.getElementById('paymentsDropdown').style.display='none';
-	togglePaymentsMenu();
+	
     showPreviousOutstandingFees();
   "
 >
