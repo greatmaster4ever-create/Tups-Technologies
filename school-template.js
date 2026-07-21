@@ -1959,6 +1959,16 @@ function renderPaymentHistory(
   data
 ) {
 
+	const searchValue =
+document.getElementById("historySearch")?.value || "";
+
+const selectedDept =
+document.getElementById("historyDepartment")?.value || "";
+
+const selectedClass =
+document.getElementById("historyClass")?.value || "";
+
+
 	const totalAmount =
 
 data.reduce(
@@ -2290,6 +2300,19 @@ Next ▶
   document.getElementById(
     "adminContent"
   ).innerHTML = html;
+  
+  document.getElementById("historySearch").value = searchValue;
+document.getElementById("historyDepartment").value = selectedDept;
+document.getElementById("historyClass").value = selectedClass;
+
+// Return focus to the search box
+document.getElementById("historySearch").focus();
+
+// Place cursor at the end of the text
+document.getElementById("historySearch").setSelectionRange(
+    searchValue.length,
+    searchValue.length
+);
 
   populateHistoryFilters(
   data
