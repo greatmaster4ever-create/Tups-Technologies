@@ -4728,13 +4728,6 @@ throw historyUpdateError;
 
 }
 
-// ========================================
-// STEP 2
-// GENERATE CURRENT TERM OUTSTANDING
-// ========================================
-
-const outstanding =
-await generateOutstandingRecords();
 
 // ========================================
 // STEP 2B
@@ -4918,6 +4911,15 @@ currentSchoolCode
 
 if(deleteError)
 throw deleteError;
+
+
+// ========================================
+// STEP 4B
+// GENERATE CURRENT TERM OUTSTANDING
+// ========================================
+
+const outstanding =
+await generateOutstandingRecords();
 
 alert(
 
