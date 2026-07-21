@@ -5351,31 +5351,6 @@ function logoutSchoolPortal() {
 
 function adminLogout() {
 
-const teacherCard =
-document.getElementById(
-"teacherCard"
-);
-
-const adminCard =
-document.getElementById(
-"adminCard"
-);
-
-teacherCard.classList.remove(
-"hide-teacher"
-);
-
-adminCard.classList.remove(
-"expand-admin"
-);
-
-adminCard.innerHTML =
-originalAdminCardHTML;
-
-document.getElementById(
-"adminPortalPassword"
-).value = "";
-
   location.reload();
 
 }
