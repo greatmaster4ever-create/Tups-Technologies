@@ -624,19 +624,7 @@ adminCard.classList.add(
 
 setTimeout(()=>{
 
-document.getElementById(
-"loginContainer"
-).style.display = "none";
-
-const dashboard =
-
-document.getElementById(
-"adminDashboardContainer"
-);
-
-dashboard.style.display = "block";
-
-dashboard.innerHTML =
+adminCard.innerHTML =
 adminDashboardHTML;
 
 },450);
@@ -5363,25 +5351,26 @@ function logoutSchoolPortal() {
 
 function adminLogout() {
 
-document.getElementById(
-"adminDashboardContainer"
-).style.display = "none";
-
-document.getElementById(
-"loginContainer"
-).style.display = "flex";
-
+const teacherCard =
 document.getElementById(
 "teacherCard"
-).classList.remove(
+);
+
+const adminCard =
+document.getElementById(
+"adminCard"
+);
+
+teacherCard.classList.remove(
 "hide-teacher"
 );
 
-document.getElementById(
-"adminCard"
-).classList.remove(
+adminCard.classList.remove(
 "expand-admin"
 );
+
+adminCard.innerHTML =
+originalAdminCardHTML;
 
 document.getElementById(
 "adminPortalPassword"
