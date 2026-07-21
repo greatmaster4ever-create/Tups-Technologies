@@ -823,15 +823,39 @@ button:hover {
 .student-form-buttons button {
   width: 150px;
 }
-.student-toolbar {
+.student-toolbar{
 
-  display: flex;
+display:flex;
 
-  align-items: center;
+justify-content:center;
 
-  gap: 15px;
-  flex-wrap: nowrap;
-  margin-bottom: 10px;
+align-items:center;
+
+gap:15px;
+
+margin:25px auto;
+
+width:fit-content;
+
+flex-wrap:wrap;
+
+}
+
+.student-toolbar select{
+
+width:180px;
+
+}
+
+.student-toolbar button{
+
+width:160px;
+
+}
+
+.student-toolbar input{
+
+width:260px;
 
 }
 
