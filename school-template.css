@@ -1161,13 +1161,17 @@ color:#009933;
 
 display:flex;
 
+justify-content:center;
+
 align-items:center;
 
 gap:15px;
 
-margin:20px 0;
+margin:25px auto;
 
 flex-wrap:wrap;
+
+width:100%;
 
 }
 
