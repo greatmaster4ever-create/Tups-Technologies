@@ -604,10 +604,42 @@ document
 
       }
 
-      document.querySelector(
-        ".admin-card"
-      ).innerHTML =
-        adminDashboardHTML;
+      const teacherCard =
+document.getElementById(
+"teacherCard"
+);
+
+const adminCard =
+document.getElementById(
+"adminCard"
+);
+
+teacherCard.classList.add(
+"hide-teacher"
+);
+
+adminCard.classList.add(
+"expand-admin"
+);
+
+setTimeout(()=>{
+
+document.getElementById(
+"loginContainer"
+).style.display = "none";
+
+const dashboard =
+
+document.getElementById(
+"adminDashboardContainer"
+);
+
+dashboard.style.display = "block";
+
+dashboard.innerHTML =
+adminDashboardHTML;
+
+},450);
 
     }
   );
@@ -5330,6 +5362,30 @@ function logoutSchoolPortal() {
 }
 
 function adminLogout() {
+
+document.getElementById(
+"adminDashboardContainer"
+).style.display = "none";
+
+document.getElementById(
+"loginContainer"
+).style.display = "flex";
+
+document.getElementById(
+"teacherCard"
+).classList.remove(
+"hide-teacher"
+);
+
+document.getElementById(
+"adminCard"
+).classList.remove(
+"expand-admin"
+);
+
+document.getElementById(
+"adminPortalPassword"
+).value = "";
 
   location.reload();
 
