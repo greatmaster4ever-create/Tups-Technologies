@@ -4738,9 +4738,7 @@ throw historyUpdateError;
 // Read generated outstanding records
 
 const {
-
 data: currentOutstanding,
-
 error: currentOutstandingError
 
 } = await supabaseClient
@@ -4762,6 +4760,17 @@ if(currentOutstandingError){
 throw currentOutstandingError;
 
 }
+
+// ===========================
+// DEBUG 1
+// ===========================
+
+console.log(
+"CURRENT OUTSTANDING BEFORE COPY"
+);
+
+console.table(currentOutstanding);
+
 
 // Remove any previous snapshot first
 
@@ -4789,7 +4798,10 @@ throw deletePreviousError;
 
 }
 
-// Copy snapshot
+
+// Build rows to insert
+
+let previousRows = [];
 
 if(
 
@@ -4799,51 +4811,57 @@ currentOutstanding.length > 0
 
 ){
 
-const previousRows =
+previousRows =
 
 currentOutstanding.map(row => ({
 
 school_code:
-
 row.school_code,
 
 student_id:
-
 row.student_id,
 
 reg_no:
-
 row.reg_no,
 
 student_name:
-
 row.student_name,
 
-class_name:
+department:
+row.department,
 
+class_name:
 row.class_name,
 
 session:
-
 row.session,
 
 term:
-
 row.term,
 
 original_amount:
-
 row.original_amount,
 
 remaining_amount:
-
 row.remaining_amount,
 
 status:
-
 row.status
 
 }));
+
+// ===========================
+// DEBUG 2
+// ===========================
+
+console.log(
+"ROWS GOING INTO PREVIOUS TABLE"
+);
+
+console.table(previousRows);
+
+
+// Insert
 
 const {
 
@@ -4864,6 +4882,41 @@ if(previousInsertError){
 throw previousInsertError;
 
 }
+
+
+// ===========================
+// DEBUG 3
+// VERIFY INSERT
+// ===========================
+
+const {
+
+data: verifyPrevious,
+error: verifyError
+
+} = await supabaseClient
+
+.from("student_previous_outstanding_fees")
+
+.select("*")
+
+.eq(
+
+"school_code",
+
+currentSchoolCode
+
+);
+
+console.log(
+"PREVIOUS TABLE AFTER INSERT"
+);
+
+console.table(verifyPrevious);
+
+console.log(
+"VERIFY ERROR:",
+verifyError);
 
 }
 // STEP 3
