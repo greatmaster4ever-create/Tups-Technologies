@@ -5110,7 +5110,7 @@ archiveBatchId
 
 }
 
-async function generateOutstandingRecords(){
+async function generateOutstandingRecords() {
 
   // Get all students
   const {
@@ -5124,7 +5124,7 @@ async function generateOutstandingRecords(){
       currentSchoolCode
     );
 
-  if(studentError) throw studentError;
+  if (studentError) throw studentError;
 
   // Get class fees
   const {
@@ -5138,11 +5138,30 @@ async function generateOutstandingRecords(){
       currentSchoolCode
     );
 
-  if(feeError) throw feeError;
+  if (feeError) throw feeError;
+
+  // ========================================
+  // CLEAR CURRENT OUTSTANDING TABLE
+  // BEFORE REBUILDING IT
+  // ========================================
+
+  const {
+    error: deleteOutstandingError
+  } = await supabaseClient
+    .from("student_outstanding_fees")
+    .delete()
+    .eq(
+      "school_code",
+      currentSchoolCode
+    );
+
+  if (deleteOutstandingError) {
+    throw deleteOutstandingError;
+  }
 
   let generated = 0;
 
-  for(const student of students){
+  for (const student of students) {
 
     const feeRecord = fees.find(
       fee => fee.class_name === student.class
@@ -5157,66 +5176,68 @@ async function generateOutstandingRecords(){
     const outstanding =
       Math.max(classFee - paid, 0);
 
-    if(outstanding > 0){
+    if (outstanding > 0) {
 
-     const {
-  data: upsertData,
-  error: upsertError
-} = await supabaseClient
-.from("student_outstanding_fees")
-.upsert({
+      const {
+        data: upsertData,
+        error: upsertError
+      } = await supabaseClient
+        .from("student_outstanding_fees")
+        .upsert({
 
-    school_code:
-        currentSchoolCode,
+          school_code:
+            currentSchoolCode,
 
-    student_id:
-        student.id,
+          student_id:
+            student.id,
 
-    reg_no:
-        student.reg_no,
+          reg_no:
+            student.reg_no,
 
-    student_name:
-        student.student_name,
+          student_name:
+            student.student_name,
 
-    class_name:
-        student.class,
+          class_name:
+            student.class,
 
-    session:
-        "N/A",
+          session:
+            "N/A",
 
-    term:
-        "N/A",
+          term:
+            "N/A",
 
-    original_amount:
-        outstanding,
+          // Store the FULL class fee
+          original_amount:
+            classFee,
 
-    remaining_amount:
-        outstanding,
+          // Store the amount still owing
+          remaining_amount:
+            outstanding,
 
-    status:
-        "Outstanding"
+          status:
+            "Outstanding"
 
-},
-{
-    onConflict:
-    "school_code,reg_no"
-});
+        },
+        {
+          onConflict:
+            "school_code,reg_no"
+        });
 
-console.log(
-"Outstanding Insert:",
-upsertData
-);
+      console.log(
+        "Outstanding Insert:",
+        upsertData
+      );
 
-console.log(
-"Outstanding Error:",
-upsertError
-);
+      console.log(
+        "Outstanding Error:",
+        upsertError
+      );
 
-if(upsertError){
-    throw upsertError;
-}
+      if (upsertError) {
+        throw upsertError;
+      }
 
-generated++;
+      generated++;
 
     }
 
