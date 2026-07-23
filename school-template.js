@@ -981,31 +981,21 @@ document.getElementById(
 async function saveOptionalItem(){
 
 const item =
-
 document.getElementById(
-
 "optionalItemName"
-
 ).value.trim();
 
 const fee =
-
 Number(
-
 document.getElementById(
-
 "optionalItemFee"
-
 ).value
-
 );
 
 if(!item){
 
 alert(
-
 "Enter Item Name."
-
 );
 
 return;
@@ -1015,9 +1005,7 @@ return;
 if(fee<=0){
 
 alert(
-
 "Enter a valid Fee."
-
 );
 
 return;
@@ -1025,9 +1013,8 @@ return;
 }
 
 const {
-
-data: existing
-
+data: existing,
+error: checkError
 } = await supabaseClient
 
 .from("set_optional_payments")
@@ -1035,68 +1022,66 @@ data: existing
 .select("id")
 
 .eq(
-
 "school_code",
-
-schoolCode
-
+currentSchoolCode
 )
 
 .ilike(
-
 "item",
-
 item
-
 );
+
+if(checkError){
+
+alert(checkError.message);
+
+return;
+
+}
 
 if(existing && existing.length){
 
 alert(
-
 "This item already exists."
-
 );
 
 return;
 
 }
 
-console.log("========== OPTIONAL ITEM ==========");
+const { error } =
 
-console.log("schoolCode:", schoolCode);
-
-console.log("item:", item);
-
-console.log("fee:", fee);
-
-const {
-data: sessionData
-} = await supabaseClient.auth.getSession();
-
-console.log("SESSION:", sessionData);
-
-const {
-
-error
-
-} = await supabaseClient
+await supabaseClient
 
 .from("set_optional_payments")
 
-.insert({
+.upsert(
+
+{
 
 school_code:
-
-schoolCode,
+currentSchoolCode,
 
 item,
 
-fee
+fee,
 
-});
+active:true
+
+},
+
+{
+
+onConflict:
+"school_code,item"
+
+}
+
+);
 
 if(error){
+
+console.error(error);
 
 alert(error.message);
 
@@ -1109,7 +1094,6 @@ closeOptionalItemModal();
 showOptionalPaymentsSetup();
 
 }
-
 
 
 function editOptionalItem(id){
