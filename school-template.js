@@ -938,23 +938,33 @@ showOptionalPaymentsSetup();
 
 function openAddOptionalPaymentModal(){
 
-document.getElementById(
-
-"optionalItemName"
-
-).value="";
-
-document.getElementById(
-
-"optionalItemFee"
-
-).value="";
-
-document.getElementById(
-
+document
+.getElementById(
 "optionalItemModal"
+)
+.classList.add(
+"show"
+);
 
-).style.display="block";
+document.getElementById(
+"optionalItemName"
+).value="";
+
+document.getElementById(
+"optionalItemFee"
+).value="";
+
+}
+
+function closeOptionalItemModal(){
+
+document
+.getElementById(
+"optionalItemModal"
+)
+.classList.remove(
+"show"
+);
 
 }
 
