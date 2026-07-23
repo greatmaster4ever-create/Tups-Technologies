@@ -204,6 +204,74 @@
 
 </div>
 
+<!-- OPTIONAL PAYMENT ITEM MODAL -->
+
+<div id="optionalItemModal" class="modal">
+
+<div class="modal-content">
+
+<span
+class="close-modal"
+onclick="closeOptionalItemModal()"
+>
+
+&times;
+
+</span>
+
+<h2>
+
+Add Optional Payment Item
+
+</h2>
+
+<div class="modal-form-row">
+
+<label>
+
+Item
+
+</label>
+
+<input
+type="text"
+id="optionalItemName"
+placeholder="Example: Transport"
+>
+
+</div>
+
+<div class="modal-form-row">
+
+<label>
+
+Fee
+
+</label>
+
+<input
+type="number"
+id="optionalItemFee"
+placeholder="0"
+>
+
+</div>
+
+<br>
+
+<button
+class="update-btn"
+onclick="saveOptionalItem()"
+>
+
+Save Item
+
+</button>
+
+</div>
+
+</div>
+
   <!-- PASSWORD CHANGE MODAL -->
   <div id="passwordModal" class="modal">
 

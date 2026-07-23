@@ -938,13 +938,155 @@ showOptionalPaymentsSetup();
 
 function openAddOptionalPaymentModal(){
 
-alert(
+document.getElementById(
 
-"Coming next..."
+"optionalItemName"
+
+).value="";
+
+document.getElementById(
+
+"optionalItemFee"
+
+).value="";
+
+document.getElementById(
+
+"optionalItemModal"
+
+).style.display="block";
+
+}
+
+function closeOptionalItemModal(){
+
+document.getElementById(
+
+"optionalItemModal"
+
+).style.display="none";
+
+}
+
+async function saveOptionalItem(){
+
+const item =
+
+document.getElementById(
+
+"optionalItemName"
+
+).value.trim();
+
+const fee =
+
+Number(
+
+document.getElementById(
+
+"optionalItemFee"
+
+).value
 
 );
 
+if(!item){
+
+alert(
+
+"Enter Item Name."
+
+);
+
+return;
+
 }
+
+if(fee<=0){
+
+alert(
+
+"Enter a valid Fee."
+
+);
+
+return;
+
+}
+
+const {
+
+data: existing
+
+} = await supabaseClient
+
+.from("set_optional_payments")
+
+.select("id")
+
+.eq(
+
+"school_code",
+
+schoolCode
+
+)
+
+.ilike(
+
+"item",
+
+item
+
+);
+
+if(existing && existing.length){
+
+alert(
+
+"This item already exists."
+
+);
+
+return;
+
+}
+
+const {
+
+error
+
+} = await supabaseClient
+
+.from("set_optional_payments")
+
+.insert({
+
+school_code:
+
+schoolCode,
+
+item,
+
+fee
+
+});
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+closeOptionalItemModal();
+
+showOptionalPaymentsSetup();
+
+}
+
+
 
 function editOptionalItem(id){
 
