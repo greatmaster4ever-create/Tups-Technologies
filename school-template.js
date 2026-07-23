@@ -1108,11 +1108,155 @@ alert(
 
 }
 
-function openOptionalPaymentPopup(){
+async function openOptionalPaymentPopup(){
+
+document
+.getElementById(
+"optionalPaymentModal"
+)
+.classList.add(
+"show"
+);
+
+document.getElementById(
+"optionalStudentSearch"
+).value="";
+
+document.getElementById(
+"optionalStudentClass"
+).value="";
+
+document.getElementById(
+"optionalPaymentFee"
+).value="";
+
+document.getElementById(
+"optionalAmountPaid"
+).value="";
+
+await loadOptionalItems();
+
+}
+
+function closeOptionalPaymentModal(){
+
+document
+.getElementById(
+"optionalPaymentModal"
+)
+.classList.remove(
+"show"
+);
+
+}
+
+async function loadOptionalItems(){
+
+const{
+
+data,
+
+error
+
+}=await supabaseClient
+
+.from(
+"set_optional_payments"
+)
+
+.select("*")
+
+.eq(
+"school_code",
+schoolCode
+)
+
+.order(
+"item"
+);
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+const select=
+
+document.getElementById(
+"optionalPaymentItem"
+);
+
+select.innerHTML=
+
+`<option value="">
+Select Item
+</option>`;
+
+data.forEach(item=>{
+
+select.innerHTML+=`
+
+<option
+value="${item.id}"
+data-fee="${item.fee}"
+>
+
+${item.item}
+
+</option>
+
+`;
+
+});
+
+}
+
+document.addEventListener(
+
+"change",
+
+function(e){
+
+if(
+
+e.target.id===
+
+"optionalPaymentItem"
+
+){
+
+const fee=
+
+e.target.options[
+e.target.selectedIndex
+]
+
+.dataset.fee||
+
+0;
+
+document.getElementById(
+
+"optionalPaymentFee"
+
+).value=
+
+`₦${Number(fee).toLocaleString()}`;
+
+}
+
+}
+
+);
+
+function saveOptionalPayment(){
 
 alert(
 
-"Payment popup coming next..."
+"Next step will save payment."
 
 );
 

@@ -272,6 +272,114 @@ Save Item
 
 </div>
 
+<!-- OPTIONAL PAYMENT MODAL -->
+
+<div id="optionalPaymentModal" class="modal">
+
+  <div class="modal-content">
+
+    <span
+      class="close-modal"
+      onclick="closeOptionalPaymentModal()"
+    >
+      &times;
+    </span>
+
+    <h2>
+      Make Optional Payment
+    </h2>
+
+    <div class="modal-form-row">
+
+      <label>
+        Student
+      </label>
+
+      <input
+        type="text"
+        id="optionalStudentSearch"
+        placeholder="Search Student..."
+        autocomplete="off"
+      >
+
+      <div
+        id="optionalStudentResults"
+        class="student-search-results"
+      ></div>
+
+    </div>
+
+    <div class="modal-form-row">
+
+      <label>
+        Class
+      </label>
+
+      <input
+        type="text"
+        id="optionalStudentClass"
+        readonly
+      >
+
+    </div>
+
+    <div class="modal-form-row">
+
+      <label>
+        Item
+      </label>
+
+      <select
+        id="optionalPaymentItem"
+      >
+
+        <option value="">
+          Select Item
+        </option>
+
+      </select>
+
+    </div>
+
+    <div class="modal-form-row">
+
+      <label>
+        Fee
+      </label>
+
+      <input
+        type="text"
+        id="optionalPaymentFee"
+        readonly
+      >
+
+    </div>
+
+    <div class="modal-form-row">
+
+      <label>
+        Amount Paid
+      </label>
+
+      <input
+        type="number"
+        id="optionalAmountPaid"
+        placeholder="Enter Amount Paid"
+      >
+
+    </div>
+
+    <button
+      class="update-btn"
+      onclick="saveOptionalPayment()"
+    >
+      Update Payment
+    </button>
+
+  </div>
+
+</div>
+
   <!-- PASSWORD CHANGE MODAL -->
   <div id="passwordModal" class="modal">
 
