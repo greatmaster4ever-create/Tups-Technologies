@@ -1062,6 +1062,20 @@ return;
 
 }
 
+console.log("========== OPTIONAL ITEM ==========");
+
+console.log("schoolCode:", schoolCode);
+
+console.log("item:", item);
+
+console.log("fee:", fee);
+
+const {
+data: sessionData
+} = await supabaseClient.auth.getSession();
+
+console.log("SESSION:", sessionData);
+
 const {
 
 error
