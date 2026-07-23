@@ -448,8 +448,18 @@ togglePaymentsMenu();
 loadTermFees();
 "
   >
-    Term Fees
+    Set Term Fees
   </button>
+
+<button
+  class="admin-btn payment-item"
+  onclick="
+togglePaymentsMenu();
+showOptionalPaymentsSetup();
+"
+>
+  Set Optional Payments
+</button>
 
   <button
     class="admin-btn payment-item"
@@ -460,6 +470,16 @@ loadAllPayments();
   >
     All Payments
   </button>
+
+<button
+  class="admin-btn payment-item"
+  onclick="
+togglePaymentsMenu();
+showAllOptionalPayments();
+"
+>
+  All Optional Payments
+</button>
 
   <button
     class="admin-btn payment-item"
@@ -631,6 +651,330 @@ adminDashboardHTML;
 
     }
   );
+
+async function showOptionalPaymentsSetup(){
+
+const {
+
+data,
+
+error
+
+} = await supabaseClient
+
+.from("set_optional_payments")
+
+.select("*")
+
+.eq(
+
+"school_code",
+
+schoolCode
+
+)
+
+.order(
+
+"item"
+
+);
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+renderOptionalPaymentsSetup(data);
+
+}
+
+function renderOptionalPaymentsSetup(data){
+
+let html = `
+
+<h3>
+
+💰 Set Optional Payments
+
+</h3>
+
+<div class="payment-quick-filters">
+
+<button
+
+class="admin-btn"
+
+onclick="openAddOptionalPaymentModal()"
+
+>
+
+➕ Add Item
+
+</button>
+
+<button
+
+class="admin-btn"
+
+onclick="removeSelectedOptionalItems()"
+
+>
+
+➖ Remove Item
+
+</button>
+
+</div>
+
+<table class="admin-table">
+
+<thead>
+
+<tr>
+
+<th></th>
+
+<th>Item</th>
+
+<th>Fee</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+`;
+
+data.forEach(row=>{
+
+html += `
+
+<tr>
+
+<td>
+
+<input
+
+type="checkbox"
+
+class="optionalItemCheck"
+
+value="${row.id}"
+
+>
+
+</td>
+
+<td>
+
+${row.item}
+
+</td>
+
+<td>
+
+₦${Number(row.fee).toLocaleString()}
+
+</td>
+
+<td>
+
+<button
+
+class="admin-btn"
+
+onclick="editOptionalItem('${row.id}')"
+
+>
+
+Edit
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+html += `
+
+</tbody>
+
+</table>
+
+<br>
+
+<div
+style="display:flex;gap:15px;justify-content:center;flex-wrap:wrap;"
+>
+
+<button
+
+class="admin-btn"
+
+style="background:green;color:white;"
+
+onclick="openOptionalPaymentPopup()"
+
+>
+
+Make Payment
+
+</button>
+
+<button
+
+class="admin-btn"
+
+style="background:#b30000;color:white;"
+
+onclick="endOptionalPaymentTerm()"
+
+>
+
+End Of Term
+
+</button>
+
+</div>
+
+`;
+
+document.getElementById(
+
+"adminContent"
+
+).innerHTML = html;
+
+}
+
+async function removeSelectedOptionalItems(){
+
+const checked =
+
+[...
+
+document.querySelectorAll(
+
+".optionalItemCheck:checked"
+
+)
+
+].map(
+
+box=>box.value
+
+);
+
+if(
+
+checked.length===0
+
+){
+
+alert(
+
+"Select item(s) first."
+
+);
+
+return;
+
+}
+
+const proceed = confirm(
+
+`Remove ${checked.length} selected item(s)?`
+
+);
+
+if(!proceed)
+
+return;
+
+const {
+
+error
+
+} = await supabaseClient
+
+.from(
+
+"set_optional_payments"
+
+)
+
+.delete()
+
+.in(
+
+"id",
+
+checked
+
+);
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+showOptionalPaymentsSetup();
+
+}
+
+function openAddOptionalPaymentModal(){
+
+alert(
+
+"Coming next..."
+
+);
+
+}
+
+function editOptionalItem(id){
+
+alert(
+
+"Edit Item: " + id
+
+);
+
+}
+
+function openOptionalPaymentPopup(){
+
+alert(
+
+"Payment popup coming next..."
+
+);
+
+}
+
+function endOptionalPaymentTerm(){
+
+alert(
+
+"End of Term logic coming next..."
+
+);
+}
+
 
 
 function showDrive() {
