@@ -1618,13 +1618,237 @@ document.getElementById(
 
 );
 
-function saveOptionalPayment(){
+async function saveOptionalPayment(){
+
+if(!optionalSelectedStudent){
 
 alert(
+"Please select a student."
+);
 
-"Next step will save payment."
+return;
+
+}
+
+const dropdown =
+
+document.getElementById(
+"optionalPaymentItem"
+);
+
+if(!dropdown.value){
+
+alert(
+"Please select an item."
+);
+
+return;
+
+}
+
+const selectedOption =
+
+dropdown.options[
+dropdown.selectedIndex
+];
+
+const itemName =
+selectedOption.text;
+
+const fee =
+
+Number(
+selectedOption.dataset.fee
+);
+
+const amountPaid =
+
+Number(
+
+document.getElementById(
+"optionalAmountPaid"
+).value
 
 );
+
+if(
+
+isNaN(amountPaid)
+
+||
+
+amountPaid<=0
+
+){
+
+alert(
+"Enter a valid amount."
+);
+
+return;
+
+}
+
+const remaining =
+
+Math.max(
+
+fee-amountPaid,
+
+0
+
+);
+
+const status =
+
+remaining===0
+
+?
+
+"Paid"
+
+:
+
+"Partial";
+
+
+// =========================
+// CHECK EXISTING PAYMENT
+// =========================
+
+const {
+
+data: existing
+
+} = await supabaseClient
+
+.from("optional_payments")
+
+.select("id")
+
+.eq(
+"school_code",
+currentSchoolCode
+)
+
+.eq(
+"student_id",
+optionalSelectedStudent.id
+)
+
+.eq(
+"item",
+itemName
+
+);
+
+let error;
+
+if(existing && existing.length){
+
+({ error } =
+
+await supabaseClient
+
+.from("optional_payments")
+
+.update({
+
+class_name:
+
+optionalSelectedStudent.class,
+
+amount_paid:
+
+amountPaid,
+
+original_fee:
+
+fee,
+
+remaining,
+
+status,
+
+updated_at:
+
+new Date()
+
+})
+
+.eq(
+"id",
+existing[0].id
+
+));
+
+}else{
+
+({ error } =
+
+await supabaseClient
+
+.from("optional_payments")
+
+.insert({
+
+school_code:
+
+currentSchoolCode,
+
+student_id:
+
+optionalSelectedStudent.id,
+
+student_name:
+
+optionalSelectedStudent.student_name,
+
+reg_no:
+
+optionalSelectedStudent.reg_no,
+
+department:
+
+optionalSelectedStudent.department,
+
+class_name:
+
+optionalSelectedStudent.class,
+
+item:
+
+itemName,
+
+original_fee:
+
+fee,
+
+amount_paid:
+
+amountPaid,
+
+remaining,
+
+status
+
+}));
+
+}
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+alert(
+"Optional Payment Updated Successfully."
+);
+
+closeOptionalPaymentModal();
 
 }
 
