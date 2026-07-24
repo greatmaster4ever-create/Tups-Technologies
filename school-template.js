@@ -1398,11 +1398,8 @@ await loadAllOptionalPayments();
 async function loadAllOptionalPayments(){
 
 const {
-
 data,
-
 error
-
 } = await supabaseClient
 
 .from("optional_payments")
@@ -1418,7 +1415,8 @@ currentSchoolCode
 "created_at",
 {
 ascending:false
-});
+}
+);
 
 if(error){
 
@@ -1431,124 +1429,24 @@ return;
 
 }
 
-optionalPaymentsMasterData = data || [];
+// Store master data
+optionalPaymentsMasterData =
+data || [];
 
-optionalPaymentsData = [...optionalPaymentsMasterData];
+// Working copy
+optionalPaymentsData =
+[...optionalPaymentsMasterData];
+
+// Build dropdown filters
 populateOptionalFilters();
 
-let html = `
+// Reset to first page
+optionalPaymentsCurrentPage = 1;
 
-<table
-class="admin-table">
-
-<thead>
-
-<tr>
-
-<th>Date</th>
-
-<th>Time</th>
-
-<th>Name</th>
-
-<th>Class</th>
-
-<th>Item</th>
-
-<th>Fee</th>
-
-<th>Paid</th>
-
-<th>Status</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-`;
-
-data.forEach(row=>{
-
-const date =
-
-new Date(
-row.created_at
-);
-
-html += `
-
-<tr>
-
-<td>
-
-${date.toLocaleDateString()}
-
-</td>
-
-<td>
-
-${date.toLocaleTimeString()}
-
-</td>
-
-<td>
-
-${row.student_name}
-
-</td>
-
-<td>
-
-${row.class_name}
-
-</td>
-
-<td>
-
-${row.item}
-
-</td>
-
-<td>
-
-₦${Number(
-row.original_fee
-).toLocaleString()}
-
-</td>
-
-<td>
-
-₦${Number(
-row.amount_paid
-).toLocaleString()}
-
-</td>
-
-<td>
-
-${row.status}
-
-</td>
-
-</tr>
-
-`;
-
-});
-
-html += `
-
-</tbody>
-
-</table>
-
-`;
-
+// Render table
 renderOptionalPaymentsTable();
 
+// Update summary cards
 updateOptionalCards(
 optionalPaymentsData
 );
