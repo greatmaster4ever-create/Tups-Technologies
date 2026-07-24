@@ -823,7 +823,7 @@ class="admin-btn"
 
 style="background:green;color:white;"
 
-onclick="openOptionalPaymentPopup()"
+onclick="openOptionalPaymentModal()"
 
 >
 
@@ -854,6 +854,42 @@ document.getElementById(
 "adminContent"
 
 ).innerHTML = html;
+
+}
+
+function optionalItemChanged(){
+
+const dropdown =
+
+document.getElementById(
+"optionalPaymentItem"
+);
+
+const option =
+
+dropdown.options[
+dropdown.selectedIndex
+];
+
+const fee =
+
+option.dataset.fee || 0;
+
+document.getElementById(
+"optionalPaymentFee"
+).value =
+
+Number(fee).toLocaleString();
+
+}
+
+async function openOptionalPaymentModal(){
+
+document.getElementById(
+"optionalPaymentModal"
+).style.display="flex";
+
+await loadOptionalPaymentItems();
 
 }
 
@@ -978,6 +1014,70 @@ document.getElementById(
 "optionalItemModalTitle"
 ).innerText =
 "Add Optional Payment Item";
+
+}
+
+async function loadOptionalPaymentItems(){
+
+const {
+
+data,
+error
+
+} = await supabaseClient
+
+.from("set_optional_payments")
+
+.select("*")
+
+.eq(
+"school_code",
+currentSchoolCode
+)
+
+.order(
+"item"
+);
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+const dropdown =
+
+document.getElementById(
+"optionalPaymentItem"
+);
+
+dropdown.innerHTML =
+
+`<option value="">
+Select Item
+</option>`;
+
+data.forEach(row=>{
+
+dropdown.innerHTML += `
+
+<option
+
+value="${row.id}"
+
+data-fee="${row.fee}"
+
+>
+
+${row.item}
+
+</option>
+
+`;
+
+});
 
 }
 
@@ -4656,6 +4756,7 @@ classSelect.innerHTML +=
 });
 
 }
+
 
 
 function filterOutstandingFees(){
