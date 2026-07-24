@@ -1012,13 +1012,58 @@ return;
 
 }
 
-console.log("START SAVE");
+// Check duplicate item
+const {
 
-const response = await supabaseClient
+data: existing,
+error: existingError
+
+} = await supabaseClient
 
 .from("set_optional_payments")
 
-.insert({
+.select("id")
+
+.eq(
+"school_code",
+currentSchoolCode
+)
+
+.ilike(
+"item",
+item
+);
+
+if(existingError){
+
+alert(existingError.message);
+
+return;
+
+}
+
+if(existing && existing.length){
+
+alert(
+"This item already exists."
+);
+
+return;
+
+}
+
+// Save item
+const {
+
+error
+
+} = await supabaseClient
+
+.from("set_optional_payments")
+
+.upsert(
+
+{
 
 school_code: currentSchoolCode,
 
@@ -1026,17 +1071,34 @@ item,
 
 fee
 
-})
+},
 
-.select();
+{
 
-console.log("FULL RESPONSE:");
+onConflict:
+"school_code,item"
 
-console.log(response);
+}
 
-alert("FUNCTION FINISHED");
+);
+
+if(error){
+
+console.error(error);
+
+alert(error.message);
 
 return;
+
+}
+
+alert(
+"Optional Payment Item Saved Successfully."
+);
+
+closeOptionalItemModal();
+
+await showOptionalPaymentsSetup();
 
 }
 
