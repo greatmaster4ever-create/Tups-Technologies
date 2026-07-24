@@ -787,15 +787,14 @@ ${row.item}
 <td>
 
 <button
-
 class="admin-btn"
-
-onclick="editOptionalItem('${row.id}')"
-
+onclick="editOptionalItem(
+'${row.id}',
+'${row.item}',
+${row.fee}
+)"
 >
-
-Edit
-
+✏ Edit
 </button>
 
 </td>
@@ -980,6 +979,11 @@ document.getElementById(
 
 async function saveOptionalItem(){
 
+const id =
+document.getElementById(
+"optionalItemId"
+).value;
+
 const item =
 document.getElementById(
 "optionalItemName"
@@ -1012,7 +1016,12 @@ return;
 
 }
 
-// Check duplicate item
+// ===========================
+// ADD NEW ITEM
+// ===========================
+
+if(!id){
+
 const {
 
 data: existing,
@@ -1052,7 +1061,6 @@ return;
 
 }
 
-// Save item
 const {
 
 error
@@ -1065,7 +1073,8 @@ error
 
 {
 
-school_code: currentSchoolCode,
+school_code:
+currentSchoolCode,
 
 item,
 
@@ -1093,8 +1102,74 @@ return;
 }
 
 alert(
-"Optional Payment Item Saved Successfully."
+"Optional Payment Item Added Successfully."
 );
+
+}
+
+// ===========================
+// EDIT EXISTING ITEM
+// ===========================
+
+else{
+
+const {
+
+error
+
+} = await supabaseClient
+
+.from("set_optional_payments")
+
+.update({
+
+item,
+
+fee
+
+})
+
+.eq(
+"id",
+id
+);
+
+if(error){
+
+console.error(error);
+
+alert(error.message);
+
+return;
+
+}
+
+alert(
+"Optional Payment Item Updated Successfully."
+);
+
+}
+
+// ===========================
+// RESET FORM
+// ===========================
+
+document.getElementById(
+"optionalItemId"
+).value = "";
+
+document.getElementById(
+"optionalItemName"
+).value = "";
+
+document.getElementById(
+"optionalItemFee"
+).value = "";
+
+document.getElementById(
+"optionalItemModalTitle"
+).innerText =
+"Add Optional Payment Item";
 
 closeOptionalItemModal();
 
@@ -1102,14 +1177,33 @@ await showOptionalPaymentsSetup();
 
 }
 
+function editOptionalItem(
+id,
+item,
+fee
+){
 
-function editOptionalItem(id){
+document.getElementById(
+"optionalItemId"
+).value = id;
 
-alert(
+document.getElementById(
+"optionalItemName"
+).value = item;
 
-"Edit Item: " + id
+document.getElementById(
+"optionalItemFee"
+).value = fee;
 
-);
+document.getElementById(
+"optionalItemModalTitle"
+).innerText =
+"Edit Optional Payment Item";
+
+document.getElementById(
+"optionalItemModal"
+).style.display =
+"flex";
 
 }
 
