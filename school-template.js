@@ -90,6 +90,20 @@ let currentSubjects = [];
 let optionalSelectedStudent = null;
 
 let optionalStudentsCache = [];
+// ======================================
+// OPTIONAL PAYMENTS PAGINATION
+// ======================================
+
+let optionalPaymentsCurrentPage = 1;
+
+const optionalPaymentsRowsPerPage = 12;
+// ======================================
+// OPTIONAL PAYMENTS
+// ======================================
+
+let optionalPaymentsMasterData = [];
+
+let optionalPaymentsData = [];
 // ==========================
 // LOAD SCHOOL INFO
 // ==========================
@@ -1305,28 +1319,37 @@ document.getElementById("adminContent").innerHTML = `
     <div class="toolbar-search">
 
         <input
-            type="text"
-            id="optionalSearch"
-            placeholder="🔍 Search Student..."
-        >
+type="text"
+id="optionalSearch"
+placeholder="🔍 Search Student..."
+oninput="filterOptionalPayments()"
+>
 
     </div>
 
     <div class="toolbar-filters">
 
-        <select id="optionalDepartmentFilter">
+        <select
+id="optionalDepartmentFilter"
+onchange="filterOptionalPayments()">
             <option value="">🏫 Department</option>
         </select>
 
-        <select id="optionalClassFilter">
+        <select
+id="optionalDepartmentFilter"
+onchange="filterOptionalPayments()">
             <option value="">🎓 Class</option>
         </select>
 
-        <select id="optionalItemFilter">
+        <select
+id="optionalDepartmentFilter"
+onchange="filterOptionalPayments()">
             <option value="">📦 Item</option>
         </select>
 
-        <select id="optionalStatusFilter">
+        <select
+id="optionalDepartmentFilter"
+onchange="filterOptionalPayments()">
             <option value="">⚑ Status</option>
             <option value="Paid">Paid</option>
             <option value="Partial">Partial</option>
@@ -1338,7 +1361,7 @@ document.getElementById("adminContent").innerHTML = `
 
         <button
             class="refresh-btn"
-            onclick="loadAllOptionalPayments()">
+            onclick="refreshOptionalPayments()">
 
             🔄 Refresh
 
@@ -1407,6 +1430,11 @@ error.message;
 return;
 
 }
+
+optionalPaymentsMasterData = data || [];
+
+optionalPaymentsData = [...optionalPaymentsMasterData];
+populateOptionalFilters();
 
 let html = `
 
@@ -1519,84 +1547,538 @@ html += `
 
 `;
 
+renderOptionalPaymentsTable();
+
+updateOptionalCards(
+optionalPaymentsData
+);
+
+}
+
+async function refreshOptionalPayments(){
+
+document.getElementById(
+"optionalSearch"
+).value = "";
+
+document.getElementById(
+"optionalDepartmentFilter"
+).value = "";
+
+document.getElementById(
+"optionalClassFilter"
+).value = "";
+
+document.getElementById(
+"optionalItemFilter"
+).value = "";
+
+document.getElementById(
+"optionalStatusFilter"
+).value = "";
+
+await loadAllOptionalPayments();
+
+}
+
+function filterOptionalPayments(){
+
+const search =
+
+document.getElementById(
+"optionalSearch"
+).value
+.toLowerCase()
+.trim();
+
+const department =
+
+document.getElementById(
+"optionalDepartmentFilter"
+).value;
+
+const className =
+
+document.getElementById(
+"optionalClassFilter"
+).value;
+
+const item =
+
+document.getElementById(
+"optionalItemFilter"
+).value;
+
+const status =
+
+document.getElementById(
+"optionalStatusFilter"
+).value;
+
+optionalPaymentsData =
+
+optionalPaymentsMasterData.filter(row=>{
+
+const matchSearch =
+
+search==="" ||
+
+row.student_name
+.toLowerCase()
+.includes(search)
+
+||
+
+row.reg_no
+.toLowerCase()
+.includes(search);
+
+const matchDepartment =
+
+department===""
+
+||
+
+row.department===department;
+
+const matchClass =
+
+className===""
+
+||
+
+row.class_name===className;
+
+const matchItem =
+
+item===""
+
+||
+
+row.item===item;
+
+const matchStatus =
+
+status===""
+
+||
+
+row.status===status;
+
+return(
+
+matchSearch
+
+&&
+
+matchDepartment
+
+&&
+
+matchClass
+
+&&
+
+matchItem
+
+&&
+
+matchStatus
+
+);
+
+});
+
+optionalPaymentsCurrentPage = 1;
+
+renderOptionalPaymentsTable();
+
+updateOptionalCards(
+optionalPaymentsData
+);
+
+}
+
+function renderOptionalPaymentsTable(){
+
+const start =
+(optionalPaymentsCurrentPage-1)*
+optionalPaymentsRowsPerPage;
+
+const end =
+start+
+optionalPaymentsRowsPerPage;
+
+const pageData =
+optionalPaymentsData.slice(
+start,
+end
+);
+
+let html = `
+
+<table class="admin-table">
+
+<thead>
+
+<tr>
+
+<th>Date</th>
+
+<th>Time</th>
+
+<th>Name</th>
+
+<th>Class</th>
+
+<th>Item</th>
+
+<th>Fee</th>
+
+<th>Paid</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+`;
+
+pageData.forEach(row=>{
+
+const date =
+new Date(row.created_at);
+
+html += `
+
+<tr>
+
+<td>${date.toLocaleDateString()}</td>
+
+<td>${date.toLocaleTimeString()}</td>
+
+<td>${row.student_name}</td>
+
+<td>${row.class_name}</td>
+
+<td>${row.item}</td>
+
+<td>₦${Number(row.original_fee).toLocaleString()}</td>
+
+<td>₦${Number(row.amount_paid).toLocaleString()}</td>
+
+<td>${row.status}</td>
+
+</tr>
+
+`;
+
+});
+
+html += `
+
+</tbody>
+
+</table>
+
+<div class="optional-pagination">
+
+<button
+
+onclick="changeOptionalPage(-1)"
+
+${optionalPaymentsCurrentPage===1?"disabled":""}
+
+>
+
+◀ Previous
+
+</button>
+
+<span>
+
+Page ${optionalPaymentsCurrentPage}
+
+of
+
+${Math.max(
+1,
+Math.ceil(
+optionalPaymentsData.length/
+optionalPaymentsRowsPerPage
+)
+)}
+
+</span>
+
+<button
+
+onclick="changeOptionalPage(1)"
+
+${optionalPaymentsCurrentPage>=Math.ceil(optionalPaymentsData.length/optionalPaymentsRowsPerPage)?"disabled":""}
+
+>
+
+Next ▶
+
+</button>
+
+</div>
+
+`;
+
 document.getElementById(
 "optionalPaymentsTableContainer"
 ).innerHTML =
 html;
 
-updateOptionalCards(data);
+}
+
+function changeOptionalPage(direction){
+
+const totalPages =
+
+Math.max(
+1,
+Math.ceil(
+optionalPaymentsData.length/
+optionalPaymentsRowsPerPage
+)
+);
+
+optionalPaymentsCurrentPage += direction;
+
+if(optionalPaymentsCurrentPage<1){
+
+optionalPaymentsCurrentPage=1;
+
+}
+
+if(optionalPaymentsCurrentPage>totalPages){
+
+optionalPaymentsCurrentPage=totalPages;
+
+}
+
+renderOptionalPaymentsTable();
+
+}
+
+
+function populateOptionalFilters(){
+
+// =========================
+// DEPARTMENT
+// =========================
+
+const departmentSelect =
+document.getElementById(
+"optionalDepartmentFilter"
+);
+
+const departments = [
+
+...new Set(
+
+optionalPaymentsMasterData
+
+.map(r=>r.department)
+
+.filter(Boolean)
+
+)
+
+].sort();
+
+departmentSelect.innerHTML =
+
+`<option value="">
+🏫 Department
+</option>`;
+
+departments.forEach(dep=>{
+
+departmentSelect.innerHTML +=
+
+`<option value="${dep}">
+${dep}
+</option>`;
+
+});
+
+// =========================
+// CLASS
+// =========================
+
+const classSelect =
+document.getElementById(
+"optionalClassFilter"
+);
+
+const classes = [
+
+...new Set(
+
+optionalPaymentsMasterData
+
+.map(r=>r.class_name)
+
+.filter(Boolean)
+
+)
+
+].sort();
+
+classSelect.innerHTML =
+
+`<option value="">
+🎓 Class
+</option>`;
+
+classes.forEach(cls=>{
+
+classSelect.innerHTML +=
+
+`<option value="${cls}">
+${cls}
+</option>`;
+
+});
+
+// =========================
+// ITEM
+// =========================
+
+const itemSelect =
+document.getElementById(
+"optionalItemFilter"
+);
+
+const items = [
+
+...new Set(
+
+optionalPaymentsMasterData
+
+.map(r=>r.item)
+
+.filter(Boolean)
+
+)
+
+].sort();
+
+itemSelect.innerHTML =
+
+`<option value="">
+📦 Item
+</option>`;
+
+items.forEach(item=>{
+
+itemSelect.innerHTML +=
+
+`<option value="${item}">
+${item}
+</option>`;
+
+});
 
 }
 
 function updateOptionalCards(data){
 
+// Summary object
 const summary = {};
 
+// Group by Item
 data.forEach(row=>{
 
-if(!summary[row.item]){
+    if(!summary[row.item]){
 
-summary[row.item]={
-count:0,
-amount:0
-};
+        summary[row.item]={
 
-}
+            students:new Set(),
 
-summary[row.item].count++;
+            total:0
 
-summary[row.item].amount +=
+        };
 
-Number(
-row.amount_paid||0
-);
+    }
 
-});
+    summary[row.item]
+        .students
+        .add(row.student_id);
 
-Object.keys(summary).forEach(item=>{
-
-const card =
-
-Array.from(
-
-document.querySelectorAll(
-
-".optional-card-title"
-
-)
-
-).find(
-
-d=>d.innerText===item
-
-);
-
-if(!card) return;
-
-const wrapper =
-
-card.parentElement;
-
-wrapper.querySelector(
-
-".optional-card-count"
-
-).innerText =
-
-`${summary[item].count} Students`;
-
-wrapper.querySelector(
-
-".optional-card-amount"
-
-).innerText =
-
-`₦${summary[item].amount.toLocaleString()}`;
+    summary[row.item]
+        .total += Number(row.amount_paid||0);
 
 });
 
-}
+// Update each card
+document
+.querySelectorAll(".optional-card")
+.forEach(card=>{
 
+    const item =
+
+    card
+    .querySelector(".optional-card-title")
+    .innerText
+    .trim();
+
+    const countDiv =
+
+    card.querySelector(
+    ".optional-card-count"
+    );
+
+    const amountDiv =
+
+    card.querySelector(
+    ".optional-card-amount"
+    );
+
+    if(summary[item]){
+
+        const count =
+        summary[item]
+        .students.size;
+
+        countDiv.innerText =
+
+        `${count} ${
+            count===1
+            ?"Student"
+            :"Students"
+        }`;
+
+        amountDiv.innerText =
+
+        "₦"+
+
+        summary[item]
+        .total
+        .toLocaleString();
+
+    }
+
+    else{
+
+        countDiv.innerText =
+        "0 Students";
+
+        amountDiv.innerText =
+        "₦0";
+
+    }
+
+});
+
+}
 
 function closeOptionalItemModal(){
 
