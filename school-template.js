@@ -1889,17 +1889,15 @@ ${item}
 
 function updateOptionalCards(data){
 
-// Summary object
 const summary = {};
 
-// Group by Item
 data.forEach(row=>{
 
     if(!summary[row.item]){
 
         summary[row.item]={
 
-            students:new Set(),
+            count:0,
 
             total:0
 
@@ -1907,16 +1905,12 @@ data.forEach(row=>{
 
     }
 
-    summary[row.item]
-        .students
-        .add(row.student_id);
+    summary[row.item].count++;
 
-    summary[row.item]
-        .total += Number(row.amount_paid||0);
+    summary[row.item].total += Number(row.amount_paid || 0);
 
 });
 
-// Update each card
 document
 .querySelectorAll(".optional-card")
 .forEach(card=>{
@@ -1930,41 +1924,23 @@ document
 
     const countDiv =
 
-    card.querySelector(
-    ".optional-card-count"
-    );
+    card.querySelector(".optional-card-count");
 
     const amountDiv =
 
-    card.querySelector(
-    ".optional-card-amount"
-    );
+    card.querySelector(".optional-card-amount");
 
     if(summary[item]){
 
-        const count =
-        summary[item]
-        .students.size;
+        const count = summary[item].count;
 
         countDiv.innerText =
-
-        `${count} ${
-            count===1
-            ?"Student"
-            :"Students"
-        }`;
+        `${count} ${count === 1 ? "Student" : "Students"}`;
 
         amountDiv.innerText =
+        "₦" + summary[item].total.toLocaleString();
 
-        "₦"+
-
-        summary[item]
-        .total
-        .toLocaleString();
-
-    }
-
-    else{
+    }else{
 
         countDiv.innerText =
         "0 Students";
