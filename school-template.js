@@ -1250,153 +1250,129 @@ let cardsHTML = "";
 items.forEach(item=>{
 
 cardsHTML += `
+
 <div class="optional-card">
 
-<div class="optional-card-title">
+    <div class="optional-card-title">
 
-${item.item}
+        ${item.item}
 
-</div>
+    </div>
 
-<div
-class="optional-card-count"
-id="count-${item.id}">
+    <div
+        class="optional-card-count"
+        id="count-${item.id}"
+    >
 
-0
+        0 Students
 
-</div>
+    </div>
 
-<div class="optional-card-label">
+    <div
+        class="optional-card-amount"
+        id="amount-${item.id}"
+    >
 
-Students
+        ₦0
 
-</div>
-
-<div
-class="optional-card-amount"
-id="amount-${item.id}">
-
-₦0
+    </div>
 
 </div>
 
-</div>
 `;
 });
 
-document.getElementById(
-"adminContent"
-).innerHTML = `
-
-<h3>
-
-📋 All Optional Payments
-
-</h3>
+document.getElementById("adminContent").innerHTML = `
 
 <div class="optional-dashboard">
 
-<div class="optional-dashboard-header">
+    <div class="optional-dashboard-header">
 
-<h3 class="optional-title">
+        <h2 class="optional-title">
+            📋 All Optional Payments
+        </h2>
 
-📋 All Optional Payments
+    </div>
 
-</h3>
+    <div class="optional-cards-wrapper">
 
-</div>
+        ${cardsHTML}
 
-<div class="optional-cards-wrapper">
+    </div>
 
-${cardsHTML}
+    <div class="optional-toolbar-card">
 
-</div>
+        <div class="toolbar-search">
 
-<div class="optional-toolbar">
+            <input
+                type="text"
+                id="optionalSearch"
+                placeholder="🔍 Search Student..."
+            >
 
-<div class="toolbar-search">
+        </div>
 
-<input
-type="text"
-id="optionalSearch"
-placeholder="🔍 Search Student...">
+        <div class="toolbar-row">
 
-</div>
+            <div class="toolbar-filters">
 
-<div class="toolbar-filters">
+                <select id="optionalDepartmentFilter">
+                    <option value="">🏫 Department</option>
+                </select>
 
-<select id="optionalDepartmentFilter">
+                <select id="optionalClassFilter">
+                    <option value="">🎓 Class</option>
+                </select>
 
-<option value="">
-Department
-</option>
+                <select id="optionalItemFilter">
+                    <option value="">📦 Item</option>
+                </select>
 
-</select>
+                <select id="optionalStatusFilter">
+                    <option value="">⚑ Status</option>
+                    <option value="Paid">Paid</option>
+                    <option value="Partial">Partial</option>
+                </select>
 
-<select id="optionalClassFilter">
+            </div>
 
-<option value="">
-Class
-</option>
+            <div class="toolbar-buttons">
 
-</select>
+                <button
+                    class="refresh-btn"
+                    onclick="loadAllOptionalPayments()"
+                >
 
-<select id="optionalItemFilter">
+                    🔄 Refresh
 
-<option value="">
-Item
-</option>
+                </button>
 
-</select>
+                <button
+                    class="print-btn"
+                    onclick="window.print()"
+                >
 
-<select id="optionalStatusFilter">
+                    🖨 Print
 
-<option value="">
-Status
-</option>
+                </button>
 
-<option>
-Paid
-</option>
+            </div>
 
-<option>
-Partial
-</option>
+        </div>
 
-</select>
+    </div>
 
-</div>
+    <div
+        id="optionalPaymentsTableContainer"
+        class="optional-table-card"
+    >
 
-<div class="toolbar-buttons">
+        Loading...
 
-<button
-class="refresh-btn"
-onclick="loadAllOptionalPayments()">
-
-🔄 Refresh
-
-</button>
-
-<button
-class="print-btn"
-onclick="window.print()">
-
-🖨 Print
-
-</button>
+    </div>
 
 </div>
 
-</div>
-
-<div
-id="optionalPaymentsTableContainer">
-
-Loading...
-
-</div>
-
-</div>
 `;
 
 await loadAllOptionalPayments();

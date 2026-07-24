@@ -1905,3 +1905,448 @@ flex:1;
 }
 
 }
+/* ==========================================================
+   OPTIONAL PAYMENTS DASHBOARD
+========================================================== */
+
+.optional-dashboard{
+width:100%;
+padding:18px;
+animation:fadeIn .35s ease;
+}
+
+.optional-dashboard-header{
+display:flex;
+justify-content:center;
+align-items:center;
+margin-bottom:25px;
+}
+
+.optional-title{
+font-size:32px;
+font-weight:700;
+color:#0f5132;
+margin:0;
+}
+
+/* ==========================================================
+   SUMMARY CARDS
+========================================================== */
+
+.optional-cards-wrapper{
+
+display:grid;
+
+grid-template-columns:
+repeat(auto-fit,minmax(260px,1fr));
+
+gap:22px;
+
+margin-bottom:28px;
+
+}
+
+.optional-card{
+
+background:#fff;
+
+border-radius:14px;
+
+padding:25px;
+
+box-shadow:
+0 8px 20px rgba(0,0,0,.12);
+
+border-top:6px solid #0f5132;
+
+transition:.25s;
+
+text-align:center;
+
+}
+
+.optional-card:hover{
+
+transform:translateY(-4px);
+
+box-shadow:
+0 12px 28px rgba(0,0,0,.18);
+
+}
+
+.optional-card-title{
+
+font-size:20px;
+
+font-weight:700;
+
+color:#000080;      /* Royal Blue */
+
+margin-bottom:20px;
+
+}
+
+.optional-card-count{
+
+font-size:48px;
+
+font-weight:800;
+
+color:#800000;      /* Maroon */
+
+line-height:1.1;
+
+margin-bottom:8px;
+
+}
+
+.optional-card-amount{
+
+font-size:36px;
+
+font-weight:700;
+
+color:#198754;
+
+margin-top:10px;
+
+}
+
+/* ==========================================================
+   TOOLBAR CARD
+========================================================== */
+
+.optional-toolbar-card{
+
+background:#fff;
+
+padding:22px;
+
+border-radius:14px;
+
+box-shadow:
+0 5px 15px rgba(0,0,0,.10);
+
+margin-bottom:25px;
+
+}
+
+.toolbar-search{
+
+margin-bottom:18px;
+
+}
+
+.toolbar-search input{
+
+width:100%;
+
+height:50px;
+
+padding:0 18px;
+
+font-size:15px;
+
+border-radius:10px;
+
+border:1px solid #d9d9d9;
+
+transition:.2s;
+
+}
+
+.toolbar-search input:focus{
+
+outline:none;
+
+border-color:#198754;
+
+box-shadow:
+0 0 0 3px rgba(25,135,84,.15);
+
+}
+
+.toolbar-row{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+gap:18px;
+
+flex-wrap:wrap;
+
+}
+
+/* ==========================================================
+   FILTERS
+========================================================== */
+
+.toolbar-filters{
+
+display:flex;
+
+gap:12px;
+
+flex-wrap:wrap;
+
+flex:1;
+
+}
+
+.toolbar-filters select{
+
+height:48px;
+
+min-width:170px;
+
+padding:0 14px;
+
+font-size:15px;
+
+border-radius:10px;
+
+border:1px solid #d9d9d9;
+
+background:#fff;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.toolbar-filters select:focus{
+
+outline:none;
+
+border-color:#198754;
+
+box-shadow:
+0 0 0 3px rgba(25,135,84,.15);
+
+}
+
+/* ==========================================================
+   BUTTONS
+========================================================== */
+
+.toolbar-buttons{
+
+display:flex;
+
+gap:12px;
+
+}
+
+.refresh-btn{
+
+background:#198754;
+
+color:#fff;
+
+border:none;
+
+border-radius:10px;
+
+padding:0 22px;
+
+height:48px;
+
+font-size:15px;
+
+font-weight:600;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.refresh-btn:hover{
+
+background:#157347;
+
+}
+
+.print-btn{
+
+background:#0d6efd;
+
+color:#fff;
+
+border:none;
+
+border-radius:10px;
+
+padding:0 22px;
+
+height:48px;
+
+font-size:15px;
+
+font-weight:600;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.print-btn:hover{
+
+background:#0b5ed7;
+
+}
+
+/* ==========================================================
+   TABLE
+========================================================== */
+
+.optional-table-card{
+
+background:#fff;
+
+padding:20px;
+
+border-radius:14px;
+
+box-shadow:
+0 5px 15px rgba(0,0,0,.10);
+
+overflow:auto;
+
+}
+
+/* ==========================================================
+   STATUS BADGES
+========================================================== */
+
+.status-paid{
+
+background:#d1f5dd;
+
+color:#157347;
+
+padding:5px 12px;
+
+border-radius:8px;
+
+font-weight:600;
+
+}
+
+.status-partial{
+
+background:#fff3cd;
+
+color:#996c00;
+
+padding:5px 12px;
+
+border-radius:8px;
+
+font-weight:600;
+
+}
+
+.status-notpaid{
+
+background:#f8d7da;
+
+color:#b02a37;
+
+padding:5px 12px;
+
+border-radius:8px;
+
+font-weight:600;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media(max-width:992px){
+
+.toolbar-row{
+
+flex-direction:column;
+
+align-items:stretch;
+
+}
+
+.toolbar-filters{
+
+display:grid;
+
+grid-template-columns:
+repeat(2,1fr);
+
+}
+
+.toolbar-buttons{
+
+justify-content:flex-end;
+
+}
+
+}
+
+@media(max-width:700px){
+
+.optional-dashboard{
+
+padding:12px;
+
+}
+
+.optional-title{
+
+font-size:24px;
+
+text-align:center;
+
+}
+
+.optional-cards-wrapper{
+
+grid-template-columns:1fr;
+
+}
+
+.toolbar-filters{
+
+grid-template-columns:1fr;
+
+}
+
+.toolbar-buttons{
+
+width:100%;
+
+}
+
+.toolbar-buttons button{
+
+flex:1;
+
+}
+
+.optional-card-count{
+
+font-size:42px;
+
+}
+
+.optional-card-amount{
+
+font-size:32px;
+
+}
+
+}
