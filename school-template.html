@@ -301,11 +301,12 @@ Save Item
       </label>
 
       <input
-        type="text"
-        id="optionalStudentSearch"
-        placeholder="Search Student..."
-        autocomplete="off"
-      >
+  type="text"
+  id="optionalStudentSearch"
+  placeholder="Search Student..."
+  autocomplete="off"
+  onkeyup="searchOptionalStudents()"
+>
 
       <div
         id="optionalStudentResults"

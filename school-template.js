@@ -19,9 +19,6 @@ let outstandingFeesMasterData = [];
 let outstandingCurrentPage = 1;
 
 const outstandingRowsPerPage = 12;
-
-
-
 let currentPreviousOutstandingPage = 1;
 // ========================================
 // PREVIOUS TERM PAGINATION
@@ -90,7 +87,9 @@ window.location.replace("index.html");
 // GLOBAL STATE
 // ==========================
 let currentSubjects = [];
+let optionalSelectedStudent = null;
 
+let optionalStudentsCache = [];
 // ==========================
 // LOAD SCHOOL INFO
 // ==========================
@@ -889,7 +888,107 @@ document.getElementById(
 "optionalPaymentModal"
 ).style.display="flex";
 
+optionalSelectedStudent = null;
+
 await loadOptionalPaymentItems();
+
+await loadOptionalStudents();
+
+}
+
+function searchOptionalStudents(){
+
+const keyword =
+
+document.getElementById(
+"optionalStudentSearch"
+).value
+.toLowerCase()
+.trim();
+
+const resultsDiv =
+
+document.getElementById(
+"optionalStudentResults"
+);
+
+resultsDiv.innerHTML = "";
+
+if(keyword.length < 2){
+
+return;
+
+}
+
+const matches =
+
+optionalStudentsCache.filter(student=>{
+
+return(
+
+student.student_name
+
+.toLowerCase()
+
+.includes(keyword)
+
+||
+
+student.reg_no
+
+.toLowerCase()
+
+.includes(keyword)
+
+);
+
+});
+
+matches.slice(0,10).forEach(student=>{
+
+const div =
+
+document.createElement("div");
+
+div.className =
+
+"student-result-item";
+
+div.innerHTML =
+
+`${student.student_name}
+
+(${student.reg_no})`;
+
+div.onclick = ()=>{
+
+selectOptionalStudent(student);
+
+};
+
+resultsDiv.appendChild(div);
+
+});
+
+}
+
+function selectOptionalStudent(student){
+
+optionalSelectedStudent = student;
+
+document.getElementById(
+"optionalStudentSearch"
+).value =
+student.student_name;
+
+document.getElementById(
+"optionalStudentClass"
+).value =
+student.class;
+
+document.getElementById(
+"optionalStudentResults"
+).innerHTML = "";
 
 }
 
@@ -1078,6 +1177,40 @@ ${row.item}
 `;
 
 });
+
+}
+
+async function loadOptionalStudents(){
+
+const {
+
+data,
+error
+
+} = await supabaseClient
+
+.from("students")
+
+.select("*")
+
+.eq(
+"school_code",
+currentSchoolCode
+)
+
+.order(
+"student_name"
+);
+
+if(error){
+
+console.error(error);
+
+return;
+
+}
+
+optionalStudentsCache = data || [];
 
 }
 
@@ -1353,13 +1486,33 @@ await loadOptionalItems();
 
 function closeOptionalPaymentModal(){
 
-document
-.getElementById(
+document.getElementById(
 "optionalPaymentModal"
-)
-.classList.remove(
-"show"
-);
+).style.display = "none";
+
+document.getElementById(
+"optionalStudentSearch"
+).value = "";
+
+document.getElementById(
+"optionalStudentResults"
+).innerHTML = "";
+
+document.getElementById(
+"optionalStudentClass"
+).value = "";
+
+document.getElementById(
+"optionalPaymentItem"
+).selectedIndex = 0;
+
+document.getElementById(
+"optionalPaymentFee"
+).value = "";
+
+document.getElementById(
+"optionalAmountPaid"
+).value = "";
 
 }
 
