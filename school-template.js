@@ -1766,8 +1766,10 @@ original_fee:
 
 fee,
 
+remaining_amount:
 remaining,
 
+status:
 status,
 
 updated_at:
