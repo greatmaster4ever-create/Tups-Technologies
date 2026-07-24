@@ -1056,27 +1056,14 @@ await supabaseClient
 .from("set_optional_payments")
 
 .upsert(
-
 {
-
-school_code:
-currentSchoolCode,
-
-item,
-
-fee,
-
-active:true
-
+  school_code: currentSchoolCode,
+  item,
+  fee
 },
-
 {
-
-onConflict:
-"school_code,item"
-
+  onConflict: "school_code,item"
 }
-
 );
 
 if(error){
