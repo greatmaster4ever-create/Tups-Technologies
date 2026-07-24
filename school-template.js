@@ -1300,68 +1300,61 @@ document.getElementById("adminContent").innerHTML = `
 
     </div>
 
-    <div class="optional-toolbar-card">
+   <div class="optional-toolbar-card">
 
-        <div class="toolbar-search">
+    <div class="toolbar-search">
 
-            <input
-                type="text"
-                id="optionalSearch"
-                placeholder="🔍 Search Student..."
-            >
-
-        </div>
-
-        <div class="toolbar-row">
-
-            <div class="toolbar-filters">
-
-                <select id="optionalDepartmentFilter">
-                    <option value="">🏫 Department</option>
-                </select>
-
-                <select id="optionalClassFilter">
-                    <option value="">🎓 Class</option>
-                </select>
-
-                <select id="optionalItemFilter">
-                    <option value="">📦 Item</option>
-                </select>
-
-                <select id="optionalStatusFilter">
-                    <option value="">⚑ Status</option>
-                    <option value="Paid">Paid</option>
-                    <option value="Partial">Partial</option>
-                </select>
-
-            </div>
-
-            <div class="toolbar-buttons">
-
-                <button
-                    class="refresh-btn"
-                    onclick="loadAllOptionalPayments()"
-                >
-
-                    🔄 Refresh
-
-                </button>
-
-                <button
-                    class="print-btn"
-                    onclick="window.print()"
-                >
-
-                    🖨 Print
-
-                </button>
-
-            </div>
-
-        </div>
+        <input
+            type="text"
+            id="optionalSearch"
+            placeholder="🔍 Search Student..."
+        >
 
     </div>
 
+    <div class="toolbar-filters">
+
+        <select id="optionalDepartmentFilter">
+            <option value="">🏫 Department</option>
+        </select>
+
+        <select id="optionalClassFilter">
+            <option value="">🎓 Class</option>
+        </select>
+
+        <select id="optionalItemFilter">
+            <option value="">📦 Item</option>
+        </select>
+
+        <select id="optionalStatusFilter">
+            <option value="">⚑ Status</option>
+            <option value="Paid">Paid</option>
+            <option value="Partial">Partial</option>
+        </select>
+
+    </div>
+
+    <div class="toolbar-buttons">
+
+        <button
+            class="refresh-btn"
+            onclick="loadAllOptionalPayments()">
+
+            🔄 Refresh
+
+        </button>
+
+        <button
+            class="print-btn"
+            onclick="window.print()">
+
+            🖨 Print
+
+        </button>
+
+    </div>
+
+</div>
     <div
         id="optionalPaymentsTableContainer"
         class="optional-table-card"
