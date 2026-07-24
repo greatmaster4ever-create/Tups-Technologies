@@ -1012,73 +1012,31 @@ return;
 
 }
 
-const {
-data: existing,
-error: checkError
-} = await supabaseClient
+console.log("START SAVE");
+
+const response = await supabaseClient
 
 .from("set_optional_payments")
 
-.select("id")
+.insert({
 
-.eq(
-"school_code",
-currentSchoolCode
-)
+school_code: currentSchoolCode,
 
-.ilike(
-"item",
-item
-);
+item,
 
-if(checkError){
+fee
 
-alert(checkError.message);
+})
 
-return;
+.select();
 
-}
+console.log("FULL RESPONSE:");
 
-if(existing && existing.length){
+console.log(response);
 
-alert(
-"This item already exists."
-);
+alert("FUNCTION FINISHED");
 
 return;
-
-}
-
-const { error } =
-
-await supabaseClient
-
-.from("set_optional_payments")
-
-.upsert(
-{
-  school_code: currentSchoolCode,
-  item,
-  fee
-},
-{
-  onConflict: "school_code,item"
-}
-);
-
-if(error){
-
-console.error(error);
-
-alert(error.message);
-
-return;
-
-}
-
-closeOptionalItemModal();
-
-showOptionalPaymentsSetup();
 
 }
 
