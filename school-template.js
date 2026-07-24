@@ -1250,13 +1250,9 @@ let cardsHTML = "";
 items.forEach(item=>{
 
 cardsHTML += `
+<div class="optional-card">
 
-<div
-class="optional-card"
-id="card-${item.id}">
-
-<div
-class="optional-card-title">
+<div class="optional-card-title">
 
 ${item.item}
 
@@ -1266,7 +1262,13 @@ ${item.item}
 class="optional-card-count"
 id="count-${item.id}">
 
-0 Students
+0
+
+</div>
+
+<div class="optional-card-label">
+
+Students
 
 </div>
 
@@ -1279,9 +1281,7 @@ id="amount-${item.id}">
 </div>
 
 </div>
-
 `;
-
 });
 
 document.getElementById(
@@ -1294,25 +1294,38 @@ document.getElementById(
 
 </h3>
 
-<div
-class="optional-cards-wrapper">
+<div class="optional-dashboard">
+
+<div class="optional-dashboard-header">
+
+<h3 class="optional-title">
+
+📋 All Optional Payments
+
+</h3>
+
+</div>
+
+<div class="optional-cards-wrapper">
 
 ${cardsHTML}
 
 </div>
 
-<br>
+<div class="optional-toolbar">
 
-<div
-class="optional-toolbar">
+<div class="toolbar-search">
 
 <input
 type="text"
 id="optionalSearch"
-placeholder="Search Student...">
+placeholder="🔍 Search Student...">
 
-<select
-id="optionalDepartmentFilter">
+</div>
+
+<div class="toolbar-filters">
+
+<select id="optionalDepartmentFilter">
 
 <option value="">
 Department
@@ -1320,8 +1333,7 @@ Department
 
 </select>
 
-<select
-id="optionalClassFilter">
+<select id="optionalClassFilter">
 
 <option value="">
 Class
@@ -1329,8 +1341,7 @@ Class
 
 </select>
 
-<select
-id="optionalItemFilter">
+<select id="optionalItemFilter">
 
 <option value="">
 Item
@@ -1338,8 +1349,7 @@ Item
 
 </select>
 
-<select
-id="optionalStatusFilter">
+<select id="optionalStatusFilter">
 
 <option value="">
 Status
@@ -1353,17 +1363,17 @@ Paid
 Partial
 </option>
 
-<option>
-Not Paid
-</option>
-
 </select>
 
+</div>
+
+<div class="toolbar-buttons">
+
 <button
-class="admin-btn"
+class="refresh-btn"
 onclick="loadAllOptionalPayments()">
 
-Refresh
+🔄 Refresh
 
 </button>
 
@@ -1377,7 +1387,7 @@ onclick="window.print()">
 
 </div>
 
-<br>
+</div>
 
 <div
 id="optionalPaymentsTableContainer">
@@ -1386,6 +1396,7 @@ Loading...
 
 </div>
 
+</div>
 `;
 
 await loadAllOptionalPayments();
