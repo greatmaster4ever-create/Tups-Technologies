@@ -1214,6 +1214,410 @@ optionalStudentsCache = data || [];
 
 }
 
+async function showAllOptionalPayments(){
+
+const {
+
+data: items,
+
+error: itemError
+
+} = await supabaseClient
+
+.from("set_optional_payments")
+
+.select("*")
+
+.eq(
+"school_code",
+currentSchoolCode
+)
+
+.order(
+"item"
+);
+
+if(itemError){
+
+alert(itemError.message);
+
+return;
+
+}
+
+let cardsHTML = "";
+
+items.forEach(item=>{
+
+cardsHTML += `
+
+<div
+class="optional-card"
+id="card-${item.id}">
+
+<div
+class="optional-card-title">
+
+${item.item}
+
+</div>
+
+<div
+class="optional-card-count"
+id="count-${item.id}">
+
+0 Students
+
+</div>
+
+<div
+class="optional-card-amount"
+id="amount-${item.id}">
+
+₦0
+
+</div>
+
+</div>
+
+`;
+
+});
+
+document.getElementById(
+"adminContent"
+).innerHTML = `
+
+<h3>
+
+📋 All Optional Payments
+
+</h3>
+
+<div
+class="optional-cards-wrapper">
+
+${cardsHTML}
+
+</div>
+
+<br>
+
+<div
+class="optional-toolbar">
+
+<input
+type="text"
+id="optionalSearch"
+placeholder="Search Student...">
+
+<select
+id="optionalDepartmentFilter">
+
+<option value="">
+Department
+</option>
+
+</select>
+
+<select
+id="optionalClassFilter">
+
+<option value="">
+Class
+</option>
+
+</select>
+
+<select
+id="optionalItemFilter">
+
+<option value="">
+Item
+</option>
+
+</select>
+
+<select
+id="optionalStatusFilter">
+
+<option value="">
+Status
+</option>
+
+<option>
+Paid
+</option>
+
+<option>
+Partial
+</option>
+
+<option>
+Not Paid
+</option>
+
+</select>
+
+<button
+class="admin-btn"
+onclick="loadAllOptionalPayments()">
+
+Refresh
+
+</button>
+
+<button
+class="print-btn"
+onclick="window.print()">
+
+🖨 Print
+
+</button>
+
+</div>
+
+<br>
+
+<div
+id="optionalPaymentsTableContainer">
+
+Loading...
+
+</div>
+
+`;
+
+await loadAllOptionalPayments();
+
+}
+
+async function loadAllOptionalPayments(){
+
+const {
+
+data,
+
+error
+
+} = await supabaseClient
+
+.from("optional_payments")
+
+.select("*")
+
+.eq(
+"school_code",
+currentSchoolCode
+)
+
+.order(
+"created_at",
+{
+ascending:false
+});
+
+if(error){
+
+document.getElementById(
+"optionalPaymentsTableContainer"
+).innerHTML =
+error.message;
+
+return;
+
+}
+
+let html = `
+
+<table
+class="admin-table">
+
+<thead>
+
+<tr>
+
+<th>Date</th>
+
+<th>Time</th>
+
+<th>Name</th>
+
+<th>Class</th>
+
+<th>Item</th>
+
+<th>Fee</th>
+
+<th>Paid</th>
+
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+`;
+
+data.forEach(row=>{
+
+const date =
+
+new Date(
+row.created_at
+);
+
+html += `
+
+<tr>
+
+<td>
+
+${date.toLocaleDateString()}
+
+</td>
+
+<td>
+
+${date.toLocaleTimeString()}
+
+</td>
+
+<td>
+
+${row.student_name}
+
+</td>
+
+<td>
+
+${row.class_name}
+
+</td>
+
+<td>
+
+${row.item}
+
+</td>
+
+<td>
+
+₦${Number(
+row.original_fee
+).toLocaleString()}
+
+</td>
+
+<td>
+
+₦${Number(
+row.amount_paid
+).toLocaleString()}
+
+</td>
+
+<td>
+
+${row.status}
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+html += `
+
+</tbody>
+
+</table>
+
+`;
+
+document.getElementById(
+"optionalPaymentsTableContainer"
+).innerHTML =
+html;
+
+updateOptionalCards(data);
+
+}
+
+function updateOptionalCards(data){
+
+const summary = {};
+
+data.forEach(row=>{
+
+if(!summary[row.item]){
+
+summary[row.item]={
+count:0,
+amount:0
+};
+
+}
+
+summary[row.item].count++;
+
+summary[row.item].amount +=
+
+Number(
+row.amount_paid||0
+);
+
+});
+
+Object.keys(summary).forEach(item=>{
+
+const card =
+
+Array.from(
+
+document.querySelectorAll(
+
+".optional-card-title"
+
+)
+
+).find(
+
+d=>d.innerText===item
+
+);
+
+if(!card) return;
+
+const wrapper =
+
+card.parentElement;
+
+wrapper.querySelector(
+
+".optional-card-count"
+
+).innerText =
+
+`${summary[item].count} Students`;
+
+wrapper.querySelector(
+
+".optional-card-amount"
+
+).innerText =
+
+`₦${summary[item].amount.toLocaleString()}`;
+
+});
+
+}
+
+
 function closeOptionalItemModal(){
 
 document.getElementById(
