@@ -1988,7 +1988,7 @@ margin-bottom:20px;
 
 .optional-card-count{
 
-font-size:48px;
+font-size:36px;
 
 font-weight:800;
 
@@ -1996,13 +1996,13 @@ color:#800000;      /* Maroon */
 
 line-height:1.1;
 
-margin-bottom:8px;
+margin-bottom:6px;
 
 }
 
 .optional-card-amount{
 
-font-size:36px;
+font-size:30px;
 
 font-weight:700;
 
@@ -2033,17 +2033,21 @@ margin-bottom:25px;
 
 .toolbar-search{
 
-margin-bottom:18px;
+flex:0 0 300px;
+
+margin-bottom:0;
 
 }
 
 .toolbar-search input{
 
-width:100%;
+width:300px;
 
-height:50px;
+max-width:100%;
 
-padding:0 18px;
+height:48px;
+
+padding:0 16px;
 
 font-size:15px;
 
@@ -2070,13 +2074,13 @@ box-shadow:
 
 display:flex;
 
-justify-content:space-between;
-
 align-items:center;
 
-gap:18px;
+justify-content:space-between;
 
-flex-wrap:wrap;
+gap:12px;
+
+flex-wrap:nowrap;
 
 }
 
@@ -2088,23 +2092,23 @@ flex-wrap:wrap;
 
 display:flex;
 
-gap:12px;
-
-flex-wrap:wrap;
+gap:8px;
 
 flex:1;
+
+justify-content:center;
 
 }
 
 .toolbar-filters select{
 
-height:48px;
+height:45px;
 
-min-width:170px;
+min-width:140px;
 
-padding:0 14px;
+padding:0 10px;
 
-font-size:15px;
+font-size:14px;
 
 border-radius:10px;
 
