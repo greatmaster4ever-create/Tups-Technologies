@@ -957,13 +957,27 @@ document.getElementById(
 
 function closeOptionalItemModal(){
 
-document
-.getElementById(
+document.getElementById(
 "optionalItemModal"
-)
-.classList.remove(
-"show"
-);
+).style.display =
+"none";
+
+document.getElementById(
+"optionalItemId"
+).value = "";
+
+document.getElementById(
+"optionalItemName"
+).value = "";
+
+document.getElementById(
+"optionalItemFee"
+).value = "";
+
+document.getElementById(
+"optionalItemModalTitle"
+).innerText =
+"Add Optional Payment Item";
 
 }
 
