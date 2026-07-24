@@ -1718,7 +1718,8 @@ remaining===0
 
 const {
 
-data: existing
+data: existing,
+error: existingError
 
 } = await supabaseClient
 
@@ -1741,6 +1742,14 @@ optionalSelectedStudent.id
 itemName
 
 );
+
+if(existingError){
+
+alert(existingError.message);
+
+return;
+
+}
 
 let error;
 
@@ -1795,44 +1804,43 @@ await supabaseClient
 .insert({
 
 school_code:
-
 currentSchoolCode,
 
 student_id:
-
 optionalSelectedStudent.id,
 
 student_name:
-
 optionalSelectedStudent.student_name,
 
 reg_no:
-
 optionalSelectedStudent.reg_no,
 
 department:
-
 optionalSelectedStudent.department,
 
 class_name:
-
 optionalSelectedStudent.class,
 
 item:
-
 itemName,
 
 original_fee:
-
 fee,
 
 amount_paid:
-
 amountPaid,
 
+remaining_amount:
 remaining,
 
-status
+status:
+status,
+
+created_at:
+new Date(),
+
+updated_at:
+new Date()
 
 }));
 
