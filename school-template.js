@@ -4962,9 +4962,9 @@ outstandingData.push({
 
     class_name: student.class,
 
-    session: currentSession,
+    session: "",
 
-    term: currentTerm,
+    term: "",
 
     original_amount: classFee,
 
