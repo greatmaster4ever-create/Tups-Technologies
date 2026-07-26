@@ -850,7 +850,7 @@ class="admin-btn"
 
 style="background:#b30000;color:white;"
 
-onclick="endOptionalPaymentTerm()"
+onclick="endTermOptionalPayments()"
 
 >
 
@@ -1529,7 +1529,7 @@ return;
 
 alert(
 
-"✅ End of Term completed successfully.\n\nAll Optional Payment records have been cleared."
+"✅ End of Term completed successfully. All Optional Payment records have been cleared."
 
 );
 
@@ -2660,17 +2660,6 @@ alert(
 closeOptionalPaymentModal();
 
 }
-
-function endOptionalPaymentTerm(){
-
-alert(
-
-"End of Term logic coming next..."
-
-);
-}
-
-
 
 function showDrive() {
 
