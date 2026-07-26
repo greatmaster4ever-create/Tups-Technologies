@@ -1329,32 +1329,31 @@ oninput="filterOptionalPayments()"
 
     <div class="toolbar-filters">
 
-        <select
+       <select
 id="optionalDepartmentFilter"
 onchange="filterOptionalPayments()">
-            <option value="">🏫 Department</option>
-        </select>
+    <option value="">🏫 Department</option>
+</select>
 
-        <select
-id="optionalDepartmentFilter"
+<select
+id="optionalClassFilter"
 onchange="filterOptionalPayments()">
-            <option value="">🎓 Class</option>
-        </select>
+    <option value="">🎓 Class</option>
+</select>
 
-        <select
-id="optionalDepartmentFilter"
+<select
+id="optionalItemFilter"
 onchange="filterOptionalPayments()">
-            <option value="">📦 Item</option>
-        </select>
+    <option value="">📦 Item</option>
+</select>
 
-        <select
-id="optionalDepartmentFilter"
+<select
+id="optionalStatusFilter"
 onchange="filterOptionalPayments()">
-            <option value="">⚑ Status</option>
-            <option value="Paid">Paid</option>
-            <option value="Partial">Partial</option>
-        </select>
-
+    <option value="">⚑ Status</option>
+    <option value="Paid">Paid</option>
+    <option value="Partial">Partial</option>
+</select>
     </div>
 
     <div class="toolbar-buttons">
