@@ -4858,6 +4858,9 @@ async function showPreviousOutstandingFees() {
 
 }
 
+
+}
+
 function renderOutstandingFees(
 
   students,
@@ -4938,32 +4941,41 @@ else {
 
 outstandingData.push({
 
-    student_name:
-        student.student_name,
+    // Existing UI fields
+    student_name: student.student_name,
 
-    reg_no:
-        student.reg_no,
+    reg_no: student.reg_no,
 
-    department:
-        student.department,
+    department: student.department,
 
-    class:
-        student.class,
+    class: student.class,
 
-    termFee:
-        classFee,
+    termFee: classFee,
 
-    paid:
-        paid,
+    paid: paid,
 
-    outstanding:
-        outstanding,
+    outstanding: outstanding,
 
-    status:
-        status
+    status: status,
+
+    // Snapshot fields
+    school_code: student.school_code,
+
+    student_id: student.id,
+
+    class_name: student.class,
+
+    session: currentSession,
+
+    term: currentTerm,
+
+    original_amount: classFee,
+
+    amount_paid: paid,
+
+    remaining_amount: outstanding
 
 });
-
     if(outstanding===0){
 
         fullyPaid++;
@@ -5844,7 +5856,7 @@ const classes =
 
 outstandingFeesMasterData.map(
 
-row=>row.class
+row=>row.class || row.class_name
 
 )
 
@@ -5996,7 +6008,7 @@ const classMatch =
 
 !cls ||
 
-row.class===cls;
+(row.class || row.class_name) === cls;
 
 const statusMatch =
 
@@ -6757,51 +6769,28 @@ throw historyUpdateError;
 
 }
 
-
 // ========================================
 // STEP 2B
 // COPY CURRENT OUTSTANDING
 // TO PREVIOUS TERM TABLE
 // ========================================
 
-// Read generated outstanding records
+// Make sure Outstanding data exists
+if(!outstandingFeesMasterData || outstandingFeesMasterData.length===0){
 
-const {
-data: currentOutstanding,
-error: currentOutstandingError
-
-} = await supabaseClient
-
-.from("student_outstanding_fees")
-
-.select("*")
-
-.eq(
-
-"school_code",
-
-currentSchoolCode
-
-);
-
-if(currentOutstandingError){
-
-throw currentOutstandingError;
+    await loadOutstandingPayments();
 
 }
 
-// ===========================
-// DEBUG 1
-// ===========================
+if(!outstandingFeesMasterData || outstandingFeesMasterData.length===0){
 
-console.log(
-"CURRENT OUTSTANDING BEFORE COPY"
-);
+    throw new Error(
+        "Unable to generate Outstanding snapshot."
+    );
 
-console.table(currentOutstanding);
+}
 
-
-// Remove any previous snapshot first
+// Remove previous snapshot
 
 const {
 
@@ -6827,22 +6816,15 @@ throw deletePreviousError;
 
 }
 
+// Build snapshot directly from the Outstanding screen
 
-// Build rows to insert
+const previousRows =
 
-let previousRows = [];
+outstandingFeesMasterData
 
-if(
+.filter(row=>row.remaining_amount>0)
 
-currentOutstanding &&
-
-currentOutstanding.length > 0
-
-){
-
-previousRows =
-
-currentOutstanding.map(row => ({
+.map(row=>({
 
 school_code:
 row.school_code,
@@ -6879,28 +6861,7 @@ row.status
 
 }));
 
-// ===========================
-// DEBUG 2
-// ===========================
-
-console.log(
-"ROWS GOING INTO PREVIOUS TABLE"
-);
-
-console.table(previousRows);
-
-// DEBUG - EXACT DATA BEING INSERTED
-// ======================================
-
-console.log(
-"PREVIOUS ROWS BEING INSERTED"
-);
-
-console.log(
-JSON.stringify(previousRows, null, 2)
-);
-
-// Insert
+if(previousRows.length){
 
 const {
 
@@ -6908,11 +6869,7 @@ error: previousInsertError
 
 } = await supabaseClient
 
-.from(
-
-"student_previous_outstanding_fees"
-
-)
+.from("student_previous_outstanding_fees")
 
 .insert(previousRows);
 
@@ -6921,41 +6878,6 @@ if(previousInsertError){
 throw previousInsertError;
 
 }
-
-
-// ===========================
-// DEBUG 3
-// VERIFY INSERT
-// ===========================
-
-const {
-
-data: verifyPrevious,
-error: verifyError
-
-} = await supabaseClient
-
-.from("student_previous_outstanding_fees")
-
-.select("*")
-
-.eq(
-
-"school_code",
-
-currentSchoolCode
-
-);
-
-console.log(
-"PREVIOUS TABLE AFTER INSERT"
-);
-
-console.table(verifyPrevious);
-
-console.log(
-"VERIFY ERROR:",
-verifyError);
 
 }
 // STEP 3
