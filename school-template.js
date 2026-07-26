@@ -4858,9 +4858,6 @@ async function showPreviousOutstandingFees() {
 
 }
 
-
-}
-
 function renderOutstandingFees(
 
   students,
