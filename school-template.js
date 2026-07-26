@@ -1478,6 +1478,66 @@ await loadAllOptionalPayments();
 
 }
 
+async function endTermOptionalPayments(){
+
+const confirmReset = confirm(
+
+`⚠ END OF TERM WARNING
+
+This will permanently delete ALL Optional Payment records for this term.
+
+Before continuing, ensure that:
+
+• All outstanding optional payments have been collected OR
+
+• You have printed/exported the Outstanding Payments List.
+
+This action CANNOT be undone.
+
+Do you want to continue?`
+
+);
+
+if(!confirmReset){
+
+return;
+
+}
+
+const {
+
+error
+
+} = await supabaseClient
+
+.from("optional_payments")
+
+.delete()
+
+.eq(
+"school_code",
+currentSchoolCode
+);
+
+if(error){
+
+alert(error.message);
+
+return;
+
+}
+
+alert(
+
+"✅ End of Term completed successfully.\n\nAll Optional Payment records have been cleared."
+
+);
+
+// Refresh dashboard
+await loadAllOptionalPayments();
+
+}
+
 function filterOptionalPayments(){
 
 const search =
