@@ -6889,6 +6889,16 @@ console.log(
 
 console.table(previousRows);
 
+// DEBUG - EXACT DATA BEING INSERTED
+// ======================================
+
+console.log(
+"PREVIOUS ROWS BEING INSERTED"
+);
+
+console.log(
+JSON.stringify(previousRows, null, 2)
+);
 
 // Insert
 
