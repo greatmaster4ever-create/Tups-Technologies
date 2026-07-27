@@ -4707,7 +4707,7 @@ async function loadOutstandingPayments() {
 
   <h3>
 
-  💰 Current Term Outstanding Fees
+  💰 Outstanding Fees
 
   </h3>
 
@@ -5004,7 +5004,7 @@ let html = `
 
 <h3>
 
-💰 Outstanding Fees
+💰 Current Term Outstanding Fees
 
 </h3>
 
