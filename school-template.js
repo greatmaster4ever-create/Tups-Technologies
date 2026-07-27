@@ -3569,7 +3569,8 @@ const {
   .eq("school_code", currentSchoolCode)
   .eq("reg_no", studentData.reg_no)
   .gt("remaining_amount", 0)
-  .eq("status", "Outstanding")
+  .order("created_at", { ascending: false })
+  .limit(1)
   .maybeSingle();
 
 // ----------------------------------------
