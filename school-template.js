@@ -2502,17 +2502,11 @@ fee-amountPaid,
 );
 
 const status =
-
-remaining===0
-
+remaining === 0
 ?
-
-"Paid"
-
+"🟢 Paid"
 :
-
-"Partial";
-
+"🟡 Partial";
 
 // =========================
 // CHECK EXISTING PAYMENT
@@ -2557,76 +2551,59 @@ return;
 
 let error;
 
-if(existing && existing.length){
+if (existing && existing.length) {
 
-({ error } =
+    const previousPaid =
+        Number(existing[0].amount_paid) || 0;
 
-await supabaseClient
+    const totalPaid =
+        previousPaid + amountPaid;
 
-.from("optional_payments")
+    const remaining =
+        Math.max(
+            fee - totalPaid,
+            0
+        );
 
-const previousPaid =
-Number(
-existing[0].amount_paid
-) || 0;
+    const status =
+        remaining === 0
+            ? "🟢 Paid"
+            : "🟡 Partial";
 
-const totalPaid =
-previousPaid + amountPaid;
+    ({ error } = await supabaseClient
 
-const remaining =
-Math.max(
-fee - totalPaid,
-0
-);
+        .from("optional_payments")
 
-const status =
-remaining === 0
-?
-"🟢 Paid"
-:
-"🟡 Partial";
+        .update({
 
-({ error } =
+            class_name:
+                optionalSelectedStudent.class,
 
-await supabaseClient
+            amount_paid:
+                totalPaid,
 
-.from("optional_payments")
+            original_fee:
+                fee,
 
-.update({
+            remaining_amount:
+                remaining,
 
-class_name:
-optionalSelectedStudent.class,
+            status:
+                status,
 
-amount_paid:
-totalPaid,
+            updated_at:
+                new Date()
 
-original_fee:
-fee,
+        })
 
-remaining_amount:
-remaining,
+        .eq(
+            "id",
+            existing[0].id
+        ));
 
-status:
-status,
+}
 
-updated_at:
-new Date()
-
-})
-
-.eq(
-"id",
-existing[0].id
-
-));
-
-.eq(
-"id",
-existing[0].id
-
-));
-
-}else{
+else{
 
 ({ error } =
 
