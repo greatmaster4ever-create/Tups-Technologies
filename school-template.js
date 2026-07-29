@@ -2998,7 +2998,12 @@ const {
 } =
   await supabaseClient
     .from("students")
-    .select("*")
+    .select(`
+id,
+student_name,
+class,
+reg_no
+`)
     .eq(
       "school_code",
       schoolCode
@@ -3050,6 +3055,14 @@ console.log(
     return;
 
   }
+  
+  data = (data || []).filter(student =>
+
+    student.student_name &&
+
+    String(student.student_name).trim() !== ""
+
+);
 
   let html = `
 
