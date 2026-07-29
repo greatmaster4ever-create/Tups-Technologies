@@ -1694,6 +1694,8 @@ let html = `
 
 <th>Paid</th>
 
+<th>Balance</th>
+
 <th>Status</th>
 
 </tr>
@@ -1727,8 +1729,9 @@ html += `
 
 <td>₦${Number(row.amount_paid).toLocaleString()}</td>
 
-<td>${row.status}</td>
+<td>₦${Number(row.remaining_amount).toLocaleString()}</td>
 
+<td>${row.status}</td>
 </tr>
 
 `;
@@ -2524,7 +2527,9 @@ error: existingError
 
 .from("optional_payments")
 
-.select("id")
+.select(
+"id, amount_paid, original_fee"
+)
 
 .eq(
 "school_code",
@@ -2560,18 +2565,42 @@ await supabaseClient
 
 .from("optional_payments")
 
+const previousPaid =
+Number(
+existing[0].amount_paid
+) || 0;
+
+const totalPaid =
+previousPaid + amountPaid;
+
+const remaining =
+Math.max(
+fee - totalPaid,
+0
+);
+
+const status =
+remaining === 0
+?
+"🟢 Paid"
+:
+"🟡 Partial";
+
+({ error } =
+
+await supabaseClient
+
+.from("optional_payments")
+
 .update({
 
 class_name:
-
 optionalSelectedStudent.class,
 
 amount_paid:
-
-amountPaid,
+totalPaid,
 
 original_fee:
-
 fee,
 
 remaining_amount:
@@ -2581,10 +2610,15 @@ status:
 status,
 
 updated_at:
-
 new Date()
 
 })
+
+.eq(
+"id",
+existing[0].id
+
+));
 
 .eq(
 "id",
