@@ -1616,11 +1616,15 @@ row.item===item;
 
 const matchStatus =
 
-status===""
+status === ""
 
 ||
 
-row.status===status;
+row.status
+.toLowerCase()
+.includes(
+status.toLowerCase()
+);
 
 return(
 
