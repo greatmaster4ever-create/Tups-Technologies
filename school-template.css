@@ -1402,9 +1402,11 @@ min-width:unset;
 }
 .restore-btn{
 
-background:#198754;
+background:#fff !important;
 
-color:#fff;
+color:#000 !important;
+
+font-weight:700;
 
 }
 

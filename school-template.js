@@ -7700,6 +7700,10 @@ console.log(
     "adminContent"
   ).innerHTML = `
 
+<h3>
+  💰 Set Term Fees
+</h3>
+
     <div
   style="
     display:flex;
