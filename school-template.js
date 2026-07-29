@@ -3055,14 +3055,6 @@ console.log(
     return;
 
   }
-  
-  data = (data || []).filter(student =>
-
-    student.student_name &&
-
-    String(student.student_name).trim() !== ""
-
-);
 
   let html = `
 
