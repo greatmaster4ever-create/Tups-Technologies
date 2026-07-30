@@ -15,14 +15,80 @@
   z-index: 99999;
 }
 
-.result-card {
-  width: 90%;
-  max-width: 450px;
-  background: #fff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-  position: relative;
+.result-card{
+
+width:90%;
+max-width:450px;
+
+background:#fff;
+
+padding:25px;
+
+border-radius:12px;
+
+box-shadow:0 15px 40px rgba(0,0,0,.3);
+
+position:relative;
+
+transition:
+width .35s ease,
+max-width .35s ease,
+height .35s ease;
+
+}
+
+/* ===========================
+DESKTOP RESULT VIEW
+===========================*/
+
+@media (min-width:769px){
+
+.result-card.show-result{
+
+max-width:1400px;
+
+width:95%;
+
+height:82vh;
+
+display:flex;
+
+flex-direction:column;
+
+}
+
+.result-card.show-result #resultViewer{
+
+flex:1;
+
+overflow:hidden;
+
+display:flex;
+
+flex-direction:column;
+
+}
+
+.result-card.show-result iframe{
+
+width:100%;
+
+height:100%;
+
+border:none;
+
+}
+
+.result-card.show-result #downloadBtn{
+
+margin-top:15px;
+
+align-self:center;
+
+width:260px;
+
+}
+
 }
 
 .result-card h3 {

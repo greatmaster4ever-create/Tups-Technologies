@@ -63,6 +63,10 @@ function closeResultChecker() {
   document.getElementById("resultSchoolCode").value = "";
   document.getElementById("resultRegNo").value = "";
 
+  document
+.getElementById("resultCard")
+.classList.remove("show-result");
+
   // 3. Clear previous result display
   document.getElementById("resultViewer").innerHTML = "";
 }
@@ -157,6 +161,10 @@ async function checkStudentResult() {
     ) || 0;
 
   if (paid < expected) {
+	  
+	document
+.getElementById("resultCard")
+.classList.add("show-result");
 
     document.getElementById(
       "resultViewer"
