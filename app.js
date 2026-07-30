@@ -197,10 +197,10 @@ document.getElementById(
   <iframe
     src="${previewUrl}"
     style="
-      width:100%;
-      height:500px;
-      border:none;
-    "
+width:100%;
+height:65vh;
+border:none;
+"
   ></iframe>
 
   <br><br>
