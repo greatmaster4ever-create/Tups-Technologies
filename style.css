@@ -340,3 +340,35 @@ form button:hover {
       0 0 10px white;
   }
 }
+
+/* =========================================
+   RESULT VIEWER - DESKTOP ONLY
+========================================= */
+
+@media (min-width: 769px) {
+
+  /* Make the popup itself much wider */
+  .result-card{
+
+    max-width: 1250px;
+    width:95%;
+
+  }
+
+  /* Make the embedded result much taller */
+  #resultViewer iframe{
+
+    width:100% !important;
+    height:78vh !important;
+    border-radius:10px;
+
+  }
+
+  /* Keep download button visible */
+  #downloadBtn{
+
+    margin-top:15px;
+
+  }
+
+}
