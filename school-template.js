@@ -3390,7 +3390,7 @@ if (
 window.viewStudentInfo =
   viewStudentInfo;
   
-  async function openStudentUpdateForm(
+async function openStudentUpdateForm(
   studentId
 ) {
 
@@ -3418,8 +3418,8 @@ window.viewStudentInfo =
   }
 
   document.getElementById(
-  "adminContent"
-).innerHTML = `
+    "adminContent"
+  ).innerHTML = `
 
 <div class="student-update-form">
 
@@ -3481,33 +3481,83 @@ window.viewStudentInfo =
 
     <br><br>
 
-   
-   <div class="student-form-buttons">
+    <div class="student-form-buttons">
 
-  <button type="submit"
-      class="admin-btn"
-      onclick="
-        saveStudentInfo(
-          ${studentId}
-        )
-      "
-    >
-    Update
-  </button>
+      <button
+        type="button"
+        id="termFeesUpdateBtn"
+        class="admin-btn"
+        onclick="
+  processTermFeesPayment(
+    ${studentId}
+  )
+"
+      >
+        Update
+      </button>
 
-  <button type="button"
-      class="admin-btn"
-      onclick="
-        openStudentUpdateForm(
-          ${studentId}
-        )
-      "
-    >
-    Clear
-  </button>
+      <button
+        type="button"
+        class="admin-btn"
+        onclick="
+          openStudentUpdateForm(
+            ${studentId}
+          )
+        "
+      >
+        Clear
+      </button>
 
-</div>
+    </div>
+
   </div>`;
+
+}
+
+async function processTermFeesPayment(
+  studentId
+) {
+
+  const button =
+    document.getElementById(
+      "termFeesUpdateBtn"
+    );
+
+  if (!button) {
+    return;
+  }
+
+  // Prevent another click while processing
+  if (button.disabled) {
+    return;
+  }
+
+  // Lock button immediately
+  button.disabled = true;
+
+  button.textContent =
+    "Processing...";
+
+  try {
+
+    // Run the existing payment/update function
+    await saveStudentInfo(
+      studentId
+    );
+
+  }
+
+  finally {
+
+    // Unlock only after saveStudentInfo()
+    // has completely finished, including
+    // dismissal of the success alert
+    button.disabled = false;
+
+    button.textContent =
+      "Update";
+
+  }
 
 }
 
