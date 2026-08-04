@@ -2426,253 +2426,292 @@ document.getElementById(
 
 async function saveOptionalPayment(){
 
-if(!optionalSelectedStudent){
+    const paymentBtn = document.getElementById(
+        "optionalUpdatePaymentBtn"
+    );
 
-alert(
-"Please select a student."
-);
+    // Prevent double-click while payment is processing
+    if(paymentBtn.disabled){
+        return;
+    }
 
-return;
+    // Lock button immediately
+    paymentBtn.disabled = true;
+    paymentBtn.textContent = "Processing...";
 
-}
+    try {
 
-const dropdown =
+        if(!optionalSelectedStudent){
 
-document.getElementById(
-"optionalPaymentItem"
-);
+            alert(
+                "Please select a student."
+            );
 
-if(!dropdown.value){
+            return;
 
-alert(
-"Please select an item."
-);
+        }
 
-return;
+        const dropdown =
 
-}
-
-const selectedOption =
-
-dropdown.options[
-dropdown.selectedIndex
-];
-
-const itemName =
-selectedOption.text;
-
-const fee =
-
-Number(
-selectedOption.dataset.fee
-);
-
-const amountPaid =
-
-Number(
-
-document.getElementById(
-"optionalAmountPaid"
-).value
-
-);
-
-if(
-
-isNaN(amountPaid)
-
-||
-
-amountPaid<=0
-
-){
-
-alert(
-"Enter a valid amount."
-);
-
-return;
-
-}
-
-const remaining =
-
-Math.max(
-
-fee-amountPaid,
-
-0
-
-);
-
-const status =
-remaining === 0
-?
-"🟢 Paid"
-:
-"🟡 Partial";
-
-// =========================
-// CHECK EXISTING PAYMENT
-// =========================
-
-const {
-
-data: existing,
-error: existingError
-
-} = await supabaseClient
-
-.from("optional_payments")
-
-.select(
-"id, amount_paid, original_fee"
-)
-
-.eq(
-"school_code",
-currentSchoolCode
-)
-
-.eq(
-"student_id",
-optionalSelectedStudent.id
-)
-
-.eq(
-"item",
-itemName
-
-);
-
-if(existingError){
-
-alert(existingError.message);
-
-return;
-
-}
-
-let error;
-
-if (existing && existing.length) {
-
-    const previousPaid =
-        Number(existing[0].amount_paid) || 0;
-
-    const totalPaid =
-        previousPaid + amountPaid;
-
-    const remaining =
-        Math.max(
-            fee - totalPaid,
-            0
+        document.getElementById(
+            "optionalPaymentItem"
         );
 
-    const status =
-        remaining === 0
-            ? "🟢 Paid"
-            : "🟡 Partial";
+        if(!dropdown.value){
 
-    ({ error } = await supabaseClient
+            alert(
+                "Please select an item."
+            );
+
+            return;
+
+        }
+
+        const selectedOption =
+
+        dropdown.options[
+            dropdown.selectedIndex
+        ];
+
+        const itemName =
+            selectedOption.text;
+
+        const fee =
+
+        Number(
+            selectedOption.dataset.fee
+        );
+
+        const amountPaid =
+
+        Number(
+
+            document.getElementById(
+                "optionalAmountPaid"
+            ).value
+
+        );
+
+        if(
+
+            isNaN(amountPaid)
+
+            ||
+
+            amountPaid <= 0
+
+        ){
+
+            alert(
+                "Enter a valid amount."
+            );
+
+            return;
+
+        }
+
+        const remaining =
+
+        Math.max(
+
+            fee - amountPaid,
+
+            0
+
+        );
+
+        const status =
+            remaining === 0
+                ? "🟢 Paid"
+                : "🟡 Partial";
+
+
+        // =========================
+        // CHECK EXISTING PAYMENT
+        // =========================
+
+        const {
+
+            data: existing,
+            error: existingError
+
+        } = await supabaseClient
 
         .from("optional_payments")
 
-        .update({
-
-            class_name:
-                optionalSelectedStudent.class,
-
-            amount_paid:
-                totalPaid,
-
-            original_fee:
-                fee,
-
-            remaining_amount:
-                remaining,
-
-            status:
-                status,
-
-            updated_at:
-                new Date()
-
-        })
+        .select(
+            "id, amount_paid, original_fee"
+        )
 
         .eq(
-            "id",
-            existing[0].id
-        ));
+            "school_code",
+            currentSchoolCode
+        )
 
-}
+        .eq(
+            "student_id",
+            optionalSelectedStudent.id
+        )
 
-else{
+        .eq(
+            "item",
+            itemName
+        );
 
-({ error } =
 
-await supabaseClient
+        if(existingError){
 
-.from("optional_payments")
+            alert(
+                existingError.message
+            );
 
-.insert({
+            return;
 
-school_code:
-currentSchoolCode,
+        }
 
-student_id:
-optionalSelectedStudent.id,
 
-student_name:
-optionalSelectedStudent.student_name,
+        let error;
 
-reg_no:
-optionalSelectedStudent.reg_no,
 
-department:
-optionalSelectedStudent.department,
+        if(existing && existing.length){
 
-class_name:
-optionalSelectedStudent.class,
+            const previousPaid =
+                Number(
+                    existing[0].amount_paid
+                ) || 0;
 
-item:
-itemName,
+            const totalPaid =
+                previousPaid + amountPaid;
 
-original_fee:
-fee,
+            const remaining =
+                Math.max(
+                    fee - totalPaid,
+                    0
+                );
 
-amount_paid:
-amountPaid,
+            const status =
+                remaining === 0
+                    ? "🟢 Paid"
+                    : "🟡 Partial";
 
-remaining_amount:
-remaining,
 
-status:
-status,
+            ({ error } = await supabaseClient
 
-created_at:
-new Date(),
+                .from("optional_payments")
 
-updated_at:
-new Date()
+                .update({
 
-}));
+                    class_name:
+                        optionalSelectedStudent.class,
 
-}
+                    amount_paid:
+                        totalPaid,
 
-if(error){
+                    original_fee:
+                        fee,
 
-alert(error.message);
+                    remaining_amount:
+                        remaining,
 
-return;
+                    status:
+                        status,
 
-}
+                    updated_at:
+                        new Date()
 
-alert(
-"Optional Payment Updated Successfully."
-);
+                })
 
-closeOptionalPaymentModal();
+                .eq(
+                    "id",
+                    existing[0].id
+                ));
+
+        }
+
+        else{
+
+            ({ error } =
+
+                await supabaseClient
+
+                .from("optional_payments")
+
+                .insert({
+
+                    school_code:
+                        currentSchoolCode,
+
+                    student_id:
+                        optionalSelectedStudent.id,
+
+                    student_name:
+                        optionalSelectedStudent.student_name,
+
+                    reg_no:
+                        optionalSelectedStudent.reg_no,
+
+                    department:
+                        optionalSelectedStudent.department,
+
+                    class_name:
+                        optionalSelectedStudent.class,
+
+                    item:
+                        itemName,
+
+                    original_fee:
+                        fee,
+
+                    amount_paid:
+                        amountPaid,
+
+                    remaining_amount:
+                        remaining,
+
+                    status:
+                        status,
+
+                    created_at:
+                        new Date(),
+
+                    updated_at:
+                        new Date()
+
+                })
+
+            );
+
+        }
+
+
+        if(error){
+
+            alert(
+                error.message
+            );
+
+            return;
+
+        }
+
+
+        alert(
+            "Optional Payment Updated Successfully."
+        );
+
+
+        closeOptionalPaymentModal();
+
+    }
+
+    finally {
+
+        // Unlock only after the payment operation
+        // and any alert have finished
+        paymentBtn.disabled = false;
+        paymentBtn.textContent = "Update Payment";
+
+    }
 
 }
 
