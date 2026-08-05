@@ -3426,6 +3426,361 @@ async function loadAdvertisements() {
 
 }
 
+/* =========================================================
+   UPLOAD ADVERTISEMENT
+========================================================= */
+
+async function uploadAdvertisement() {
+
+    const titleInput =
+        document.getElementById(
+            "advertisementTitle"
+        );
+
+    const fileInput =
+        document.getElementById(
+            "advertisementFile"
+        );
+
+    const status =
+        document.getElementById(
+            "advertisementUploadStatus"
+        );
+
+
+    const title =
+        (
+            titleInput?.value ||
+            ""
+        ).trim();
+
+
+    const file =
+        fileInput?.files?.[0];
+
+
+    /* -----------------------------------------
+       VALIDATION
+    ----------------------------------------- */
+
+    if (!file) {
+
+        if (status) {
+
+            status.style.color =
+                "red";
+
+            status.textContent =
+                "Please select an advertisement image.";
+
+        }
+
+        return;
+
+    }
+
+
+    if (!schoolCode) {
+
+        if (status) {
+
+            status.style.color =
+                "red";
+
+            status.textContent =
+                "School code is unavailable.";
+
+        }
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------
+       SHOW UPLOAD STATUS
+    ----------------------------------------- */
+
+    if (status) {
+
+        status.style.color =
+            "#000066";
+
+        status.textContent =
+            "Uploading advertisement...";
+
+    }
+
+
+    try {
+
+        /* -----------------------------------------
+           CONVERT IMAGE TO BASE64
+        ----------------------------------------- */
+
+        const base64Data =
+            await new Promise(
+                (resolve, reject) => {
+
+                    const reader =
+                        new FileReader();
+
+
+                    reader.onload =
+                        () => {
+
+                            resolve(
+                                reader.result
+                            );
+
+                        };
+
+
+                    reader.onerror =
+                        reject;
+
+
+                    reader.readAsDataURL(
+                        file
+                    );
+
+                }
+            );
+
+
+        /* -----------------------------------------
+           SEND TO APPS SCRIPT
+        ----------------------------------------- */
+
+        const response =
+            await fetch(
+                APPS_SCRIPT_URL,
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/x-www-form-urlencoded"
+
+                    },
+
+                    body:
+                        new URLSearchParams({
+
+                            action:
+                                "uploadSchoolMedia",
+
+                            schoolCode:
+                                schoolCode,
+
+                            mediaType:
+                                "advertisement",
+
+                            fileName:
+                                file.name,
+
+                            mimeType:
+                                file.type,
+
+                            fileData:
+                                base64Data
+
+                        })
+
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        /* -----------------------------------------
+           APPS SCRIPT ERROR
+        ----------------------------------------- */
+
+        if (
+            !result ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result?.error ||
+                "Advertisement upload failed."
+            );
+
+        }
+
+
+        /* -----------------------------------------
+           DETERMINE DISPLAY ORDER
+        ----------------------------------------- */
+
+        const {
+            data: existingAds,
+            error: orderError
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communications"
+                )
+
+                .select(
+                    "display_order"
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                )
+
+                .eq(
+                    "content_type",
+                    "advertisement"
+                )
+                .order(
+                    "display_order",
+                    {
+                        ascending:
+                            false
+                    }
+                )
+                .limit(1);
+
+
+        if (orderError) {
+
+            throw orderError;
+
+        }
+
+
+        const nextOrder =
+            existingAds &&
+            existingAds.length
+                ? (
+                    Number(
+                        existingAds[0]
+                            .display_order
+                    ) || 0
+                ) + 1
+                : 1;
+
+
+        /* -----------------------------------------
+           SAVE METADATA TO SUPABASE
+        ----------------------------------------- */
+
+        const {
+            error: insertError
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communications"
+                )
+
+                .insert({
+
+                    school_code:
+                        schoolCode,
+
+                    content_type:
+                        "advertisement",
+
+                    title:
+                        title ||
+                        file.name,
+
+                    drive_file_id:
+                        result.fileId,
+
+                    image_url:
+                        result.downloadUrl,
+
+                    is_active:
+                        true,
+
+                    display_order:
+                        nextOrder
+
+                });
+
+
+        if (insertError) {
+
+            throw insertError;
+
+        }
+
+
+        /* -----------------------------------------
+           SUCCESS
+        ----------------------------------------- */
+
+        if (status) {
+
+            status.style.color =
+                "green";
+
+            status.textContent =
+                "Advertisement uploaded successfully.";
+
+        }
+
+
+        /* Clear form */
+
+        if (titleInput) {
+
+            titleInput.value =
+                "";
+
+        }
+
+
+        if (fileInput) {
+
+            fileInput.value =
+                "";
+
+        }
+
+
+        /* Refresh advertisement list */
+
+        await loadAdvertisements();
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Advertisement Upload Error:",
+            error
+        );
+
+
+        if (status) {
+
+            status.style.color =
+                "red";
+
+            status.textContent =
+                error.message ||
+                "Unable to upload advertisement.";
+
+        }
+
+    }
+
+}
+
+
 
 async function syncStudentsFromSheet() {
 
