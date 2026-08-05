@@ -1755,6 +1755,30 @@ const slides =
         ".slide"
     );
 
+console.log(
+    "SLIDE COUNT:",
+    slides.length
+);
+
+console.log(
+    "FIRST SLIDE CLASS:",
+    slides[0]?.className
+);
+
+console.log(
+    "FIRST SLIDE OPACITY:",
+    slides[0]
+        ? getComputedStyle(slides[0]).opacity
+        : "NO SLIDE"
+);
+
+console.log(
+    "FIRST SLIDE RECT:",
+    slides[0]
+        ? slides[0].getBoundingClientRect()
+        : "NO SLIDE"
+);
+
 
 if (
     slides.length <= 1
