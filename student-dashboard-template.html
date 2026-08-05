@@ -2041,6 +2041,65 @@ window.addEventListener(
     }
 );
 
+/* =========================================================
+   STUDENT DASHBOARD — 5 MINUTE INACTIVITY TIMEOUT
+========================================================= */
+
+const STUDENT_DASHBOARD_TIMEOUT =
+    5 * 60 * 1000;
+
+let studentDashboardTimeout;
+
+
+/* Reset the inactivity timer */
+
+function resetStudentDashboardTimeout() {
+
+    clearTimeout(
+        studentDashboardTimeout
+    );
+
+    studentDashboardTimeout =
+        setTimeout(
+            function () {
+
+                logoutStudentDashboard();
+
+            },
+            STUDENT_DASHBOARD_TIMEOUT
+        );
+}
+
+
+/* User activity */
+
+[
+    "click",
+    "mousemove",
+    "mousedown",
+    "keydown",
+    "touchstart",
+    "scroll"
+].forEach(
+    function (eventName) {
+
+        document.addEventListener(
+            eventName,
+            resetStudentDashboardTimeout,
+            {
+                passive: true
+            }
+        );
+
+    }
+);
+
+
+/* Start timer when dashboard is loaded */
+
+resetStudentDashboardTimeout();
+
+
 async function loadOptionalPaymentHistory() {
 
     const paymentBody =
