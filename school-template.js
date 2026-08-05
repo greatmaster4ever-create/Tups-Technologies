@@ -3781,6 +3781,183 @@ async function uploadAdvertisement() {
 }
 
 /* =========================================================
+   DELETE ADVERTISEMENT
+========================================================= */
+
+async function deleteAdvertisement(
+    advertisementId,
+    driveFileId
+) {
+
+    const confirmed =
+        confirm(
+            "Are you sure you want to delete this advertisement?"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        /* -----------------------------------------
+           VALIDATION
+        ----------------------------------------- */
+
+        if (!schoolCode) {
+
+            throw new Error(
+                "School code is unavailable."
+            );
+
+        }
+
+
+        if (!driveFileId) {
+
+            throw new Error(
+                "Google Drive file ID is missing."
+            );
+
+        }
+
+
+        /* -----------------------------------------
+           DELETE FILE FROM GOOGLE DRIVE
+        ----------------------------------------- */
+
+        const formData =
+            new URLSearchParams();
+
+
+        formData.append(
+            "action",
+            "deleteSchoolMedia"
+        );
+
+        formData.append(
+            "schoolCode",
+            schoolCode
+        );
+
+        formData.append(
+            "fileId",
+            driveFileId
+        );
+
+
+        const response =
+            await fetch(
+
+                "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
+
+                {
+
+                    method:
+                        "POST",
+
+                    body:
+                        formData
+
+                }
+
+            );
+
+
+        const result =
+            await response.json();
+
+
+        console.log(
+            "DELETE SCHOOL MEDIA RESPONSE:",
+            result
+        );
+
+
+        /* -----------------------------------------
+           APPS SCRIPT ERROR
+        ----------------------------------------- */
+
+        if (
+            !result ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result?.error ||
+                "Google Drive deletion failed."
+            );
+
+        }
+
+
+        /* -----------------------------------------
+           DELETE SUPABASE RECORD
+        ----------------------------------------- */
+
+        const {
+            error:
+                deleteError
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communications"
+                )
+
+                .delete()
+
+                .eq(
+                    "id",
+                    advertisementId
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                );
+
+
+        if (deleteError) {
+
+            throw deleteError;
+
+        }
+
+
+        /* -----------------------------------------
+           REFRESH ADVERTISEMENT LIST
+        ----------------------------------------- */
+
+        await loadAdvertisements();
+
+
+        alert(
+            "Advertisement deleted successfully."
+        );
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Delete Advertisement Error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to delete advertisement."
+        );
+
+    }
+
+}
+
+/* =========================================================
    TOGGLE ADVERTISEMENT STATUS
 ========================================================= */
 
