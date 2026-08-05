@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Student Dashboard</title>
+
+<style>
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f3f6fa;
+    color: #222;
+}
+
+
+/* =========================================================
+   DASHBOARD WRAPPER
+========================================================= */
+
+.student-dashboard {
+    width: 100%;
+    max-width: 1500px;
+    margin: auto;
+    padding: 20px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.dashboard-header {
+
+    width: 100%;
+
+    min-height: 90px;
+
+    background: white;
+
+    border-radius: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    padding: 15px 25px;
+
+    margin-bottom: 20px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,0.08);
+
+}
+
+.school-logo {
+
+    width: 65px;
+
+    height: 65px;
+
+    object-fit: contain;
+
+    border-radius: 8px;
+
+}
+
+.dashboard-title {
+
+    margin: 0;
+
+    font-size: clamp(20px, 2.5vw, 32px);
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   MAIN DASHBOARD
+========================================================= */
+
+.dashboard-main {
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(280px, 1fr)
+        minmax(500px, 3fr);
+
+    gap: 20px;
+
+    align-items: start;
+
+}
+
+
+/* =========================================================
+   LEFT STUDENT CARD
+========================================================= */
+
+.student-card {
+
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,0.08);
+
+}
+
+
+/* =========================================================
+   STUDENT PROFILE HEADER
+========================================================= */
+
+.student-profile-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 20px;
+
+}
+
+.student-passport {
+
+    width: 75px;
+
+    height: 90px;
+
+    object-fit: cover;
+
+    border-radius: 8px;
+
+    border: 1px solid #ddd;
+
+}
+
+.student-info-title {
+
+    margin: 0;
+
+    font-size: 20px;
+
+}
+
+
+/* =========================================================
+   INFORMATION
+========================================================= */
+
+.student-information {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+}
+
+.info-row {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+
+}
+
+.info-label {
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    color: #777;
+
+    text-transform: uppercase;
+
+}
+
+.info-value {
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    word-break: break-word;
+
+}
+
+
+/* =========================================================
+   TEACHER COMMENT
+========================================================= */
+
+.section-title {
+
+    margin-top: 25px;
+
+    margin-bottom: 10px;
+
+    padding-bottom: 7px;
+
+    border-bottom: 2px solid #eee;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+}
+
+.teacher-comment {
+
+    background: #f6f8fb;
+
+    border-left: 4px solid #000066;
+
+    padding: 12px;
+
+    border-radius: 5px;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+}
+
+
+/* =========================================================
+   PAYMENT TABLES
+========================================================= */
+
+.payment-table-wrapper {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+}
+
+.payment-table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    font-size: 12px;
+
+}
+
+.payment-table th {
+
+    background: #000066;
+
+    color: white;
+
+    padding: 8px;
+
+    text-align: left;
+
+    white-space: nowrap;
+
+}
+
+.payment-table td {
+
+    padding: 8px;
+
+    border-bottom: 1px solid #eee;
+
+    white-space: nowrap;
+
+}
+
+.no-record {
+
+    text-align: center;
+
+    color: #888;
+
+    padding: 15px !important;
+
+}
+
+
+/* =========================================================
+   PRINT / DOWNLOAD
+========================================================= */
+
+.student-card-actions {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-top: 20px;
+
+}
+
+.dashboard-btn {
+
+    border: none;
+
+    border-radius: 6px;
+
+    padding: 10px 14px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+
+    font-weight: bold;
+
+}
+
+.print-btn {
+
+    background: #000066;
+
+    color: white;
+
+}
+
+.download-btn {
+
+    background: #00a86b;
+
+    color: white;
+
+}
+
+
+/* =========================================================
+   RIGHT COLUMN
+========================================================= */
+
+.right-column {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+
+}
+
+
+/* =========================================================
+   ADVERTISEMENT CARD
+========================================================= */
+
+.advertisement-card {
+
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 15px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,0.08);
+
+}
+
+
+/* =========================================================
+   SLIDESHOW
+========================================================= */
+
+.slideshow-container {
+
+    width: 100%;
+
+    aspect-ratio: 16 / 7;
+
+    background: #111;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    position: relative;
+
+}
+
+.slide {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    object-fit: cover;
+
+    opacity: 0;
+
+    transition:
+        opacity 0.8s ease;
+
+}
+
+.slide.active {
+
+    opacity: 1;
+
+}
+
+
+/* =========================================================
+   ANNOUNCEMENTS + FLYER
+========================================================= */
+
+.advertisement-lower {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 15px;
+
+    margin-top: 15px;
+
+}
+
+.announcement-card,
+.flyer-card {
+
+    min-height: 220px;
+
+    background: #f7f9fc;
+
+    border-radius: 8px;
+
+    padding: 15px;
+
+}
+
+.advert-small-title {
+
+    margin: 0 0 10px 0;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+}
+
+.announcement-content {
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+}
+
+.flyer-image {
+
+    width: 100%;
+
+    height: 170px;
+
+    object-fit: contain;
+
+    border-radius: 5px;
+
+}
+
+
+/* =========================================================
+   COMMUNICATION BOOK
+========================================================= */
+
+.communication-book {
+
+    background: white;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 3px 12px rgba(0,0,0,0.08);
+
+}
+
+.communication-title {
+
+    margin: 0 0 15px 0;
+
+    font-size: 18px;
+
+}
+
+.communication-messages {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+
+    max-height: 500px;
+
+    overflow-y: auto;
+
+}
+
+.communication-message {
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    background: #f5f7fa;
+
+}
+
+.communication-message.teacher {
+
+    border-left: 4px solid #000066;
+
+}
+
+.communication-message.parent {
+
+    border-left: 4px solid #00a86b;
+
+}
+
+.message-header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-bottom: 6px;
+
+}
+
+.message-sender {
+
+    font-weight: bold;
+
+    font-size: 13px;
+
+}
+
+.message-date {
+
+    font-size: 11px;
+
+    color: #777;
+
+}
+
+.message-text {
+
+    font-size: 13px;
+
+    line-height: 1.6;
+
+    white-space: pre-wrap;
+
+}
+
+
+/* =========================================================
+   PARENT MESSAGE FORM
+========================================================= */
+
+.parent-message-box {
+
+    margin-top: 15px;
+
+}
+
+.parent-message-box textarea {
+
+    width: 100%;
+
+    min-height: 90px;
+
+    resize: vertical;
+
+    padding: 10px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 7px;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+}
+
+.send-message-btn {
+
+    margin-top: 8px;
+
+    background: #000066;
+
+    color: white;
+
+}
+
+
+/* =========================================================
+   EMPTY STATES
+========================================================= */
+
+.empty-state {
+
+    text-align: center;
+
+    padding: 30px 15px;
+
+    color: #888;
+
+    font-size: 13px;
+
+}
+
+
+/* =========================================================
+   MOBILE RESPONSIVENESS
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .student-dashboard {
+
+        padding: 10px;
+
+    }
+
+    .dashboard-main {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .right-column {
+
+        width: 100%;
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .dashboard-header {
+
+        padding: 12px;
+
+        gap: 12px;
+
+    }
+
+    .school-logo {
+
+        width: 50px;
+
+        height: 50px;
+
+    }
+
+    .dashboard-title {
+
+        font-size: 18px;
+
+    }
+
+    .student-card,
+    .advertisement-card,
+    .communication-book {
+
+        padding: 14px;
+
+        border-radius: 9px;
+
+    }
+
+    .advertisement-lower {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .announcement-card,
+    .flyer-card {
+
+        min-height: auto;
+
+    }
+
+    .student-profile-header {
+
+        align-items: flex-start;
+
+    }
+
+    .student-passport {
+
+        width: 65px;
+
+        height: 78px;
+
+    }
+
+    .student-card-actions {
+
+        flex-direction: column;
+
+    }
+
+    .dashboard-btn {
+
+        width: 100%;
+
+    }
+
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print {
+
+    body {
+
+        background: white;
+
+    }
+
+    body * {
+
+        visibility: hidden;
+
+    }
+
+    #studentCard,
+    #studentCard * {
+
+        visibility: visible;
+
+    }
+
+    #studentCard {
+
+        position: absolute;
+
+        left: 0;
+
+        top: 0;
+
+        width: 100%;
+
+        box-shadow: none;
+
+    }
+
+    .student-card-actions {
+
+        display: none;
+
+    }
+
+}
+
+</style>
+
+<link
+    rel="stylesheet"
+    href="student-dashboard-template.css"
+>
+
+</head>
+
+
+<body>
+
+
+<div class="student-dashboard">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="dashboard-header">
+
+        <img
+            id="schoolLogo"
+            class="school-logo"
+            src=""
+            alt="School Logo"
+        >
+
+        <h1
+            id="dashboardTitle"
+            class="dashboard-title"
+        >
+            Welcome to Students Dashboard
+        </h1>
+
+    </header>
+
+
+    <!-- =====================================================
+         MAIN TWO-COLUMN AREA
+    ====================================================== -->
+
+    <main class="dashboard-main">
+
+
+        <!-- =================================================
+             LEFT CARD
+        ================================================== -->
+
+        <section
+            id="studentCard"
+            class="student-card"
+        >
+
+            <div class="student-profile-header">
+
+                <img
+                    id="studentPassport"
+                    class="student-passport"
+                    src=""
+                    alt="Student Passport"
+                >
+
+                <h2 class="student-info-title">
+                    STUDENT INFO
+                </h2>
+
+            </div>
+
+
+            <div class="student-information">
+
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Name:
+                    </span>
+
+                    <span
+                        id="studentName"
+                        class="info-value"
+                    >
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Class:
+                    </span>
+
+                    <span
+                        id="studentClass"
+                        class="info-value"
+                    >
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Admission Number:
+                    </span>
+
+                    <span
+                        id="studentRegNo"
+                        class="info-value"
+                    >
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Address:
+                    </span>
+
+                    <span
+                        id="studentAddress"
+                        class="info-value"
+                    >
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Parent Contact 1:
+                    </span>
+
+                    <span
+                        id="parentContact1"
+                        class="info-value"
+                    >
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Parent Contact 2:
+                    </span>
+
+                    <span
+                        id="parentContact2"
+                        class="info-value"
+                    >
+                        —
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =============================================
+                 TEACHER COMMENT
+            ============================================== -->
+
+            <div class="section-title">
+
+                CLASS TEACHER'S PROGRESS COMMENT
+
+            </div>
+
+            <div
+                id="teacherComment"
+                class="teacher-comment"
+            >
+
+                No progress comment available yet.
+
+            </div>
+
+
+            <!-- =============================================
+                 SCHOOL FEES
+            ============================================== -->
+
+<div class="payment-history-section">
+
+    <div class="payment-history-title">
+        SCHOOL FEES PAYMENT HISTORY
+    </div>
+
+    <div class="payment-history-table-wrapper">
+
+        <table class="payment-history-table">
+
+            <thead>
+                <tr>
+                    <th>TERM FEE</th>
+                    <th>AMOUNT</th>
+                    <th>DATE</th>
+                    <th>TIME</th>
+                </tr>
+            </thead>
+
+            <tbody id="schoolFeesPaymentBody">
+
+                <tr>
+                    <td colspan="4">
+                        Loading...
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+            <!-- =============================================
+                 OPTIONAL PAYMENTS
+            ============================================== -->
+
+            <div class="section-title">
+
+                OPTIONAL PAYMENT HISTORY
+
+            </div>
+
+
+            <div class="payment-table-wrapper">
+
+                <table class="payment-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Optional Item
+                            </th>
+
+                            <th>
+                                Amount Paid
+                            </th>
+
+                            <th>
+                                Date
+                            </th>
+
+                            <th>
+                                Time
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="optionalPaymentHistory"
+                    >
+
+                        <tr>
+
+                            <td
+                                colspan="4"
+                                class="no-record"
+                            >
+                                No current-term optional payments.
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- =============================================
+                 PRINT / DOWNLOAD
+            ============================================== -->
+
+            <div class="student-card-actions">
+
+                <button
+                    type="button"
+                    class="dashboard-btn print-btn"
+                    onclick="printStudentCard()"
+                >
+                    PRINT
+                </button>
+
+
+                <button
+                    type="button"
+                    class="dashboard-btn download-btn"
+                    onclick="downloadStudentCard()"
+                >
+                    DOWNLOAD
+                </button>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =================================================
+             RIGHT COLUMN
+        ================================================== -->
+
+        <section class="right-column">
+
+
+            <!-- =============================================
+                 ADVERTISEMENT CARD
+            ============================================== -->
+
+            <div class="advertisement-card">
+
+
+                <!-- SLIDESHOW -->
+
+                <div
+                    id="slideshow"
+                    class="slideshow-container"
+                >
+
+                    <div class="empty-state">
+                        School advertisements will appear here.
+                    </div>
+
+                </div>
+
+
+                <!-- ANNOUNCEMENTS + FLYER -->
+
+                <div class="advertisement-lower">
+
+
+                    <div class="announcement-card">
+
+                        <h3 class="advert-small-title">
+                            ANNOUNCEMENTS
+                        </h3>
+
+                        <div
+                            id="announcements"
+                            class="announcement-content"
+                        >
+
+                            No announcements available.
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="flyer-card">
+
+                        <h3 class="advert-small-title">
+                            SCHOOL INFORMATION
+                        </h3>
+
+                        <img
+                            id="schoolFlyer"
+                            class="flyer-image"
+                            src=""
+                            alt="School Flyer"
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+            <!-- =============================================
+                 COMMUNICATION BOOK
+                 BELONGS TO RIGHT COLUMN
+            ============================================== -->
+
+            <div class="communication-book">
+
+
+                <h2 class="communication-title">
+                    COMMUNICATION BOOK
+                </h2>
+
+
+                <div
+                    id="communicationMessages"
+                    class="communication-messages"
+                >
+
+                    <div class="empty-state">
+
+                        No communication messages yet.
+
+                    </div>
+
+                </div>
+
+
+                <!-- PARENT RESPONSE -->
+
+                <div class="parent-message-box">
+
+                    <textarea
+                        id="parentMessage"
+                        placeholder="Write a message to the class teacher..."
+                    ></textarea>
+
+
+                    <button
+                        type="button"
+                        class="dashboard-btn send-message-btn"
+                        onclick="sendParentMessage()"
+                    >
+                        SEND MESSAGE
+                    </button>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+    "https://sgdrncpiqingjwxmkqij.supabase.co";
+
+const SUPABASE_ANON_KEY =
+    "sb_publishable_CFLKvoqepTX4UqzG5XjumQ_TJ2T2hFj";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+
+
+/* =========================================================
+   DASHBOARD PARAMETERS
+========================================================= */
+
+const dashboardParams =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const schoolCode =
+    (
+        dashboardParams.get("school") || ""
+    ).trim();
+
+const regNo =
+    (
+        dashboardParams.get("reg_no") || ""
+    ).trim();
+
+
+/* =========================================================
+   PAGE START
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    async function () {
+
+        if (!schoolCode || !regNo) {
+
+            showDashboardError(
+                "Invalid student dashboard link."
+            );
+
+            return;
+
+        }
+
+        await loadStudentDashboard();
+
+        startDemoSlideshow();
+
+    }
+);
+
+
+/* =========================================================
+   LOAD STUDENT DASHBOARD
+========================================================= */
+
+async function loadStudentDashboard() {
+
+    try {
+
+        /* -----------------------------------------
+           LOAD SCHOOL INFORMATION
+        ----------------------------------------- */
+
+        const {
+            data: schoolData,
+            error: schoolError
+        } = await supabaseClient
+
+            .from("schools")
+
+            .select(
+                "school_code, School_name, logo_url"
+            )
+
+            .eq(
+                "school_code",
+                schoolCode
+            )
+
+            .maybeSingle();
+
+
+        if (schoolError) {
+
+            throw schoolError;
+
+        }
+
+
+        if (!schoolData) {
+
+            showDashboardError(
+                "School information could not be found."
+            );
+
+            return;
+
+        }
+
+
+        /* -----------------------------------------
+           SCHOOL NAME
+        ----------------------------------------- */
+
+        document.getElementById(
+            "dashboardTitle"
+        ).textContent =
+            `Welcome to ${
+                schoolData.School_name
+            } Students Dashboard`;
+
+
+        /* -----------------------------------------
+           SCHOOL LOGO
+        ----------------------------------------- */
+
+        const schoolLogo =
+            document.getElementById(
+                "schoolLogo"
+            );
+
+
+        if (schoolData.logo_url) {
+
+            schoolLogo.src =
+                schoolData.logo_url;
+
+            schoolLogo.style.display =
+                "block";
+
+        }
+        else {
+
+            schoolLogo.style.display =
+                "none";
+
+        }
+
+
+        /* -----------------------------------------
+           LOAD STUDENT
+        ----------------------------------------- */
+
+        const {
+            data: studentData,
+            error: studentError
+        } = await supabaseClient
+
+            .from("students")
+
+            .select(`
+                id,
+                school_code,
+                student_name,
+                class,
+                reg_no,
+                address,
+                parent_contact1,
+                parent_contact2,
+                passport_url,
+                department
+            `)
+
+            .eq(
+                "school_code",
+                schoolCode
+            )
+
+            .eq(
+                "reg_no",
+                regNo
+            )
+
+            .maybeSingle();
+
+
+        if (studentError) {
+
+            throw studentError;
+
+        }
+
+
+        if (!studentData) {
+
+            showDashboardError(
+                "Student record could not be found."
+            );
+
+            return;
+
+        }
+
+
+        /* -----------------------------------------
+           STUDENT NAME
+        ----------------------------------------- */
+
+        document.getElementById(
+            "studentName"
+        ).textContent =
+            studentData.student_name || "—";
+
+
+        /* -----------------------------------------
+           CLASS
+        ----------------------------------------- */
+
+        document.getElementById(
+            "studentClass"
+        ).textContent =
+            studentData.class || "—";
+
+
+        /* -----------------------------------------
+           REGISTRATION / ADMISSION NUMBER
+        ----------------------------------------- */
+
+        document.getElementById(
+            "studentRegNo"
+        ).textContent =
+            studentData.reg_no || "—";
+
+
+        /* -----------------------------------------
+           ADDRESS
+        ----------------------------------------- */
+
+        document.getElementById(
+            "studentAddress"
+        ).textContent =
+            studentData.address || "—";
+
+
+        /* -----------------------------------------
+           PARENT CONTACT 1
+        ----------------------------------------- */
+
+        document.getElementById(
+            "parentContact1"
+        ).textContent =
+            studentData.parent_contact1 || "—";
+
+
+        /* -----------------------------------------
+           PARENT CONTACT 2
+        ----------------------------------------- */
+
+        document.getElementById(
+            "parentContact2"
+        ).textContent =
+            studentData.parent_contact2 || "—";
+
+
+        /* -----------------------------------------
+           PASSPORT
+        ----------------------------------------- */
+
+        const passport =
+            document.getElementById(
+                "studentPassport"
+            );
+
+
+        if (studentData.passport_url) {
+
+            passport.src =
+                studentData.passport_url;
+
+            passport.style.display =
+                "block";
+
+        }
+        else {
+
+            passport.style.display =
+                "none";
+
+        }
+
+
+        /* -----------------------------------------
+           STORE STUDENT DATA
+           FOR NEXT MODULES
+        ----------------------------------------- */
+
+       window.currentStudent =
+    studentData;
+
+window.currentSchool =
+    schoolData;
+
+await loadSchoolFeesPaymentHistory();
+
+await loadOptionalPaymentHistory();
+
+        console.log(
+            "Student Dashboard Loaded:",
+            studentData
+        );
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Student Dashboard Error:",
+            error
+        );
+
+        showDashboardError(
+            error.message ||
+            "Unable to load student dashboard."
+        );
+
+    }
+
+}
+
+/* =========================================================
+   LOAD SCHOOL FEES PAYMENT HISTORY
+========================================================= */
+
+async function loadSchoolFeesPaymentHistory() {
+
+    const paymentBody =
+        document.getElementById(
+            "schoolFeesPaymentBody"
+        );
+
+    if (!paymentBody) {
+        return;
+    }
+
+    if (!window.currentStudent) {
+
+        paymentBody.innerHTML = `
+            <tr>
+                <td colspan="4">
+                    Student information unavailable.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+
+            .from("student_payments")
+
+            .select(`
+                amount_paid,
+                payment_date
+            `)
+
+            .eq(
+                "school_code",
+                schoolCode
+            )
+
+            .eq(
+                "student_id",
+                window.currentStudent.id
+            )
+
+            .order(
+                "payment_date",
+                {
+                    ascending: false
+                }
+            );
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        /* -----------------------------------------
+           NO PAYMENTS
+        ----------------------------------------- */
+
+        if (!data || !data.length) {
+
+            paymentBody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="4"
+                        style="text-align:center;"
+                    >
+                        No school fees payment
+                        recorded.
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+
+        /* -----------------------------------------
+           DISPLAY PAYMENTS
+        ----------------------------------------- */
+
+        paymentBody.innerHTML =
+            data.map(
+                payment => {
+
+                    const paymentDate =
+                        new Date(
+                            payment.payment_date
+                        );
+
+
+                    const date =
+                        paymentDate.toLocaleDateString(
+                            "en-GB"
+                        );
+
+
+                    const time =
+                        paymentDate.toLocaleTimeString(
+                            "en-US",
+                            {
+                                hour: "numeric",
+                                minute: "2-digit",
+                                hour12: true
+                            }
+                        );
+
+
+                    const amount =
+                        Number(
+                            payment.amount_paid
+                        ) || 0;
+
+
+                    return `
+
+                        <tr>
+
+                            <td>
+                                Term Fee
+                            </td>
+
+                            <td>
+                                ₦${amount.toLocaleString(
+                                    "en-NG",
+                                    {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }
+                                )}
+                            </td>
+
+                            <td>
+                                ${date}
+                            </td>
+
+                            <td>
+                                ${time}
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                }
+            ).join("");
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "School Fees Payment History Error:",
+            error
+        );
+
+
+        paymentBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="4"
+                    style="color:red;text-align:center;"
+                >
+                    Unable to load payment history.
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   ERROR DISPLAY
+========================================================= */
+
+function showDashboardError(
+    message
+) {
+
+    document.querySelector(
+        ".student-dashboard"
+    ).innerHTML = `
+
+        <div style="
+            min-height:70vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            text-align:center;
+            padding:30px;
+        ">
+
+            <div style="
+                background:white;
+                padding:35px;
+                border-radius:12px;
+                box-shadow:
+                    0 3px 15px
+                    rgba(0,0,0,0.10);
+                max-width:500px;
+            ">
+
+                <h2>
+                    Student Dashboard
+                </h2>
+
+                <p style="
+                    color:#777;
+                    line-height:1.6;
+                ">
+                    ${message}
+                </p>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================================================
+   DEMO SLIDESHOW
+========================================================= */
+
+function startDemoSlideshow() {
+
+    /*
+       Advertisement loading will be connected
+       after the dashboard's student information
+       is confirmed working.
+    */
+
+}
+
+
+/* =========================================================
+   SEND PARENT MESSAGE
+========================================================= */
+
+async function sendParentMessage() {
+
+    const messageBox =
+        document.getElementById(
+            "parentMessage"
+        );
+
+    const message =
+        messageBox.value.trim();
+
+
+    if (!message) {
+
+        alert(
+            "Please enter a message."
+        );
+
+        return;
+
+    }
+
+
+    alert(
+        "Communication system will be connected in the next stage."
+    );
+
+}
+
+
+/* =========================================================
+   PRINT STUDENT CARD
+========================================================= */
+
+function printStudentCard() {
+
+    window.print();
+
+}
+
+
+/* =========================================================
+   DOWNLOAD STUDENT CARD
+========================================================= */
+
+function downloadStudentCard() {
+
+    alert(
+        "Download function will be connected in the next stage."
+    );
+
+}
+
+async function loadOptionalPaymentHistory() {
+
+    const paymentBody =
+        document.getElementById(
+            "optionalPaymentHistoryBody"
+        );
+
+    if (!paymentBody) {
+        return;
+    }
+
+    if (!window.currentStudent) {
+
+        paymentBody.innerHTML = `
+            <tr>
+                <td colspan="4">
+                    Student information unavailable.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+
+            .from("optional_payments")
+
+            .select("*")
+
+            .eq(
+                "school_code",
+                schoolCode
+            )
+
+            .eq(
+                "student_id",
+                window.currentStudent.id
+            )
+
+            .order(
+                "created_at",
+                {
+                    ascending: false
+                }
+            );
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data || !data.length) {
+
+            paymentBody.innerHTML = `
+                <tr>
+                    <td
+                        colspan="4"
+                        style="text-align:center;"
+                    >
+                        No optional payment
+                        recorded.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        paymentBody.innerHTML =
+            data.map(
+                row => {
+
+                    const date =
+                        new Date(
+                            row.created_at
+                        );
+
+                    return `
+                        <tr>
+
+                            <td>
+                                ${
+                                    row.item ||
+                                    "Optional Fee"
+                                }
+                            </td>
+
+                            <td>
+                                ₦${Number(
+                                    row.amount_paid || 0
+                                ).toLocaleString(
+                                    "en-NG",
+                                    {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    }
+                                )}
+                            </td>
+
+                            <td>
+                                ${date.toLocaleDateString(
+                                    "en-GB"
+                                )}
+                            </td>
+
+                            <td>
+                                ${date.toLocaleTimeString(
+                                    "en-US",
+                                    {
+                                        hour: "numeric",
+                                        minute: "2-digit",
+                                        hour12: true
+                                    }
+                                )}
+                            </td>
+
+                        </tr>
+                    `;
+
+                }
+            ).join("");
+
+    }
+    catch (error) {
+
+        console.error(
+            "Optional Payment History Error:",
+            error
+        );
+
+        paymentBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="4"
+                    style="color:red;text-align:center;"
+                >
+                    Unable to load optional
+                    payment history.
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
