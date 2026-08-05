@@ -414,3 +414,46 @@ form button:hover {
       0 0 10px white;
   }
 }
+
+/* =====================================================
+   GLOBAL STUDENT ACTION BUTTONS
+===================================================== */
+
+.global-student-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.student-info-btn {
+    background: #000066;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.student-info-btn:hover {
+    opacity: 0.9;
+}
+
+
+/* Mobile */
+
+@media (max-width: 600px) {
+
+    .global-student-actions {
+        gap: 6px;
+    }
+
+    .global-student-actions button {
+        font-size: 10px;
+        padding: 8px 10px;
+    }
+
+}

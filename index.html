@@ -42,13 +42,25 @@
      
     <div class="login-card">
 	  
-	  <div> 
-	   <!-- Result Checker-->
-         <button class="result-checker-btn" 
-		         onclick="openResultChecker()">
-            RESULT CHECKER
-         </button>
-	  </div>
+	 <div class="global-student-actions">
+
+    <!-- Result Checker -->
+    <button
+        class="result-checker-btn"
+        onclick="openResultChecker()"
+    >
+        RESULT CHECKER
+    </button>
+
+    <!-- Student Info -->
+    <button
+        class="student-info-btn"
+        onclick="openStudentInfoChecker()"
+    >
+        CHECK STUDENT INFO
+    </button>
+
+</div>
 	  
       <img src="logo.JPG" alt="App Logo" class="logo">
       <h1 class="app-title">TupsTechnologies</h1>
@@ -117,6 +129,56 @@ id="resultCard">
     <div id="resultViewer"></div>
 
   </div>
+
+</div>
+
+<!-- =====================================================
+     STUDENT INFO CHECKER MODAL
+===================================================== -->
+
+<div
+    id="studentInfoModal"
+    class="result-modal"
+    style="display:none;"
+>
+
+    <div
+        class="result-card student-info-checker-card"
+    >
+
+        <button
+            class="result-close"
+            onclick="closeStudentInfoChecker()"
+        >
+            ✕
+        </button>
+
+        <h3>
+            Student Information
+        </h3>
+
+        <input
+            type="text"
+            id="studentInfoSchoolCode"
+            placeholder="School Code"
+        >
+
+        <input
+            type="text"
+            id="studentInfoRegNo"
+            placeholder="Admission Number"
+        >
+
+        <button
+            class="result-checker-btn"
+            onclick="viewStudentInfoDashboard()"
+        >
+            <span>
+                View Student Info
+            </span>
+        </button>
+
+    </div>
 
 </div>
   
