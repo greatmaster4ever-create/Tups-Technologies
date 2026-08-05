@@ -3780,7 +3780,78 @@ async function uploadAdvertisement() {
 
 }
 
+/* =========================================================
+   TOGGLE ADVERTISEMENT STATUS
+========================================================= */
 
+async function toggleAdvertisementStatus(
+    advertisementId,
+    currentStatus
+) {
+
+    try {
+
+        const {
+            error
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communications"
+                )
+
+                .update({
+
+                    is_active:
+                        !currentStatus,
+
+                    updated_at:
+                        new Date().toISOString()
+
+                })
+
+                .eq(
+                    "id",
+                    advertisementId
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                );
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        /* -----------------------------------------
+           REFRESH LIST
+        ----------------------------------------- */
+
+        await loadAdvertisements();
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Toggle Advertisement Status Error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to update advertisement status."
+        );
+
+    }
+
+}
 
 async function syncStudentsFromSheet() {
 
