@@ -3552,10 +3552,10 @@ async function uploadAdvertisement() {
            SEND TO APPS SCRIPT
         ----------------------------------------- */
 
-        const response =
-            await fetch(
-                APPS_SCRIPT_URL,
-                {
+       const response =
+    await fetch(
+        "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
+        {
 
                     method:
                         "POST",
