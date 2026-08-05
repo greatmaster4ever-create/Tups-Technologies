@@ -8,566 +8,362 @@ const supabaseKey = "sb_publishable_CFLKvoqepTX4UqzG5XjumQ_TJ2T2hFj";
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 window.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM READY");
+console.log("DOM READY");
 
-  const form = document.getElementById("loginForm");
+const form = document.getElementById("loginForm");
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
+form.addEventListener("submit", async (e) => {
+e.preventDefault();
 
-    const schoolCode = document.getElementById("schoolCode").value.trim();
-    const password = document.getElementById("password").value.trim();
+```
+const schoolCode = document.getElementById("schoolCode").value.trim();
+const password = document.getElementById("password").value.trim();
 
-    const { data, error } = await supabaseClient
-      .from("schools")
-      .select("*")
-      .eq("school_code", schoolCode)
-      .eq("password", password)
-      .single();
+const { data, error } = await supabaseClient
+  .from("schools")
+  .select("*")
+  .eq("school_code", schoolCode)
+  .eq("password", password)
+  .single();
 
-    if (error || !data) {
-      alert("Invalid login details");
-      return;
-    }
+if (error || !data) {
+  alert("Invalid login details");
+  return;
+}
 
-    alert("Login successful");
-    
-  sessionStorage.setItem(
+alert("Login successful");
+
+sessionStorage.setItem(
   "school_code",
   data.school_code
 );
 
-    window.location.href = data.school_page;
+window.location.href = data.school_page;
 
-    // NEXT STEP (we will enable redirect later)
-    // window.location.href = data.school_page;
-  });
+// NEXT STEP (we will enable redirect later)
+// window.location.href = data.school_page;
+```
+
+});
 });
 
 function openResultChecker() {
-  document.getElementById("resultModal").style.display = "flex";
+document.getElementById("resultModal").style.display = "flex";
 
-  document.getElementById("resultSchoolCode").value = "";
-  document.getElementById("resultRegNo").value = "";
-  document.getElementById("resultViewer").innerHTML = "";
+document.getElementById("resultSchoolCode").value = "";
+document.getElementById("resultRegNo").value = "";
+document.getElementById("resultViewer").innerHTML = "";
 }
 
 window.openResultChecker =
-  openResultChecker;
+openResultChecker;
 
 function closeResultChecker() {
-  // 1. Hide modal
-  document.getElementById("resultModal").style.display = "none";
 
-  // 2. Clear input fields
-  document.getElementById("resultSchoolCode").value = "";
-  document.getElementById("resultRegNo").value = "";
+// 1. Hide modal
+document.getElementById("resultModal").style.display = "none";
 
-  document
+// 2. Clear input fields
+document.getElementById("resultSchoolCode").value = "";
+document.getElementById("resultRegNo").value = "";
+
+document
 .getElementById("resultCard")
 .classList.remove("show-result");
 
-  // 3. Clear previous result display
-  document.getElementById("resultViewer").innerHTML = "";
+// 3. Clear previous result display
+document.getElementById("resultViewer").innerHTML = "";
 }
 
 function downloadResult(fileUrl) {
 
-  const match =
-    fileUrl.match(/\/d\/(.*?)\//);
+const match =
+fileUrl.match(//d/(.*?)//);
 
-  if (!match) {
-    alert("Invalid Google Drive link.");
-    return;
-  }
+if (!match) {
+alert("Invalid Google Drive link.");
+return;
+}
 
-  const fileId = match[1];
+const fileId = match[1];
 
-  const downloadUrl =
-    `https://drive.google.com/uc?export=download&id=${fileId}`;
+const downloadUrl =
+`https://drive.google.com/uc?export=download&id=${fileId}`;
 
-  const a = document.createElement("a");
-  a.href = downloadUrl;
-  a.target = "_self";
+const a = document.createElement("a");
 
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+a.href = downloadUrl;
+a.target = "_self";
+
+document.body.appendChild(a);
+
+a.click();
+
+document.body.removeChild(a);
 }
 
 async function checkStudentResult() {
 
-  const schoolCode =
-    document.getElementById(
-      "resultSchoolCode"
-    ).value.trim();
+const schoolCode =
+document.getElementById(
+"resultSchoolCode"
+).value.trim();
 
-  const regNo =
-    document.getElementById(
-      "resultRegNo"
-    ).value.trim();
+const regNo =
+document.getElementById(
+"resultRegNo"
+).value.trim();
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("students")
-      .select("*")
-      .eq(
-        "school_code",
-        schoolCode
-      )
-      .eq(
-        "reg_no",
-        regNo
-      )
-      .single();
+const {
+data,
+error
+} =
+await supabaseClient
+.from("students")
+.select("*")
+.eq(
+"school_code",
+schoolCode
+)
+.eq(
+"reg_no",
+regNo
+)
+.single();
 
-  if (error || !data) {
+if (error || !data) {
 
-    alert(
-      "Student not found."
-    );
+```
+alert(
+  "Student not found."
+);
 
-    return;
+return;
+```
 
-  }
+}
 
-  const {
-    data: fee
-  } =
-    await supabaseClient
-      .from("class_fees")
-      .select("term_fee")
-      .eq(
-        "school_code",
-        schoolCode
-      )
-      .eq(
-        "class_name",
-        data.class
-      )
-      .single();
+const {
+data: fee
+} =
+await supabaseClient
+.from("class_fees")
+.select("term_fee")
+.eq(
+"school_code",
+schoolCode
+)
+.eq(
+"class_name",
+data.class
+)
+.single();
 
-  const expected =
-    Number(
-      fee?.term_fee
-    ) || 0;
+const expected =
+Number(
+fee?.term_fee
+) || 0;
 
-  const paid =
-    Number(
-      data.total_fees_paid
-    ) || 0;
+const paid =
+Number(
+data.total_fees_paid
+) || 0;
 
-  if (paid < expected) {
-	  
-	document
-.getElementById("resultCard")
-.classList.add("show-result");
+if (paid < expected) {
 
-    document.getElementById(
-      "resultViewer"
-    ).innerHTML = `
-
-      <p style="
-        color:red;
-        font-weight:bold;
-      ">
-        Result unavailable.
-        Please contact the school administrator/accounts.
-      </p>
-
-    `;
-
-    return;
-
-  }
-
-console.log(data.result_url);
-const previewUrl =
-  data.result_url.replace(
-    "/view",
-    "/preview"
-  );
+```
+document
+  .getElementById("resultCard")
+  .classList.add("show-result");
 
 document.getElementById(
   "resultViewer"
 ).innerHTML = `
-  <iframe
-    src="${previewUrl}"
-    style="
-width:100%;
-height:65vh;
-border:none;
-"
-  ></iframe>
 
-  <br><br>
+  <p style="
+    color:red;
+    font-weight:bold;
+  ">
+    Result unavailable.
+    Please contact the school administrator/accounts.
+  </p>
 
-  <button
-    type="button"
-    id="downloadBtn"
-  >
-    Download Result
-  </button>
 `;
 
-document.getElementById(
-  "downloadBtn"
-).addEventListener(
-  "click",
-  function (e) {
+return;
+```
 
-    e.preventDefault();
-
-    downloadResult(
-      data.result_url
-    );
-
-  }
-);
 }
-
-console.log("APP JS LOADED");
-
-// 🔴 REPLACE THESE WITH YOUR REAL SUPABASE DETAILS
-const supabaseUrl = "https://sgdrncpiqingjwxmkqij.supabase.co";
-const supabaseKey = "sb_publishable_CFLKvoqepTX4UqzG5XjumQ_TJ2T2hFj";
-
-// create client
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-
-window.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM READY");
-
-  const form = document.getElementById("loginForm");
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const schoolCode = document.getElementById("schoolCode").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    const { data, error } = await supabaseClient
-      .from("schools")
-      .select("*")
-      .eq("school_code", schoolCode)
-      .eq("password", password)
-      .single();
-
-    if (error || !data) {
-      alert("Invalid login details");
-      return;
-    }
-
-    alert("Login successful");
-    
-  sessionStorage.setItem(
-  "school_code",
-  data.school_code
-);
-
-    window.location.href = data.school_page;
-
-    // NEXT STEP (we will enable redirect later)
-    // window.location.href = data.school_page;
-  });
-});
-
-function openResultChecker() {
-  document.getElementById("resultModal").style.display = "flex";
-
-  document.getElementById("resultSchoolCode").value = "";
-  document.getElementById("resultRegNo").value = "";
-  document.getElementById("resultViewer").innerHTML = "";
-}
-
-window.openResultChecker =
-  openResultChecker;
-
-function closeResultChecker() {
-  // 1. Hide modal
-  document.getElementById("resultModal").style.display = "none";
-
-  // 2. Clear input fields
-  document.getElementById("resultSchoolCode").value = "";
-  document.getElementById("resultRegNo").value = "";
-
-  document
-.getElementById("resultCard")
-.classList.remove("show-result");
-
-  // 3. Clear previous result display
-  document.getElementById("resultViewer").innerHTML = "";
-}
-
-function downloadResult(fileUrl) {
-
-  const match =
-    fileUrl.match(/\/d\/(.*?)\//);
-
-  if (!match) {
-    alert("Invalid Google Drive link.");
-    return;
-  }
-
-  const fileId = match[1];
-
-  const downloadUrl =
-    `https://drive.google.com/uc?export=download&id=${fileId}`;
-
-  const a = document.createElement("a");
-  a.href = downloadUrl;
-  a.target = "_self";
-
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
-async function checkStudentResult() {
-
-  const schoolCode =
-    document.getElementById(
-      "resultSchoolCode"
-    ).value.trim();
-
-  const regNo =
-    document.getElementById(
-      "resultRegNo"
-    ).value.trim();
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .from("students")
-      .select("*")
-      .eq(
-        "school_code",
-        schoolCode
-      )
-      .eq(
-        "reg_no",
-        regNo
-      )
-      .single();
-
-  if (error || !data) {
-
-    alert(
-      "Student not found."
-    );
-
-    return;
-
-  }
-
-  const {
-    data: fee
-  } =
-    await supabaseClient
-      .from("class_fees")
-      .select("term_fee")
-      .eq(
-        "school_code",
-        schoolCode
-      )
-      .eq(
-        "class_name",
-        data.class
-      )
-      .single();
-
-  const expected =
-    Number(
-      fee?.term_fee
-    ) || 0;
-
-  const paid =
-    Number(
-      data.total_fees_paid
-    ) || 0;
-
-  if (paid < expected) {
-	  
-	document
-.getElementById("resultCard")
-.classList.add("show-result");
-
-    document.getElementById(
-      "resultViewer"
-    ).innerHTML = `
-
-      <p style="
-        color:red;
-        font-weight:bold;
-      ">
-        Result unavailable.
-        Please contact the school administrator/accounts.
-      </p>
-
-    `;
-
-    return;
-
-  }
 
 console.log(data.result_url);
+
 const previewUrl =
-  data.result_url.replace(
-    "/view",
-    "/preview"
-  );
+data.result_url.replace(
+"/view",
+"/preview"
+);
 
 document.getElementById(
-  "resultViewer"
+"resultViewer"
 ).innerHTML = `
+
   <iframe
     src="${previewUrl}"
     style="
-width:100%;
-height:65vh;
-border:none;
-"
+      width:100%;
+      height:65vh;
+      border:none;
+    "
   ></iframe>
 
-  <br><br>
+<br><br>
 
-  <button
-    type="button"
-    id="downloadBtn"
-  >
-    Download Result
+<button
+type="button"
+id="downloadBtn"
+
+>
+
+```
+Download Result
+```
+
   </button>
+
 `;
 
 document.getElementById(
-  "downloadBtn"
+"downloadBtn"
 ).addEventListener(
-  "click",
-  function (e) {
+"click",
+function (e) {
 
-    e.preventDefault();
+```
+  e.preventDefault();
 
-    downloadResult(
-      data.result_url
-    );
+  downloadResult(
+    data.result_url
+  );
 
-  }
+}
+```
+
 );
+
 }
 
 /* =====================================================
-   STUDENT INFO CHECKER
+STUDENT INFO CHECKER
 ===================================================== */
 
 function openStudentInfoChecker() {
 
-    const modal =
-        document.getElementById(
-            "studentInfoModal"
-        );
-
-    if (!modal) {
-        return;
-    }
-
+```
+const modal =
     document.getElementById(
-        "studentInfoSchoolCode"
-    ).value = "";
+        "studentInfoModal"
+    );
 
-    document.getElementById(
-        "studentInfoRegNo"
-    ).value = "";
+if (!modal) {
+    return;
+}
 
-    modal.style.display = "flex";
+document.getElementById(
+    "studentInfoSchoolCode"
+).value = "";
+
+document.getElementById(
+    "studentInfoRegNo"
+).value = "";
+
+modal.style.display = "flex";
+```
 
 }
 
-
 /* =====================================================
-   CLOSE STUDENT INFO CHECKER
+CLOSE STUDENT INFO CHECKER
 ===================================================== */
 
 function closeStudentInfoChecker() {
 
-    const modal =
-        document.getElementById(
-            "studentInfoModal"
-        );
+```
+const modal =
+    document.getElementById(
+        "studentInfoModal"
+    );
 
-    if (!modal) {
-        return;
-    }
+if (!modal) {
+    return;
+}
 
-    modal.style.display = "none";
+modal.style.display = "none";
+```
 
 }
 
-
 /* =====================================================
-   OPEN STUDENT DASHBOARD
+OPEN STUDENT DASHBOARD
 ===================================================== */
 
 function viewStudentInfoDashboard() {
 
-    const schoolCode =
-        document.getElementById(
-            "studentInfoSchoolCode"
-        ).value.trim();
+```
+const schoolCode =
+    document.getElementById(
+        "studentInfoSchoolCode"
+    ).value.trim();
 
-    const regNo =
-        document.getElementById(
-            "studentInfoRegNo"
-        ).value.trim();
-
-
-    if (!schoolCode) {
-
-        alert(
-            "Please enter the School Code."
-        );
-
-        return;
-
-    }
+const regNo =
+    document.getElementById(
+        "studentInfoRegNo"
+    ).value.trim();
 
 
-    if (!regNo) {
+if (!schoolCode) {
 
-        alert(
-            "Please enter the Admission Number."
-        );
+    alert(
+        "Please enter the School Code."
+    );
 
-        return;
+    return;
 
-    }
-
-
-    /*
-       Pass the two values to the Student Dashboard
-       through the URL.
-
-       The dashboard itself will perform the
-       student lookup.
-    */
-
-    const dashboardUrl =
-        "student-dashboard-template.html"
-        + "?school_code="
-        + encodeURIComponent(
-            schoolCode
-        )
-        + "&reg_no="
-        + encodeURIComponent(
-            regNo
-        );
+}
 
 
-    window.location.href =
-        dashboardUrl;
+if (!regNo) {
+
+    alert(
+        "Please enter the Admission Number."
+    );
+
+    return;
+
+}
+
+
+/*
+   Pass the two values to the Student Dashboard
+   through the URL.
+
+   The dashboard itself will perform the
+   student lookup.
+*/
+
+const dashboardUrl =
+    "student-dashboard-template.html"
+    + "?school_code="
+    + encodeURIComponent(
+        schoolCode
+    )
+    + "&reg_no="
+    + encodeURIComponent(
+        regNo
+    );
+
+
+window.location.href =
+    dashboardUrl;
+```
 
 }
