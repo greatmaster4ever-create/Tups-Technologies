@@ -1779,6 +1779,64 @@ console.log(
         : "NO SLIDE"
 );
 
+const firstSlide =
+    slides[0];
+
+console.log(
+    "FIRST SLIDE SRC:",
+    firstSlide
+        ? firstSlide.src
+        : "NO SLIDE"
+);
+
+console.log(
+    "FIRST SLIDE COMPLETE:",
+    firstSlide
+        ? firstSlide.complete
+        : "NO SLIDE"
+);
+
+console.log(
+    "FIRST SLIDE NATURAL WIDTH:",
+    firstSlide
+        ? firstSlide.naturalWidth
+        : "NO SLIDE"
+);
+
+console.log(
+    "FIRST SLIDE NATURAL HEIGHT:",
+    firstSlide
+        ? firstSlide.naturalHeight
+        : "NO SLIDE"
+);
+
+
+if (firstSlide) {
+
+    firstSlide.onload =
+        function () {
+
+            console.log(
+                "ADVERTISEMENT IMAGE LOADED:",
+                firstSlide.naturalWidth,
+                "x",
+                firstSlide.naturalHeight
+            );
+
+        };
+
+
+    firstSlide.onerror =
+        function () {
+
+            console.error(
+                "ADVERTISEMENT IMAGE FAILED TO LOAD:",
+                firstSlide.src
+            );
+
+        };
+
+}
 
 if (
     slides.length <= 1
