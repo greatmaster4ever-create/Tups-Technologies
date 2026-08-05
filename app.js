@@ -317,15 +317,15 @@ function viewStudentInfoDashboard() {
 
 
     const dashboardUrl =
-        "student-dashboard-template.html"
-        + "?school_code="
-        + encodeURIComponent(
-            schoolCode
-        )
-        + "&reg_no="
-        + encodeURIComponent(
-            regNo
-        );
+    "student-dashboard-template.html"
+    + "?schoolCode="
+    + encodeURIComponent(
+        schoolCode
+    )
+    + "&regNo="
+    + encodeURIComponent(
+        regNo
+    );
 
 
     window.location.href =
