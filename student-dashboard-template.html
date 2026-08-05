@@ -2022,6 +2022,25 @@ document.addEventListener(
     }
 );
 
+/* =========================================================
+   INVALIDATE DASHBOARD SESSION WHEN LEAVING
+========================================================= */
+
+window.addEventListener(
+    "pagehide",
+    function () {
+
+        sessionStorage.removeItem(
+            "student_dashboard_school"
+        );
+
+        sessionStorage.removeItem(
+            "student_dashboard_reg_no"
+        );
+
+    }
+);
+
 async function loadOptionalPaymentHistory() {
 
     const paymentBody =
