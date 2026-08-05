@@ -435,6 +435,29 @@ const adminDashboardHTML = `
   👨‍🎓 Students & Fees
 </button>
 
+<!-- =====================================================
+     NEW — ADVERTS
+===================================================== -->
+
+<button
+  class="admin-tab"
+  onclick="showAdverts()"
+>
+  📢 Adverts
+</button>
+
+
+<!-- =====================================================
+     NEW — COMMUNICATION BOOK
+===================================================== -->
+
+<button
+  class="admin-tab"
+  onclick="showCommunicationBook()"
+>
+  📖 Communication Book
+</button>
+
 <div class="admin-dropdown">
 
 <button class="admin-tab-btn" 
@@ -2945,6 +2968,464 @@ async function showStudentsFees() {
   wireStudentsModule();
 
 }
+
+/* =========================================================
+   ADVERTISEMENTS MODULE
+   ========================================================= */
+
+async function showAdverts() {
+
+  const adminContent =
+    document.getElementById(
+      "adminContent"
+    );
+
+  if (!adminContent) {
+    return;
+  }
+
+
+  adminContent.innerHTML = `
+
+    <div
+      style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:15px;
+        flex-wrap:wrap;
+        margin-bottom:20px;
+      "
+    >
+
+      <div>
+
+        <h3
+          style="
+            margin:0 0 5px 0;
+          "
+        >
+          📢 Advertisements
+        </h3>
+
+        <p
+          style="
+            margin:0;
+            color:#666;
+          "
+        >
+          Upload and manage advertisements
+          displayed on the Student Dashboard.
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="admin-btn"
+        onclick="openAdvertisementUpload()"
+      >
+        ➕ Upload Advertisement
+      </button>
+
+    </div>
+
+
+    <!-- =========================================
+         UPLOAD AREA
+    ========================================== -->
+
+    <div
+      id="advertisementUploadArea"
+      style="
+        display:none;
+        padding:20px;
+        margin-bottom:20px;
+        border:1px solid #ddd;
+        border-radius:10px;
+        background:#f8f9fa;
+      "
+    >
+
+      <h4
+        style="
+          margin-top:0;
+        "
+      >
+        Upload Advertisement
+      </h4>
+
+
+      <div
+        style="
+          display:flex;
+          flex-direction:column;
+          gap:12px;
+          max-width:600px;
+        "
+      >
+
+        <input
+          type="text"
+          id="advertisementTitle"
+          placeholder="Advertisement title"
+        >
+
+
+        <input
+          type="file"
+          id="advertisementFile"
+          accept="image/*"
+        >
+
+
+        <div
+          style="
+            display:flex;
+            gap:10px;
+            flex-wrap:wrap;
+          "
+        >
+
+          <button
+            type="button"
+            class="admin-btn"
+            onclick="uploadAdvertisement()"
+          >
+            ⬆ Upload
+          </button>
+
+
+          <button
+            type="button"
+            class="admin-btn"
+            onclick="closeAdvertisementUpload()"
+          >
+            Cancel
+          </button>
+
+        </div>
+
+
+        <div
+          id="advertisementUploadStatus"
+          style="
+            font-size:14px;
+          "
+        ></div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =========================================
+         EXISTING ADVERTISEMENTS
+    ========================================== -->
+
+    <div
+      id="advertisementsList"
+    >
+      Loading advertisements...
+    </div>
+
+  `;
+
+
+  await loadAdvertisements();
+
+}
+
+/* =========================================================
+   OPEN ADVERTISEMENT UPLOAD
+========================================================= */
+
+function openAdvertisementUpload() {
+
+  const area =
+    document.getElementById(
+      "advertisementUploadArea"
+    );
+
+  if (area) {
+
+    area.style.display =
+      "block";
+
+  }
+
+}
+
+
+/* =========================================================
+   CLOSE ADVERTISEMENT UPLOAD
+========================================================= */
+
+function closeAdvertisementUpload() {
+
+  const area =
+    document.getElementById(
+      "advertisementUploadArea"
+    );
+
+  if (area) {
+
+    area.style.display =
+      "none";
+
+  }
+
+}
+
+/* =========================================================
+   LOAD ADVERTISEMENTS
+========================================================= */
+
+async function loadAdvertisements() {
+
+  const container =
+    document.getElementById(
+      "advertisementsList"
+    );
+
+  if (!container) {
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+
+      .from(
+        "school_communications"
+      )
+
+      .select("*")
+
+      .eq(
+        "school_code",
+        schoolCode
+      )
+
+      .eq(
+        "content_type",
+        "advertisement"
+      )
+
+      .order(
+        "display_order",
+        {
+          ascending:true
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Load Advertisements Error:",
+      error
+    );
+
+    container.innerHTML = `
+
+      <p
+        style="
+          color:red;
+        "
+      >
+        Unable to load advertisements.
+      </p>
+
+    `;
+
+    return;
+
+  }
+
+
+  if (!data || !data.length) {
+
+    container.innerHTML = `
+
+      <div
+        style="
+          padding:30px;
+          text-align:center;
+          border:1px dashed #ccc;
+          border-radius:10px;
+          color:#777;
+        "
+      >
+
+        No advertisements uploaded yet.
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  container.innerHTML = `
+
+    <div
+      style="
+        overflow-x:auto;
+      "
+    >
+
+      <table
+        class="admin-table"
+      >
+
+        <thead>
+
+          <tr>
+
+            <th>Preview</th>
+
+            <th>Title</th>
+
+            <th>Status</th>
+
+            <th>Order</th>
+
+            <th>Date Added</th>
+
+            <th>Action</th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          ${data.map(
+            advert => {
+
+              const image =
+                advert.image_url
+                  ? `
+                    <img
+                      src="${advert.image_url}"
+                      style="
+                        width:120px;
+                        height:70px;
+                        object-fit:cover;
+                        border-radius:6px;
+                      "
+                    >
+                  `
+                  : "No preview";
+
+
+              const status =
+                advert.is_active
+                  ? "Active"
+                  : "Inactive";
+
+
+              return `
+
+                <tr>
+
+                  <td>
+                    ${image}
+                  </td>
+
+
+                  <td>
+                    ${
+                      advert.title ||
+                      "Untitled Advertisement"
+                    }
+                  </td>
+
+
+                  <td>
+                    ${status}
+                  </td>
+
+
+                  <td>
+                    ${advert.display_order}
+                  </td>
+
+
+                  <td>
+                    ${
+                      advert.created_at
+                        ? new Date(
+                            advert.created_at
+                          ).toLocaleDateString(
+                            "en-GB"
+                          )
+                        : "—"
+                    }
+                  </td>
+
+
+                  <td>
+
+                    <button
+                      type="button"
+                      class="admin-btn"
+                      onclick="
+                        toggleAdvertisementStatus(
+                          '${advert.id}',
+                          ${advert.is_active}
+                        )
+                      "
+                    >
+                      ${
+                        advert.is_active
+                          ? "Deactivate"
+                          : "Activate"
+                      }
+                    </button>
+
+
+                    <button
+                      type="button"
+                      class="admin-btn"
+                      onclick="
+                        deleteAdvertisement(
+                          '${advert.id}',
+                          '${advert.drive_file_id || ""}'
+                        )
+                      "
+                    >
+                      🗑 Delete
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              `;
+
+            }
+
+          ).join("")}
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  `;
+
+}
+
 
 async function syncStudentsFromSheet() {
 
