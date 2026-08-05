@@ -3406,6 +3406,32 @@ async function loadAdvertisements() {
                       🗑 Delete
                     </button>
 
+<button
+  type="button"
+  class="admin-btn"
+  onclick="
+    moveAdvertisementUp(
+      '${advert.id}',
+      ${advert.display_order}
+    )
+  "
+>
+  ↑
+</button>
+
+
+<button
+  type="button"
+  class="admin-btn"
+  onclick="
+    moveAdvertisementDown(
+      '${advert.id}',
+      ${advert.display_order}
+    )
+  "
+>
+  ↓
+</button>
                   </td>
 
                 </tr>
@@ -3951,6 +3977,427 @@ async function deleteAdvertisement(
         alert(
             error.message ||
             "Unable to delete advertisement."
+        );
+
+    }
+
+}
+
+/* =========================================================
+   MOVE ADVERTISEMENT UP
+========================================================= */
+
+async function moveAdvertisementUp(
+    advertisementId,
+    currentOrder
+) {
+
+    try {
+
+        if (
+            currentOrder <= 1
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+         * Find the advertisement immediately
+         * above this one.
+         */
+
+        const {
+            data: previousAds,
+            error: previousError
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communications"
+                )
+
+                .select(
+                    "id, display_order"
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                )
+
+                .eq(
+                    "content_type",
+                    "advertisement"
+                )
+
+                .eq(
+                    "display_order",
+                    currentOrder - 1
+                )
+
+                .limit(1);
+
+
+        if (previousError) {
+
+            throw previousError;
+
+        }
+
+
+        if (
+            !previousAds ||
+            !previousAds.length
+        ) {
+
+            return;
+
+        }
+
+
+        const previousId =
+            previousAds[0].id;
+
+
+        /*
+         * Temporarily move current item
+         * to a safe negative order.
+         */
+
+        let {
+            error: tempError
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communications"
+                )
+
+                .update({
+
+                    display_order:
+                        -999999
+
+                })
+
+                .eq(
+                    "id",
+                    advertisementId
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                );
+
+
+        if (tempError) {
+
+            throw tempError;
+
+        }
+
+
+        /*
+         * Move previous item down.
+         */
+
+        let {
+            error: downError
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communications"
+                )
+
+                .update({
+
+                    display_order:
+                        currentOrder
+
+                })
+
+                .eq(
+                    "id",
+                    previousId
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                );
+
+
+        if (downError) {
+
+            throw downError;
+
+        }
+
+
+        /*
+         * Put current item in previous position.
+         */
+
+        let {
+            error: finalError
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communications"
+                )
+
+                .update({
+
+                    display_order:
+                        currentOrder - 1,
+
+                    updated_at:
+                        new Date().toISOString()
+
+                })
+
+                .eq(
+                    "id",
+                    advertisementId
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                );
+
+
+        if (finalError) {
+
+            throw finalError;
+
+        }
+
+
+        await loadAdvertisements();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Move Advertisement Up Error:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Unable to move advertisement."
+        );
+
+    }
+
+}
+
+/* =========================================================
+   MOVE ADVERTISEMENT DOWN
+========================================================= */
+
+async function moveAdvertisementDown(
+    advertisementId,
+    currentOrder
+) {
+
+    try {
+
+        /*
+         * Find the advertisement immediately
+         * below this one.
+         */
+
+        const {
+            data: nextAds,
+            error: nextError
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communications"
+                )
+
+                .select(
+                    "id, display_order"
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                )
+
+                .eq(
+                    "content_type",
+                    "advertisement"
+                )
+
+                .eq(
+                    "display_order",
+                    currentOrder + 1
+                )
+
+                .limit(1);
+
+
+        if (nextError) {
+
+            throw nextError;
+
+        }
+
+
+        if (
+            !nextAds ||
+            !nextAds.length
+        ) {
+
+            return;
+
+        }
+
+
+        const nextId =
+            nextAds[0].id;
+
+
+        /*
+         * Temporarily move current item
+         * to a safe negative order.
+         */
+
+        let {
+            error: tempError
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communications"
+                )
+
+                .update({
+
+                    display_order:
+                        -999999
+
+                })
+
+                .eq(
+                    "id",
+                    advertisementId
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                );
+
+
+        if (tempError) {
+
+            throw tempError;
+
+        }
+
+
+        /*
+         * Move next item up.
+         */
+
+        let {
+            error: upError
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communications"
+                )
+
+                .update({
+
+                    display_order:
+                        currentOrder
+
+                })
+
+                .eq(
+                    "id",
+                    nextId
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                );
+
+
+        if (upError) {
+
+            throw upError;
+
+        }
+
+
+        /*
+         * Put current item in next position.
+         */
+
+        let {
+            error: finalError
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communications"
+                )
+
+                .update({
+
+                    display_order:
+                        currentOrder + 1,
+
+                    updated_at:
+                        new Date().toISOString()
+
+                })
+
+                .eq(
+                    "id",
+                    advertisementId
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                );
+
+
+        if (finalError) {
+
+            throw finalError;
+
+        }
+
+
+        await loadAdvertisements();
+
+    }
+    catch (error) {
+
+        console.error(
+            "Move Advertisement Down Error:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Unable to move advertisement."
         );
 
     }
