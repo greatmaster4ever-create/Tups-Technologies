@@ -228,3 +228,106 @@ document.getElementById(
   }
 );
 }
+
+/* =====================================================
+   STUDENT INFO CHECKER
+   NEW MODULE — DO NOT MODIFY EXISTING CODE ABOVE
+===================================================== */
+
+function openStudentInfoChecker() {
+
+    const modal =
+        document.getElementById(
+            "studentInfoModal"
+        );
+
+    if (!modal) {
+        console.error(
+            "Student Info modal not found."
+        );
+        return;
+    }
+
+    document.getElementById(
+        "studentInfoSchoolCode"
+    ).value = "";
+
+    document.getElementById(
+        "studentInfoRegNo"
+    ).value = "";
+
+    modal.style.display = "flex";
+}
+
+
+/* =====================================================
+   CLOSE STUDENT INFO CHECKER
+===================================================== */
+
+function closeStudentInfoChecker() {
+
+    const modal =
+        document.getElementById(
+            "studentInfoModal"
+        );
+
+    if (!modal) {
+        return;
+    }
+
+    modal.style.display = "none";
+}
+
+
+/* =====================================================
+   VIEW STUDENT INFO
+===================================================== */
+
+function viewStudentInfoDashboard() {
+
+    const schoolCode =
+        document.getElementById(
+            "studentInfoSchoolCode"
+        ).value.trim();
+
+    const regNo =
+        document.getElementById(
+            "studentInfoRegNo"
+        ).value.trim();
+
+
+    if (!schoolCode) {
+
+        alert(
+            "Please enter the School Code."
+        );
+
+        return;
+    }
+
+
+    if (!regNo) {
+
+        alert(
+            "Please enter the Admission Number."
+        );
+
+        return;
+    }
+
+
+    const dashboardUrl =
+        "student-dashboard-template.html"
+        + "?school_code="
+        + encodeURIComponent(
+            schoolCode
+        )
+        + "&reg_no="
+        + encodeURIComponent(
+            regNo
+        );
+
+
+    window.location.href =
+        dashboardUrl;
+}
