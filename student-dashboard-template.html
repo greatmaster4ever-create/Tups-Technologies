@@ -1633,10 +1633,6 @@ await loadOptionalPaymentHistory();
    LOAD STUDENT DASHBOARD ADVERTISEMENTS
 ========================================================= */
 
-/* =========================================================
-   LOAD STUDENT DASHBOARD ADVERTISEMENTS
-========================================================= */
-
 async function loadStudentAdvertisements() {
 
     const slideshow =
@@ -1718,26 +1714,28 @@ async function loadStudentAdvertisements() {
         ----------------------------------------- */
 
         slideshow.innerHTML =
-            data
-                .map(
-                    advert => `
-                        <img
-                            src="${advert.image_url}"
-                            alt="${
-                                advert.title ||
-                                "School Advertisement"
-                            }"
-                            style="
-                                width:100%;
-                                height:100%;
-                                object-fit:cover;
-                                display:block;
-                            "
-                        >
-                    `
-                )
-                .join("");
-
+    data
+        .map(
+            (
+                advert,
+                index
+            ) => `
+                <img
+                    src="${advert.image_url}"
+                    alt="${
+                        advert.title ||
+                        "School Advertisement"
+                    }"
+                    class="slide ${
+                        index === 0
+                            ? "active"
+                            : ""
+                    }"
+                >
+            `
+        )
+        .join("");
+		
 console.log(
     "SLIDESHOW HTML:",
     slideshow.innerHTML
@@ -1748,66 +1746,52 @@ console.log(
     slideshow.querySelectorAll("img")
 );
 
-        /* -----------------------------------------
-           SIMPLE SLIDESHOW
-        ----------------------------------------- */
+  /* -----------------------------------------
+   SLIDESHOW CONTROL
+----------------------------------------- */
 
-        const slides =
-            slideshow.querySelectorAll(
-                "img"
-            );
-
-
-        if (
-            slides.length <= 1
-        ) {
-            return;
-        }
+const slides =
+    slideshow.querySelectorAll(
+        ".slide"
+    );
 
 
-        let currentSlide = 0;
+if (
+    slides.length <= 1
+) {
+    return;
+}
 
 
-        slides.forEach(
+let currentSlide = 0;
+
+
+setInterval(
+    function () {
+
+        slides[
+            currentSlide
+        ].classList.remove(
+            "active"
+        );
+
+
+        currentSlide =
             (
-                slide,
-                index
-            ) => {
+                currentSlide + 1
+            ) %
+            slides.length;
 
-                slide.style.display =
-                    index === 0
-                        ? "block"
-                        : "none";
 
-            }
+        slides[
+            currentSlide
+        ].classList.add(
+            "active"
         );
 
-
-        setInterval(
-            function () {
-
-                slides[
-                    currentSlide
-                ].style.display =
-                    "none";
-
-
-                currentSlide =
-                    (
-                        currentSlide + 1
-                    ) %
-                    slides.length;
-
-
-                slides[
-                    currentSlide
-                ].style.display =
-                    "block";
-
-            },
-            5000
-        );
-
+    },
+    5000
+);
     }
     catch (error) {
 
