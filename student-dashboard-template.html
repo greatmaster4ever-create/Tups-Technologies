@@ -1329,6 +1329,16 @@ const validStudentDashboardSession =
 document.addEventListener(
     "DOMContentLoaded",
     async function () {
+	
+	console.log(
+    "DASHBOARD SCHOOL CODE:",
+    schoolCode
+);
+
+console.log(
+    "DASHBOARD REG NO:",
+    regNo
+);
 
        if (
     !schoolCode ||
@@ -1623,6 +1633,10 @@ await loadOptionalPaymentHistory();
    LOAD STUDENT DASHBOARD ADVERTISEMENTS
 ========================================================= */
 
+/* =========================================================
+   LOAD STUDENT DASHBOARD ADVERTISEMENTS
+========================================================= */
+
 async function loadStudentAdvertisements() {
 
     const slideshow =
@@ -1630,11 +1644,9 @@ async function loadStudentAdvertisements() {
             "slideshow"
         );
 
-
     if (!slideshow) {
         return;
     }
-
 
     try {
 
@@ -1676,19 +1688,19 @@ async function loadStudentAdvertisements() {
 
 
         if (error) {
-
             throw error;
-
         }
 
 
-        /* -----------------------------------------
-           NO ADVERTISEMENTS
-        ----------------------------------------- */
+        console.log(
+            "STUDENT ADVERTISEMENTS:",
+            data
+        );
+
 
         if (
             !data ||
-            !data.length
+            data.length === 0
         ) {
 
             slideshow.innerHTML = `
@@ -1698,60 +1710,68 @@ async function loadStudentAdvertisements() {
             `;
 
             return;
-
         }
 
 
         /* -----------------------------------------
-           CREATE SLIDES
+           BUILD SLIDES
         ----------------------------------------- */
 
         slideshow.innerHTML =
             data
                 .map(
-                    (advert, index) => {
-
-                        return `
-                            <img
-                                src="${advert.image_url}"
-                                class="slide ${
-                                    index === 0
-                                        ? "active"
-                                        : ""
-                                }"
-                                alt="${
-                                    advert.title ||
-                                    "School Advertisement"
-                                }"
-                            >
-                        `;
-
-                    }
+                    advert => `
+                        <img
+                            src="${advert.image_url}"
+                            alt="${
+                                advert.title ||
+                                "School Advertisement"
+                            }"
+                            style="
+                                width:100%;
+                                height:100%;
+                                object-fit:cover;
+                                display:block;
+                            "
+                        >
+                    `
                 )
                 .join("");
 
 
         /* -----------------------------------------
-           SLIDESHOW CONTROL
+           SIMPLE SLIDESHOW
         ----------------------------------------- */
 
         const slides =
             slideshow.querySelectorAll(
-                ".slide"
+                "img"
             );
 
 
         if (
             slides.length <= 1
         ) {
-
             return;
-
         }
 
 
-        let currentSlide =
-            0;
+        let currentSlide = 0;
+
+
+        slides.forEach(
+            (
+                slide,
+                index
+            ) => {
+
+                slide.style.display =
+                    index === 0
+                        ? "block"
+                        : "none";
+
+            }
+        );
 
 
         setInterval(
@@ -1759,9 +1779,8 @@ async function loadStudentAdvertisements() {
 
                 slides[
                     currentSlide
-                ].classList.remove(
-                    "active"
-                );
+                ].style.display =
+                    "none";
 
 
                 currentSlide =
@@ -1773,14 +1792,12 @@ async function loadStudentAdvertisements() {
 
                 slides[
                     currentSlide
-                ].classList.add(
-                    "active"
-                );
+                ].style.display =
+                    "block";
 
             },
             5000
         );
-
 
     }
     catch (error) {
@@ -1800,7 +1817,6 @@ async function loadStudentAdvertisements() {
     }
 
 }
-
 /* =========================================================
    LOAD SCHOOL FEES PAYMENT HISTORY
 ========================================================= */
