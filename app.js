@@ -326,7 +326,18 @@ function viewStudentInfoDashboard() {
     + encodeURIComponent(
         regNo
     );
+	
+sessionStorage.setItem(
+    "student_dashboard_school",
+    schoolCode
+);
+
+sessionStorage.setItem(
+    "student_dashboard_reg_no",
+    regNo
+);
 
 window.location.href =
     dashboardUrl;
+
 }

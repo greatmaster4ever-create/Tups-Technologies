@@ -819,7 +819,13 @@ body {
 
 
 <div class="student-dashboard">
-
+<button
+    type="button"
+    class="student-dashboard-logout"
+    onclick="logoutStudentDashboard()"
+>
+    Logout
+</button>
 
     <!-- =====================================================
          HEADER
@@ -1302,6 +1308,19 @@ const regNo =
         dashboardParams.get("reg_no") || ""
     ).trim();
 
+const studentDashboardSessionSchool =
+    sessionStorage.getItem(
+        "student_dashboard_school"
+    );
+
+const studentDashboardSessionRegNo =
+    sessionStorage.getItem(
+        "student_dashboard_reg_no"
+    );
+
+const validStudentDashboardSession =
+    studentDashboardSessionSchool === schoolCode &&
+    studentDashboardSessionRegNo === regNo;
 
 /* =========================================================
    PAGE START
@@ -1311,15 +1330,18 @@ document.addEventListener(
     "DOMContentLoaded",
     async function () {
 
-        if (!schoolCode || !regNo) {
+       if (
+    !schoolCode ||
+    !regNo ||
+    !validStudentDashboardSession
+) {
 
-            showDashboardError(
-                "Invalid student dashboard link."
-            );
+    window.location.replace(
+        "index.html"
+    );
 
-            return;
-
-        }
+    return;
+}
 
         await loadStudentDashboard();
 
@@ -1893,6 +1915,21 @@ function printStudentCard() {
 }
 
 
+function logoutStudentDashboard() {
+
+    sessionStorage.removeItem(
+        "student_dashboard_school"
+    );
+
+    sessionStorage.removeItem(
+        "student_dashboard_reg_no"
+    );
+
+    window.location.replace(
+        "index.html"
+    );
+}
+
 /* =========================================================
    DOWNLOAD STUDENT CARD
 ========================================================= */
@@ -1904,6 +1941,47 @@ function downloadStudentCard() {
     );
 
 }
+
+window.addEventListener(
+    "pageshow",
+    function () {
+
+        const currentSchool =
+            sessionStorage.getItem(
+                "student_dashboard_school"
+            );
+
+        const currentRegNo =
+            sessionStorage.getItem(
+                "student_dashboard_reg_no"
+            );
+
+        const dashboardSchool =
+            new URLSearchParams(
+                window.location.search
+            ).get("school");
+
+        const dashboardRegNo =
+            new URLSearchParams(
+                window.location.search
+            ).get("reg_no");
+
+
+        if (
+            !currentSchool ||
+            !currentRegNo ||
+            currentSchool !== dashboardSchool ||
+            currentRegNo !== dashboardRegNo
+        ) {
+
+            window.location.replace(
+                "index.html"
+            );
+
+        }
+
+    }
+);
 
 async function loadOptionalPaymentHistory() {
 
