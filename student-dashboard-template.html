@@ -1942,41 +1942,80 @@ function downloadStudentCard() {
 
 }
 
+/* =========================================================
+   PREVENT DASHBOARD ACCESS AFTER LOGOUT / BACK BUTTON
+========================================================= */
+
+function protectStudentDashboard() {
+
+    const currentSchool =
+        sessionStorage.getItem(
+            "student_dashboard_school"
+        );
+
+    const currentRegNo =
+        sessionStorage.getItem(
+            "student_dashboard_reg_no"
+        );
+
+    const dashboardParams =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    const dashboardSchool =
+        (
+            dashboardParams.get("school") || ""
+        ).trim();
+
+    const dashboardRegNo =
+        (
+            dashboardParams.get("reg_no") || ""
+        ).trim();
+
+
+    if (
+        !currentSchool ||
+        !currentRegNo ||
+        currentSchool !== dashboardSchool ||
+        currentRegNo !== dashboardRegNo
+    ) {
+
+        window.location.replace(
+            "index.html"
+        );
+
+        return false;
+    }
+
+    return true;
+}
+
+
+/* Check when dashboard is restored with Back/Forward */
+
 window.addEventListener(
     "pageshow",
     function () {
 
-        const currentSchool =
-            sessionStorage.getItem(
-                "student_dashboard_school"
-            );
+        protectStudentDashboard();
 
-        const currentRegNo =
-            sessionStorage.getItem(
-                "student_dashboard_reg_no"
-            );
+    }
+);
 
-        const dashboardSchool =
-            new URLSearchParams(
-                window.location.search
-            ).get("school");
 
-        const dashboardRegNo =
-            new URLSearchParams(
-                window.location.search
-            ).get("reg_no");
+/* Check when page becomes visible again */
 
+document.addEventListener(
+    "visibilitychange",
+    function () {
 
         if (
-            !currentSchool ||
-            !currentRegNo ||
-            currentSchool !== dashboardSchool ||
-            currentRegNo !== dashboardRegNo
+            document.visibilityState ===
+            "visible"
         ) {
 
-            window.location.replace(
-                "index.html"
-            );
+            protectStudentDashboard();
 
         }
 
