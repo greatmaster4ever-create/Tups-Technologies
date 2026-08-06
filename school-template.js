@@ -3701,41 +3701,40 @@ async function uploadAdvertisement() {
            SAVE METADATA TO SUPABASE
         ----------------------------------------- */
 
-        const {
-            error: insertError
-        } =
-            await supabaseClient
+      const {
+    error: insertError
+} =
+    await supabaseClient
 
-                .from(
-                    "school_communications"
-                )
+        .from(
+            "school_communications"
+        )
 
-                .insert({
+        .insert({
 
-                    school_code:
-                        schoolCode,
+            school_code:
+                schoolCode,
 
-                    content_type:
-                        "advertisement",
+            content_type:
+                "advertisement",
 
-                    title:
-                        title ||
-                        file.name,
+            title:
+                title ||
+                file.name,
 
-                    drive_file_id:
-                        result.fileId,
+            image_url:
+                result.supabasePublicUrl,
 
-                    image_url:
-                        result.downloadUrl,
+            storage_path:
+                result.storagePath,
 
-                    is_active:
-                        true,
+            is_active:
+                true,
 
-                    display_order:
-                        nextOrder
+            display_order:
+                nextOrder
 
-                });
-
+        });
 
         if (insertError) {
 
