@@ -3455,7 +3455,6 @@ async function loadAdvertisements() {
 /* =========================================================
    UPLOAD ADVERTISEMENT
 ========================================================= */
-
 async function uploadAdvertisement() {
 
     const titleInput =
@@ -3580,7 +3579,7 @@ async function uploadAdvertisement() {
 
 const response =
     await fetch(
-        "https://script.google.com/macros/s/AKfycbxowh8OhuSL-k-Q_s3j1ipWkGmLIXEukDZLy_iDgobydyk8_U0UVPKBTKLyxqErp26hPA/exec",
+        "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
         {
             method: "POST",
             body: new URLSearchParams({
@@ -3780,6 +3779,7 @@ const response =
 
 }
 
+
 /* =========================================================
    DELETE ADVERTISEMENT
 ========================================================= */
@@ -3853,7 +3853,7 @@ formData.append(
         const response =
             await fetch(
 
-                "https://script.google.com/macros/s/AKfycbxowh8OhuSL-k-Q_s3j1ipWkGmLIXEukDZLy_iDgobydyk8_U0UVPKBTKLyxqErp26hPA/exec",
+                "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
 
                 {
 
@@ -4490,7 +4490,7 @@ async function syncStudentsFromSheet() {
 
   const response =
   await fetch(
-    "https://script.google.com/macros/s/AKfycbxowh8OhuSL-k-Q_s3j1ipWkGmLIXEukDZLy_iDgobydyk8_U0UVPKBTKLyxqErp26hPA/exec",
+    "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
     {
       method: "POST",
       body: formData
@@ -10748,7 +10748,7 @@ document.addEventListener("click", async (e) => {
     document.getElementById("adminContent").innerHTML =
       "<p>Opening School Drive...</p>";
 
-    const res = await fetch("https://script.google.com/macros/s/AKfycbxowh8OhuSL-k-Q_s3j1ipWkGmLIXEukDZLy_iDgobydyk8_U0UVPKBTKLyxqErp26hPA/exec", {
+    const res = await fetch("https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({

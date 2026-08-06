@@ -1131,7 +1131,7 @@ formData.append(
 
 const response =
   await fetch(
-    "https://script.google.com/macros/s/AKfycbxowh8OhuSL-k-Q_s3j1ipWkGmLIXEukDZLy_iDgobydyk8_U0UVPKBTKLyxqErp26hPA/exec",
+    "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
     {
       method: "POST",
       body: formData
@@ -2086,7 +2086,7 @@ if (!data.sheet_url) {
 
   const response =
     await fetch(
-      "https://script.google.com/macros/s/AKfycbxowh8OhuSL-k-Q_s3j1ipWkGmLIXEukDZLy_iDgobydyk8_U0UVPKBTKLyxqErp26hPA/exec",
+      "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
       {
         method: "POST",
         body: formData
@@ -2301,7 +2301,7 @@ async function deleteSchool(schoolCode) {
     formData.append("schoolCode", schoolCode);
 
     const response = await fetch(
-      "https://script.google.com/macros/s/AKfycbxowh8OhuSL-k-Q_s3j1ipWkGmLIXEukDZLy_iDgobydyk8_U0UVPKBTKLyxqErp26hPA/exec",
+      "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
       {
         method: "POST",
         body: formData
