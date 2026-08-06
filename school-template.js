@@ -3580,7 +3580,7 @@ async function uploadAdvertisement() {
 
        const response =
     await fetch(
-        "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
+        "https://script.google.com/macros/s/AKfycbxowh8OhuSL-k-Q_s3j1ipWkGmLIXEukDZLy_iDgobydyk8_U0UVPKBTKLyxqErp26hPA/exec",
         {
 
                     method:
@@ -3877,7 +3877,7 @@ async function deleteAdvertisement(
         const response =
             await fetch(
 
-                "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
+                "https://script.google.com/macros/s/AKfycbxowh8OhuSL-k-Q_s3j1ipWkGmLIXEukDZLy_iDgobydyk8_U0UVPKBTKLyxqErp26hPA/exec",
 
                 {
 
@@ -4514,7 +4514,7 @@ async function syncStudentsFromSheet() {
 
   const response =
   await fetch(
-    "https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec",
+    "https://script.google.com/macros/s/AKfycbxowh8OhuSL-k-Q_s3j1ipWkGmLIXEukDZLy_iDgobydyk8_U0UVPKBTKLyxqErp26hPA/exec",
     {
       method: "POST",
       body: formData
@@ -10772,7 +10772,7 @@ document.addEventListener("click", async (e) => {
     document.getElementById("adminContent").innerHTML =
       "<p>Opening School Drive...</p>";
 
-    const res = await fetch("https://script.google.com/macros/s/AKfycbzf6-sPVZl2ggJcp2ovlBhLMwNL2K9m1R0ch5doIg50mcJ0o6GZNKFv9FcxcL-WTpwuSQ/exec", {
+    const res = await fetch("https://script.google.com/macros/s/AKfycbxowh8OhuSL-k-Q_s3j1ipWkGmLIXEukDZLy_iDgobydyk8_U0UVPKBTKLyxqErp26hPA/exec", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
