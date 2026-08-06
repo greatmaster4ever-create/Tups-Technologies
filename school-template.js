@@ -3577,42 +3577,48 @@ async function uploadAdvertisement() {
            SEND TO APPS SCRIPT
         ----------------------------------------- */
 
-const response =
-    await fetch(
-        "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
-        {
-            method: "POST",
-            body: new URLSearchParams({
-                action: "uploadSchoolMedia",
-                schoolCode: schoolCode,
-                mediaType: "advertisement",
-                fileName: file.name,
-                mimeType: file.type,
-                fileData: base64Data
-            })
-        }
-    );
+/* -----------------------------------------
+   Upload directly to Supabase Storage
+----------------------------------------- */
 
+const storagePath =
+`${schoolCode}/advertisements/${Date.now()}_${file.name}`;
 
-        const result =
-            await response.json();
+const {
+    data: uploadData,
+    error: uploadError
+} =
+await supabaseClient
+.storage
+.from("school-media")
+.upload(
+    storagePath,
+    file,
+    {
+        upsert:true
+    }
+);
 
+if(uploadError){
 
-        /* -----------------------------------------
-           APPS SCRIPT ERROR
-        ----------------------------------------- */
+    throw uploadError;
 
-        if (
-            !result ||
-            !result.success
-        ) {
+}
 
-            throw new Error(
-                result?.error ||
-                "Advertisement upload failed."
-            );
+/* -----------------------------------------
+   Public URL
+----------------------------------------- */
 
-        }
+const {
+    data: publicUrlData
+} =
+supabaseClient
+.storage
+.from("school-media")
+.getPublicUrl(storagePath);
+
+const imageUrl =
+publicUrlData.publicUrl;
 
 
         /* -----------------------------------------
@@ -3695,13 +3701,11 @@ const response =
             title:
                 title ||
                 file.name,
+image_url:
+imageUrl,
 
-            image_url:
-                result.supabasePublicUrl,
-
-            storage_path:
-                result.storagePath,
-
+storage_path:
+storagePath,
             is_active:
                 true,
 
