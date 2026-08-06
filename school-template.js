@@ -3398,9 +3398,9 @@ async function loadAdvertisements() {
                       class="admin-btn"
                       onclick="
                         deleteAdvertisement(
-                          '${advert.id}',
-                          '${advert.drive_file_id || ""}'
-                        )
+    '${advert.id}',
+    '${advert.storage_path || ""}'
+)
                       "
                     >
                       🗑 Delete
@@ -3812,7 +3812,7 @@ async function uploadAdvertisement() {
 
 async function deleteAdvertisement(
     advertisementId,
-    driveFileId
+    storagePath
 ) {
 
     const confirmed =
@@ -3841,38 +3841,40 @@ async function deleteAdvertisement(
         }
 
 
-        if (!driveFileId) {
+       if (!storagePath) {
 
-            throw new Error(
-                "Google Drive file ID is missing."
-            );
+    throw new Error(
+        "Storage path is missing."
+    );
 
-        }
+}
 
+/* -----------------------------------------
+   DELETE FILE FROM SUPABASE STORAGE
+----------------------------------------- */
 
-        /* -----------------------------------------
-           DELETE FILE FROM GOOGLE DRIVE
-        ----------------------------------------- */
+const formData =
+    new URLSearchParams();
 
-        const formData =
-            new URLSearchParams();
+formData.append(
+    "action",
+    "deleteSchoolMedia"
+);
 
+formData.append(
+    "schoolCode",
+    schoolCode
+);
 
-        formData.append(
-            "action",
-            "deleteSchoolMedia"
-        );
+formData.append(
+    "mediaType",
+    "advertisement"
+);
 
-        formData.append(
-            "schoolCode",
-            schoolCode
-        );
-
-        formData.append(
-            "fileId",
-            driveFileId
-        );
-
+formData.append(
+    "storagePath",
+    storagePath
+);
 
         const response =
             await fetch(
@@ -3896,10 +3898,10 @@ async function deleteAdvertisement(
             await response.json();
 
 
-        console.log(
-            "DELETE SCHOOL MEDIA RESPONSE:",
-            result
-        );
+       console.log(
+    "DELETE SUPABASE MEDIA RESPONSE:",
+    result
+);
 
 
         /* -----------------------------------------
@@ -3913,7 +3915,7 @@ async function deleteAdvertisement(
 
             throw new Error(
                 result?.error ||
-                "Google Drive deletion failed."
+                "Media deletion failed."
             );
 
         }
