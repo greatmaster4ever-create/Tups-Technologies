@@ -2158,7 +2158,6 @@ async function sendParentMessage() {
     const message =
         messageBox.value.trim();
 
-
     if (!message) {
 
         alert(
@@ -2169,10 +2168,74 @@ async function sendParentMessage() {
 
     }
 
+    try {
 
-    alert(
-        "Communication system will be connected in the next stage."
-    );
+        const {
+            error
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communication_book"
+                )
+
+                .insert({
+
+                    school_code:
+                        schoolCode,
+
+                    department:
+                        window.currentStudent.department,
+
+                    class:
+                        window.currentStudent.class,
+
+                    student_id:
+                        window.currentStudent.id,
+
+                    reg_no:
+                        window.currentStudent.reg_no,
+
+                    student_name:
+                        window.currentStudent.student_name,
+
+                    sender_type:
+                        "Parent",
+
+                    sender_name:
+                        "Parent",
+
+                    message:
+                        message
+
+                });
+
+        if (error) {
+
+            throw error;
+
+        }
+
+        messageBox.value = "";
+
+        alert(
+            "Message sent successfully."
+        );
+
+    }
+    catch (err) {
+
+        console.error(
+            "Parent Message Error:",
+            err
+        );
+
+        alert(
+            err.message ||
+            "Unable to send message."
+        );
+
+    }
 
 }
 
