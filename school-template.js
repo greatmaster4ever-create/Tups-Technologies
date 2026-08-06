@@ -3578,46 +3578,21 @@ async function uploadAdvertisement() {
            SEND TO APPS SCRIPT
         ----------------------------------------- */
 
-       const response =
+const response =
     await fetch(
         "https://script.google.com/macros/s/AKfycbxowh8OhuSL-k-Q_s3j1ipWkGmLIXEukDZLy_iDgobydyk8_U0UVPKBTKLyxqErp26hPA/exec",
         {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "application/x-www-form-urlencoded"
-
-                    },
-
-                    body:
-                        new URLSearchParams({
-
-                            action:
-                                "uploadSchoolMedia",
-
-                            schoolCode:
-                                schoolCode,
-
-                            mediaType:
-                                "advertisement",
-
-                            fileName:
-                                file.name,
-
-                            mimeType:
-                                file.type,
-
-                            fileData:
-                                base64Data
-
-                        })
-
-                }
-            );
+            method: "POST",
+            body: new URLSearchParams({
+                action: "uploadSchoolMedia",
+                schoolCode: schoolCode,
+                mediaType: "advertisement",
+                fileName: file.name,
+                mimeType: file.type,
+                fileData: base64Data
+            })
+        }
+    );
 
 
         const result =
