@@ -1,9 +1,10 @@
 // ======================================
 // PAYMENT HISTORY PAGINATION
 // ======================================
-
+let communicationStudents = [];
+let selectedCommunicationStudent = null;
 let paymentHistoryMasterData = [];
-
+let communicationRefresh = null;
 let paymentHistoryData = [];
 
 let paymentHistoryCurrentPage = 1;
@@ -698,11 +699,85 @@ function openTeacherCommunicationBook(){
 
 function closeTeacherCommunicationBook(){
 
+    clearInterval(
+        communicationRefresh
+    );
+
     document.getElementById(
         "teacherCommunicationModal"
     ).style.display="none";
 
 }
+
+async function loadCommunicationClasses() {
+
+    const department =
+        document.getElementById("commDepartment").value;
+
+    const classSelect =
+        document.getElementById("commClass");
+
+    classSelect.innerHTML =
+        '<option value="">Loading...</option>';
+
+    if (!department) {
+
+        classSelect.innerHTML =
+        '<option value="">Select Class</option>';
+
+        return;
+    }
+
+    const { data, error } =
+        await supabaseClient
+        .from("students")
+        .select("class")
+        .eq("school_code", schoolCode)
+        .eq("department", department);
+
+    if (error) {
+
+        console.error(error);
+
+        classSelect.innerHTML =
+        '<option value="">No Class</option>';
+
+        return;
+
+    }
+
+    // Remove duplicates
+
+    const uniqueClasses =
+        [...new Set(
+            data.map(row => row.class)
+        )].sort();
+
+    classSelect.innerHTML =
+        '<option value="">Select Class</option>';
+
+    uniqueClasses.forEach(cls => {
+
+        const option =
+            document.createElement("option");
+
+        option.value = cls;
+
+        option.textContent = cls;
+
+        classSelect.appendChild(option);
+
+    });
+
+}
+
+document
+.getElementById("commDepartment")
+.addEventListener(
+    "change",
+    loadCommunicationClasses
+);
+
 
 async function showOptionalPaymentsSetup(){
 
@@ -741,6 +816,280 @@ return;
 }
 
 renderOptionalPaymentsSetup(data);
+
+}
+
+async function loadCommunicationStudents() {
+
+    const department =
+        document.getElementById("commDepartment").value;
+
+    const className =
+        document.getElementById("commClass").value;
+
+    communicationStudents = [];
+
+    selectedCommunicationStudent = null;
+
+    document.getElementById(
+        "commStudentSearch"
+    ).value = "";
+
+    document.getElementById(
+        "commStudentResults"
+    ).innerHTML = "";
+
+    if (!department || !className) return;
+
+    const { data, error } =
+        await supabaseClient
+        .from("students")
+        .select(`
+            id,
+            student_name,
+            reg_no,
+            class,
+            department
+        `)
+        .eq("school_code", schoolCode)
+        .eq("department", department)
+        .eq("class", className)
+        .order("student_name");
+
+    if (error) {
+
+        console.error(error);
+
+        return;
+
+    }
+
+    communicationStudents = data || [];
+
+}
+
+document
+.getElementById("commClass")
+.addEventListener(
+    "change",
+    loadCommunicationStudents
+);
+
+document
+.getElementById("commStudentSearch")
+.addEventListener("input", function () {
+
+    const keyword =
+        this.value.toLowerCase();
+
+    const results =
+        document.getElementById(
+            "commStudentResults"
+        );
+
+    results.innerHTML = "";
+
+    if (!keyword) return;
+
+    const matches =
+        communicationStudents.filter(student =>
+            student.student_name.toLowerCase().includes(keyword) ||
+            student.reg_no.toLowerCase().includes(keyword)
+        );
+
+    matches.forEach(student => {
+
+        const div =
+            document.createElement("div");
+
+        div.className = "dropdown-item";
+
+        div.innerHTML = `
+            <strong>${student.student_name}</strong><br>
+            ${student.reg_no}
+        `;
+
+        div.onclick = function () {
+
+            selectedCommunicationStudent = student;
+			clearInterval(communicationRefresh);
+
+communicationRefresh =
+setInterval(
+
+    loadCommunicationConversation,
+
+    5000
+
+);
+
+            document.getElementById(
+                "commStudentSearch"
+            ).value = student.student_name;
+
+            results.innerHTML = "";
+
+            loadCommunicationConversation();
+
+        };
+
+        results.appendChild(div);
+
+    });
+
+});
+
+async function loadCommunicationConversation() {
+
+    if (!selectedCommunicationStudent) return;
+
+    const conversation =
+        document.getElementById(
+            "teacherConversationThread"
+        );
+
+    conversation.innerHTML =
+        "<p>Loading conversation...</p>";
+
+    const { data, error } =
+        await supabaseClient
+        .from("school_communication_book")
+        .select("*")
+        .eq(
+            "school_code",
+            schoolCode
+        )
+        .eq(
+            "student_id",
+            selectedCommunicationStudent.id
+        )
+        .order(
+            "created_at",
+            { ascending: true }
+        );
+
+    if (error) {
+
+        console.error(error);
+
+        conversation.innerHTML =
+        "<p>No conversation found.</p>";
+
+        return;
+
+    }
+
+    if (!data || data.length === 0) {
+
+        conversation.innerHTML =
+        "<p>No messages yet.</p>";
+
+        return;
+
+    }
+
+    conversation.innerHTML = "";
+
+    data.forEach(msg => {
+
+        const bubble =
+            document.createElement("div");
+
+        bubble.className = "chat-bubble";
+
+        let sender = "Unknown";
+
+        if (msg.sender === "Parent")
+            sender = "👨‍👩‍👧 Parent";
+
+        if (msg.sender === "Teacher")
+            sender = "👨‍🏫 Teacher";
+
+        if (msg.sender === "Admin")
+            sender = "🏫 Admin";
+
+        bubble.innerHTML = `
+            <div class="chat-sender">
+                ${sender}
+            </div>
+
+            <div class="chat-message">
+                ${msg.message}
+            </div>
+
+            <div class="chat-time">
+                ${new Date(
+                    msg.created_at
+                ).toLocaleString()}
+            </div>
+        `;
+
+        conversation.appendChild(bubble);
+
+    });
+
+    conversation.scrollTop =
+        conversation.scrollHeight;
+
+}
+
+async function sendTeacherReply(){
+
+    if(!selectedCommunicationStudent){
+
+        alert("Please select a student.");
+
+        return;
+
+    }
+
+    const message =
+        document
+        .getElementById("teacherReply")
+        .value
+        .trim();
+
+    if(message===""){
+
+        alert("Please type a reply.");
+
+        return;
+
+    }
+
+    const { error } =
+        await supabaseClient
+        .from("school_communication_book")
+        .insert([{
+
+            school_code: schoolCode,
+
+            student_id:
+                selectedCommunicationStudent.id,
+
+            sender: "Teacher",
+
+            recipient: "Parent",
+
+            message: message
+
+        }]);
+
+    if(error){
+
+        console.error(error);
+
+        alert(error.message);
+
+        return;
+
+    }
+
+    document
+        .getElementById("teacherReply")
+        .value="";
+
+    loadCommunicationConversation();
 
 }
 
