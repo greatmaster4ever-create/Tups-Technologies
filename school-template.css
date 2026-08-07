@@ -349,7 +349,7 @@ button:hover {
   display: flex;
   justify-content: center;
   align-items: stretch;     /* cards become equal height */
-  gap: 35px;
+  gap: 20px;
   flex-wrap: wrap;
   width: 100%;
 }
@@ -359,7 +359,7 @@ button:hover {
   width: 100%;
   max-width: 420px;
 
-  padding: 22px;
+  padding: 18px;
   border-radius: 18px;
 
   background: rgba(255,255,255,0.12);
@@ -378,11 +378,12 @@ button:hover {
 
 /* TEACHER CARD (your existing form style stays dominant) */
 .teacher-card{
-    max-width:390px;
-    min-height:470px;
+    width:390px;
+    min-height:430px;
 
     display:flex;
     flex-direction:column;
+    justify-content:flex-start;
 
     background:rgba(255,255,255,.12);
     backdrop-filter:blur(15px);
@@ -390,13 +391,12 @@ button:hover {
 
 /* ADMIN CARD (white clean contrast) */
 .admin-card{
-    max-width:390px;
-    min-height:470px;
+    width:390px;
+    min-height:430px;
 
     display:flex;
     flex-direction:column;
-    justify-content:center;
-    align-items:center;
+    justify-content:flex-start;
 
     background:rgba(255,255,255,.95);
 }
