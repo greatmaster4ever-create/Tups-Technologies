@@ -997,16 +997,22 @@ async function loadCommunicationConversation() {
 
         bubble.className = "chat-bubble";
 
-        let sender = "Unknown";
+    let sender = "Unknown";
 
-        if (msg.sender === "Parent")
-            sender = "👨‍👩‍👧 Parent";
+switch (msg.sender_type) {
 
-        if (msg.sender === "Teacher")
-            sender = "👨‍🏫 Teacher";
+    case "Parent":
+        sender = "👨‍👩‍👧 Parent";
+        break;
 
-        if (msg.sender === "Admin")
-            sender = "🏫 Admin";
+    case "Teacher":
+        sender = "👨‍🏫 Teacher";
+        break;
+
+    case "Admin":
+        sender = "🏫 Admin";
+        break;
+}
 
         bubble.innerHTML = `
             <div class="chat-sender">
