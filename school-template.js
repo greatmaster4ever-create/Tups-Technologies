@@ -6,6 +6,7 @@ let selectedCommunicationStudent = null;
 let paymentHistoryMasterData = [];
 let communicationRefresh = null;
 let paymentHistoryData = [];
+let adminConversationRefresh = null;
 
 let paymentHistoryCurrentPage = 1;
 
@@ -89,7 +90,10 @@ window.location.replace("index.html");
 // ==========================
 let currentSubjects = [];
 let optionalSelectedStudent = null;
+let communicationDates = {};
+let commCalendarDate = new Date();
 
+let selectedCommunicationDate = null;
 let optionalStudentsCache = [];
 // ======================================
 // OPTIONAL PAYMENTS PAGINATION
@@ -454,7 +458,7 @@ const adminDashboardHTML = `
 
 <button
   class="admin-tab"
-  onclick="showCommunicationBook()"
+  onclick="openCommunicationBook()"
 >
   📖 Communication Book
 </button>
@@ -600,6 +604,63 @@ restoreLastRollover();
   </div>
 `;
 
+const communicationBookHTML = `
+
+<div class="communication-layout">
+
+    <!-- LEFT SIDEBAR -->
+
+    <div class="communication-sidebar">
+
+        <h3>Filters</h3>
+
+        <label>Department</label>
+        <select id="commDepartment"></select>
+
+        <label>Class</label>
+        <select id="commClass"></select>
+
+        <label>Sort</label>
+
+        <select id="commSort">
+
+            <option value="newest">
+                Newest
+            </option>
+
+            <option value="oldest">
+                Oldest
+            </option>
+
+        </select>
+
+        <label>Date</label>
+
+     <div id="adminCalendar"></div>
+
+    </div>
+
+    <!-- RIGHT PANEL -->
+
+    <div class="communication-main">
+
+        <h2>
+            Communication Book
+        </h2>
+
+        <div id="conversationList">
+
+            Select a class to load conversations.
+
+        </div>
+
+    </div>
+
+</div>
+
+`;
+
+
 document
   .getElementById("openAdminPortal")
   .addEventListener(
@@ -708,6 +769,563 @@ function closeTeacherCommunicationBook(){
     ).style.display="none";
 
 }
+
+
+async function openCommunicationBook(){
+
+    document.getElementById("adminContent").innerHTML =
+        communicationBookHTML;
+
+    await loadCommunicationCalendarData();
+
+renderAdminCalendar();
+
+}
+
+function renderAdminCalendar(){
+
+    const calendar =
+        document.getElementById("adminCalendar");
+
+    if(!calendar) return;
+
+    const year =
+        commCalendarDate.getFullYear();
+
+    const month =
+        commCalendarDate.getMonth();
+
+    const monthNames = [
+
+        "January","February","March","April",
+
+        "May","June","July","August",
+
+        "September","October","November","December"
+
+    ];
+
+    const days = [
+
+        "Sun","Mon","Tue","Wed","Thu","Fri","Sat"
+
+    ];
+
+    const firstDay =
+        new Date(year,month,1).getDay();
+
+    const totalDays =
+        new Date(year,month+1,0).getDate();
+
+    const today =
+        new Date();
+
+    let html = `
+
+    <div class="calendar-nav">
+
+        <button onclick="previousCommMonth()">
+            ◀
+        </button>
+
+        <span>
+
+            ${monthNames[month]}
+
+            ${year}
+
+        </span>
+
+        <button onclick="nextCommMonth()">
+            ▶
+        </button>
+
+    </div>
+
+    <div class="calendar-grid">
+
+    `;
+
+    days.forEach(day=>{
+
+        html +=
+        `<div class="calendar-head">${day}</div>`;
+
+    });
+
+    for(let i=0;i<firstDay;i++){
+
+        html += "<div></div>";
+
+    }
+
+    for(let d=1; d<=totalDays; d++){
+
+        let cls = "calendar-day";
+
+        if(
+
+            d===today.getDate()
+
+            &&
+
+            month===today.getMonth()
+
+            &&
+
+            year===today.getFullYear()
+
+        ){
+
+            cls += " today";
+
+        }
+
+        const key =
+`${year}-${String(month+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+
+        const info =
+communicationDates[key];
+
+        let badge = "";
+
+        if(info){
+
+            badge = info.unread
+
+                ? `<span class="calendar-dot unread"></span>`
+
+                : `<span class="calendar-dot"></span>`;
+
+        }
+
+        html += `
+
+        <div
+
+            class="${cls}"
+
+            onclick="selectCommunicationDate(${d})"
+
+        >
+
+            ${d}
+
+            ${badge}
+
+        </div>
+
+        `;
+
+    }
+
+    html += "</div>";
+
+    calendar.innerHTML = html;
+
+}
+
+function previousCommMonth(){
+
+    commCalendarDate.setMonth(
+
+        commCalendarDate.getMonth()-1
+
+    );
+
+    renderAdminCalendar();
+
+}
+
+function nextCommMonth(){
+
+    commCalendarDate.setMonth(
+
+        commCalendarDate.getMonth()+1
+
+    );
+
+    renderAdminCalendar();
+
+}
+
+
+function selectCommunicationDate(day){
+
+    selectedCommunicationDate =
+
+        new Date(
+
+            commCalendarDate.getFullYear(),
+
+            commCalendarDate.getMonth(),
+
+            day
+
+        );
+
+    loadAdminCommunicationList();
+
+}
+
+async function loadAdminCommunicationList(){
+
+    if(!selectedCommunicationDate) return;
+
+    const dateString =
+
+        selectedCommunicationDate
+
+        .toISOString()
+
+        .split("T")[0];
+
+    const list =
+
+        document.getElementById(
+
+            "conversationList"
+
+        );
+
+    list.innerHTML =
+
+        "<p>Loading...</p>";
+
+    const { data,error } =
+
+        await supabaseClient
+
+        .from("school_communication_book")
+
+        .select("*")
+
+        .eq("school_code",schoolCode)
+
+        .gte(
+
+            "created_at",
+
+            dateString+"T00:00:00"
+
+        )
+
+        .lte(
+
+            "created_at",
+
+            dateString+"T23:59:59"
+
+        )
+
+        .order(
+
+            "created_at",
+
+            {
+
+                ascending:false
+
+            }
+
+        );
+
+    if(error){
+
+        console.error(error);
+
+        list.innerHTML =
+
+            "<p>No messages.</p>";
+
+        return;
+
+    }
+
+    if(!data || data.length===0){
+
+        list.innerHTML =
+
+            "<p>No messages on this date.</p>";
+
+        return;
+
+    }
+
+    list.innerHTML="";
+
+    data.forEach(msg=>{
+
+        const row=
+
+            document.createElement("div");
+
+        row.className=
+
+            "conversation-row";
+
+        row.innerHTML=`
+
+        <div class="conversation-name">
+
+            ${msg.student_name}
+
+        </div>
+
+        <div class="conversation-preview">
+
+            ${msg.message.substring(0,60)}...
+
+        </div>
+
+        `;
+
+        row.onclick=()=>{
+
+            openConversation(msg.student_id);
+
+        };
+
+        list.appendChild(row);
+
+    });
+
+}
+
+async function openConversation(studentId){
+
+    const rightPanel =
+        document.getElementById("conversationViewer");
+
+    rightPanel.innerHTML =
+        "<p>Loading conversation...</p>";
+
+    const { data,error } =
+        await supabaseClient
+
+        .from("school_communication_book")
+
+        .select("*")
+
+        .eq("school_code",schoolCode)
+
+        .eq("student_id",studentId)
+
+        .order("created_at",{ascending:true});
+
+    if(error){
+
+        console.error(error);
+
+        rightPanel.innerHTML =
+        "<p>No conversation.</p>";
+
+        return;
+
+    }
+
+    if(!data.length){
+
+        rightPanel.innerHTML =
+        "<p>No messages.</p>";
+
+        return;
+
+    }
+
+    const student = data[0];
+
+    let html = `
+
+    <div class="conversation-header">
+
+        <h3>
+
+            ${student.student_name}
+
+        </h3>
+
+        <div>
+
+            ${student.class}
+
+        </div>
+
+        <div>
+
+            ${student.reg_no}
+
+        </div>
+
+    </div>
+
+    <div id="conversationMessages">
+
+    `;
+
+    data.forEach(msg=>{
+
+        let sender="";
+
+        if(msg.sender_type==="Parent")
+            sender="👨‍👩‍👧 Parent";
+
+        if(msg.sender_type==="Teacher")
+            sender="👨‍🏫 Teacher";
+
+        if(msg.sender_type==="Admin")
+            sender="🏫 Admin";
+
+        html +=`
+
+        <div class="chat-bubble">
+
+            <div class="chat-sender">
+
+                ${sender}
+
+            </div>
+
+            <div class="chat-message">
+
+                ${msg.message}
+
+            </div>
+
+            <div class="chat-time">
+
+                ${new Date(msg.created_at)
+
+                    .toLocaleString()}
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    html +=`
+
+    </div>
+
+    <textarea
+
+        id="adminReply"
+
+        placeholder="Type reply..."
+
+        rows="5"
+
+    ></textarea>
+
+    <button
+
+        class="teacher-send-btn"
+
+        onclick="sendAdminReply(${studentId})"
+
+    >
+
+        Send Reply
+
+    </button>
+
+    `;
+
+    rightPanel.innerHTML=html;
+	
+	clearInterval(adminConversationRefresh);
+
+adminConversationRefresh = setInterval(function(){
+
+    openConversation(studentId);
+
+},5000);
+
+}
+
+async function sendAdminReply(studentId){
+
+    const message =
+        document
+        .getElementById("adminReply")
+        .value
+        .trim();
+
+    if(!message){
+
+        alert("Please type a reply.");
+
+        return;
+
+    }
+
+    // Find the selected student from cache
+
+    const student =
+        communicationStudents.find(
+
+            s => s.id == studentId
+
+        );
+
+    if(!student){
+
+        alert("Student not found.");
+
+        return;
+
+    }
+
+    const { error } =
+        await supabaseClient
+
+        .from("school_communication_book")
+
+        .insert([{
+
+            school_code : schoolCode,
+
+            department : student.department,
+
+            class : student.class,
+
+            student_id : student.id,
+
+            reg_no : student.reg_no,
+
+            student_name : student.student_name,
+
+            sender_type : "Admin",
+
+            sender_name : "Admin",
+
+            message : message,
+
+            is_read : false
+
+        }]);
+
+    if(error){
+
+        console.error(error);
+
+        alert(error.message);
+
+        return;
+
+    }
+
+    document
+    .getElementById("adminReply")
+    .value = "";
+
+    openConversation(studentId);
+
+}
+
 
 async function loadCommunicationClasses() {
 
@@ -9847,6 +10465,68 @@ console.log(
     "keyup",
     filterFeesTable
   );
+
+}
+
+async function loadCommunicationCalendarData(){
+
+    communicationDates = {};
+
+    const { data, error } = await supabaseClient
+
+        .from("school_communication_book")
+
+        .select(`
+            created_at,
+            is_read,
+            sender_type
+        `)
+
+        .eq("school_code", schoolCode);
+
+    if(error){
+
+        console.error(error);
+
+        return;
+
+    }
+
+    data.forEach(msg=>{
+
+        const date =
+
+            msg.created_at.substring(0,10);
+
+        if(!communicationDates[date]){
+
+            communicationDates[date]={
+
+                unread:false,
+
+                total:0
+
+            };
+
+        }
+
+        communicationDates[date].total++;
+
+        if(
+
+            msg.sender_type==="Parent"
+
+            &&
+
+            !msg.is_read
+
+        ){
+
+            communicationDates[date].unread=true;
+
+        }
+
+    });
 
 }
 
