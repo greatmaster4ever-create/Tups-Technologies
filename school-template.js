@@ -972,8 +972,37 @@ async function loadCommunicationConversation() {
 
         console.error(error);
 
-        conversation.innerHTML =
-        "<p>No conversation found.</p>";
+// =======================================
+// Mark all Parent messages as read
+// =======================================
+
+await supabaseClient
+.from("school_communication_book")
+.update({
+    is_read: true
+})
+.eq("school_code", schoolCode)
+.eq("student_id", selectedCommunicationStudent.id)
+.eq("sender_type", "Parent")
+.eq("is_read", false);
+
+      // Reload conversation after updating read status
+
+const { data: refreshedData } =
+await supabaseClient
+.from("school_communication_book")
+.select("*")
+.eq("school_code", schoolCode)
+.eq("student_id", selectedCommunicationStudent.id)
+.order("created_at",{ascending:true});
+
+conversation.innerHTML = "";
+
+refreshedData.forEach(msg => {
+
+    // your existing bubble creation code
+
+});
 
         return;
 
