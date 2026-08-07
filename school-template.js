@@ -1049,6 +1049,12 @@ async function sendTeacherReply(){
         .value
         .trim();
 
+  // 👇 ADD THIS HERE
+    console.log(
+        "Reply textbox value:",
+        document.getElementById("teacherReply").value
+    );
+
     if(message===""){
 
         alert("Please type a reply.");
@@ -1057,24 +1063,37 @@ async function sendTeacherReply(){
 
     }
 
-    const { error } =
-        await supabaseClient
-        .from("school_communication_book")
-        .insert([{
+   const { error } =
+await supabaseClient
+.from("school_communication_book")
+.insert([{
 
-            school_code: schoolCode,
+    school_code: schoolCode,
 
-            student_id:
-                selectedCommunicationStudent.id,
+    department:
+        selectedCommunicationStudent.department,
 
-            sender: "Teacher",
+    class:
+        selectedCommunicationStudent.class,
 
-            recipient: "Parent",
+    student_id:
+        selectedCommunicationStudent.id,
 
-            message: message
+    reg_no:
+        selectedCommunicationStudent.reg_no,
 
-        }]);
+    student_name:
+        selectedCommunicationStudent.student_name,
 
+    sender_type: "Teacher",
+
+    sender_name: "Teacher",
+
+    message: message,
+
+    is_read: false
+
+}]);
     if(error){
 
         console.error(error);
