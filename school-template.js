@@ -868,7 +868,7 @@ async function loadCommunicationStudents() {
 
 }
 
-async function searchCommunicationStudents(){
+function searchCommunicationStudents(){
 
     const keyword =
         document.getElementById("commStudentSearch")
@@ -902,51 +902,37 @@ async function searchCommunicationStudents(){
 
         });
 
-for (const student of matches) {
+    matches.forEach(student=>{
 
-    const row = document.createElement("div");
+        const row =
+            document.createElement("div");
 
-    row.className = "student-result-item";
+        row.className =
+            "student-result-item";
 
-    const { count } = await supabaseClient
-        .from("school_communication_book")
-        .select("*", { count: "exact", head: true })
-        .eq("school_code", schoolCode)
-        .eq("student_id", student.id)
-        .eq("sender_type", "Parent")
-        .eq("is_read", false);
+        row.innerHTML =
+        `${student.student_name}
+        (${student.reg_no})`;
 
-    row.innerHTML = `
-        <div class="student-result-row">
+        row.onclick = ()=>{
 
-            <span>
-                ${student.student_name}
-                (${student.reg_no})
-            </span>
+            selectedCommunicationStudent =
+                student;
 
-            ${
-                count > 0
-                    ? `<span class="message-badge">${count}</span>`
-                    : ""
-            }
+            document.getElementById(
+                "commStudentSearch"
+            ).value =
+                student.student_name;
 
-        </div>
-    `;
+            results.innerHTML = "";
 
-    row.onclick = () => {
+            loadCommunicationConversation();
 
-        selectedCommunicationStudent = student;
+        };
 
-        document.getElementById("commStudentSearch").value =
-            student.student_name;
+        results.appendChild(row);
 
-        results.innerHTML = "";
-
-        loadCommunicationConversation();
-
-    };
-
-    results.appendChild(row);
+    });
 
 }
 
