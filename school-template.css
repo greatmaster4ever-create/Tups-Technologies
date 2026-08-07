@@ -2391,3 +2391,145 @@ font-size:32px;
 }
 
 }
+
+/* =========================================================
+   COMMUNICATION BOOK
+========================================================= */
+
+.communication-modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.45);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:9999;
+
+}
+
+.communication-modal-content{
+
+    background:white;
+
+    width:95%;
+
+    max-width:700px;
+
+    max-height:90vh;
+
+    overflow-y:auto;
+
+    border-radius:10px;
+
+    padding:20px;
+
+}
+
+.communication-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.communication-close{
+
+    font-size:30px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+}
+
+.communication-field{
+
+    margin-bottom:15px;
+
+}
+
+.communication-field label{
+
+    display:block;
+
+    margin-bottom:5px;
+
+    font-weight:bold;
+
+}
+
+.communication-field select,
+
+.communication-field input,
+
+#teacherReply{
+
+    width:100%;
+
+    padding:10px;
+
+    border:1px solid #ddd;
+
+    border-radius:6px;
+
+}
+
+.communication-results{
+
+    margin-top:5px;
+
+}
+
+.teacher-conversation{
+
+    min-height:200px;
+
+    max-height:300px;
+
+    overflow-y:auto;
+
+    background:#f7f7f7;
+
+    border-radius:6px;
+
+    padding:10px;
+
+}
+
+#teacherReply{
+
+    min-height:120px;
+
+    resize:vertical;
+
+}
+
+.teacher-send-btn{
+
+    margin-top:15px;
+
+    padding:10px 20px;
+
+    background:#000066;
+
+    color:white;
+
+    border:none;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+}

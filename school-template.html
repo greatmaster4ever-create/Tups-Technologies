@@ -146,6 +146,28 @@
         </button>
 
          </div>
+		 
+		  <!-- COMMUNICATION BOOK ROW -->
+
+        <button
+          type="button"
+          id="changePasswordBtn"
+          class="change-btn"
+          onclick="openChangePasswordModal()"
+        >
+          Change Password
+        </button>
+		
+		<button
+    type="button"
+    id="communicationBookBtn"
+    class="change-btn"
+	onclick=""
+>
+    📖 Communication Book
+</button>
+
+         </div>
 
         </form>
 
@@ -456,6 +478,151 @@ Save Item
     </div>
 
   </div>
+  
+  <!-- =========================================================
+     TEACHER COMMUNICATION BOOK MODAL
+========================================================= -->
+
+<div
+    id="communicationBookModal"
+    class="communication-modal"
+    style="display:none;"
+>
+
+    <div class="communication-modal-content">
+
+        <div class="communication-header">
+
+            <h2>Communication Book</h2>
+
+            <span
+                id="closeCommunicationBook"
+                class="communication-close"
+            >
+                &times;
+            </span>
+
+        </div>
+
+
+        <!-- Department -->
+
+        <div class="communication-field">
+
+            <label>
+
+                Department
+
+            </label>
+
+            <select id="communicationDepartment">
+
+                <option value="">
+                    Select Department
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- Class -->
+
+        <div class="communication-field">
+
+            <label>
+
+                Class
+
+            </label>
+
+            <select id="communicationClass">
+
+                <option value="">
+                    Select Class
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- Student -->
+
+        <div class="communication-field">
+
+            <label>
+
+                Search Student
+
+            </label>
+
+            <input
+                type="text"
+                id="communicationStudentSearch"
+                placeholder="Type student name..."
+            >
+
+            <div
+                id="communicationStudentResults"
+                class="communication-results"
+            ></div>
+
+        </div>
+
+
+        <!-- Parent Messages -->
+
+        <div class="communication-section">
+
+            <h3>
+
+                Parent Messages
+
+            </h3>
+
+            <div
+                id="teacherConversation"
+                class="teacher-conversation"
+            >
+
+                Select a student.
+
+            </div>
+
+        </div>
+
+
+        <!-- Teacher Reply -->
+
+        <div class="communication-section">
+
+            <h3>
+
+                Teacher Reply
+
+            </h3>
+
+            <textarea
+                id="teacherReply"
+                placeholder="Write your reply..."
+            ></textarea>
+
+        </div>
+
+
+        <button
+            id="sendTeacherReply"
+            class="teacher-send-btn"
+        >
+
+            Send Reply
+
+        </button>
+
+    </div>
+
+</div>
 
  <div class="school-contact">
 

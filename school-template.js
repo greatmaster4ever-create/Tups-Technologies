@@ -10736,6 +10736,91 @@ alert(
 
 }
 
+/* =========================================================
+   TEACHER COMMUNICATION BOOK MODAL
+========================================================= */
+
+const communicationBookBtn =
+    document.getElementById(
+        "communicationBookBtn"
+    );
+
+const communicationBookModal =
+    document.getElementById(
+        "communicationBookModal"
+    );
+
+const closeCommunicationBook =
+    document.getElementById(
+        "closeCommunicationBook"
+    );
+
+
+/* -----------------------------------------
+   OPEN
+----------------------------------------- */
+
+if (
+    communicationBookBtn
+) {
+
+    communicationBookBtn.addEventListener(
+        "click",
+        function () {
+
+            communicationBookModal.style.display =
+                "flex";
+
+        }
+    );
+
+}
+
+
+/* -----------------------------------------
+   CLOSE BUTTON
+----------------------------------------- */
+
+if (
+    closeCommunicationBook
+) {
+
+    closeCommunicationBook.addEventListener(
+        "click",
+        function () {
+
+            communicationBookModal.style.display =
+                "none";
+
+        }
+    );
+
+}
+
+
+/* -----------------------------------------
+   CLICK OUTSIDE
+----------------------------------------- */
+
+window.addEventListener(
+    "click",
+    function (
+        event
+    ) {
+
+        if (
+            event.target ===
+            communicationBookModal
+        ) {
+
+            communicationBookModal.style.display =
+                "none";
+
+        }
+
+    }
+);
+
 // ==========================
 // FOOTER YEAR
 // ==========================
