@@ -346,14 +346,20 @@ button:hover {
 }
 
 .login-container{
-    display:flex;
-    justify-content:center;
-    align-items:flex-start;
-    gap:35px;
-    flex-wrap:nowrap;
     width:100%;
     max-width:1200px;
+
     margin:0 auto;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    gap:40px;
+
+    flex-wrap:nowrap;
 }
 
 /* BOTH CARDS SHARE BASE STYLE */
@@ -375,32 +381,14 @@ button:hover {
 
 /* TEACHER CARD (your existing form style stays dominant) */
 .teacher-card{
-    width:390px;
-    min-height:520px;
-
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-start;
-
-    background:rgba(255,255,255,.12);
-    backdrop-filter:blur(15px);
+    width:420px;
+    flex:0 0 420px;
 }
 
-/* ADMIN CARD (white clean contrast) */
 .admin-card{
-
-    flex:0 0 460px;
-    width:460px;
-
-    min-height:520px;
-
-    background:rgba(255,255,255,.95);
-
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
+    width:420px;
+    flex:0 0 420px;
 }
-
 
 .admin-card h2 {
   color: var(--primary-color);
@@ -2316,6 +2304,31 @@ display:block;
 width:100%;
 
 margin-bottom:15px;
+
+}
+
+@media (max-width:900px){
+
+    .login-container{
+
+        flex-direction:column;
+
+        align-items:center;
+
+        gap:30px;
+
+    }
+
+    .teacher-card,
+    .admin-card{
+
+        width:100%;
+
+        max-width:420px;
+
+        flex:none;
+
+    }
 
 }
 
