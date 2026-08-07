@@ -949,51 +949,6 @@ for (const student of matches) {
     results.appendChild(row);
 
 }
-.from("school_communication_book")
-.select("*", { count: "exact", head: true })
-.eq("school_code", schoolCode)
-.eq("student_id", student.id)
-.eq("sender_type", "Parent")
-.eq("is_read", false);
-
-row.innerHTML = `
-<div class="student-result-row">
-
-    <span>
-        ${student.student_name}
-        (${student.reg_no})
-    </span>
-
-    ${
-        count > 0
-        ? `<span class="message-badge">${count}</span>`
-        : ""
-    }
-
-</div>
-`;
-
-        row.onclick = ()=>{
-
-            selectedCommunicationStudent =
-                student;
-
-            document.getElementById(
-                "commStudentSearch"
-            ).value =
-                student.student_name;
-
-            results.innerHTML = "";
-
-            loadCommunicationConversation();
-
-        };
-
-        results.appendChild(row);
-
-    });
-
-}
 
 document
 .getElementById("commClass")
