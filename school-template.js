@@ -868,6 +868,74 @@ async function loadCommunicationStudents() {
 
 }
 
+function searchCommunicationStudents(){
+
+    const keyword =
+        document.getElementById("commStudentSearch")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const results =
+        document.getElementById("commStudentResults");
+
+    results.innerHTML = "";
+
+    if(keyword.length < 2) return;
+
+    const matches =
+        communicationStudents.filter(student=>{
+
+            return(
+
+                student.student_name
+                .toLowerCase()
+                .includes(keyword)
+
+                ||
+
+                student.reg_no
+                .toLowerCase()
+                .includes(keyword)
+
+            );
+
+        });
+
+    matches.forEach(student=>{
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "student-result-item";
+
+        row.innerHTML =
+        `${student.student_name}
+        (${student.reg_no})`;
+
+        row.onclick = ()=>{
+
+            selectedCommunicationStudent =
+                student;
+
+            document.getElementById(
+                "commStudentSearch"
+            ).value =
+                student.student_name;
+
+            results.innerHTML = "";
+
+            loadCommunicationConversation();
+
+        };
+
+        results.appendChild(row);
+
+    });
+
+}
+
 document
 .getElementById("commClass")
 .addEventListener(
@@ -955,54 +1023,16 @@ async function loadCommunicationConversation() {
         await supabaseClient
         .from("school_communication_book")
         .select("*")
-        .eq(
-            "school_code",
-            schoolCode
-        )
-        .eq(
-            "student_id",
-            selectedCommunicationStudent.id
-        )
-        .order(
-            "created_at",
-            { ascending: true }
-        );
+        .eq("school_code", schoolCode)
+        .eq("student_id", selectedCommunicationStudent.id)
+        .order("created_at", { ascending: true });
 
     if (error) {
 
         console.error(error);
 
-// =======================================
-// Mark all Parent messages as read
-// =======================================
-
-await supabaseClient
-.from("school_communication_book")
-.update({
-    is_read: true
-})
-.eq("school_code", schoolCode)
-.eq("student_id", selectedCommunicationStudent.id)
-.eq("sender_type", "Parent")
-.eq("is_read", false);
-
-      // Reload conversation after updating read status
-
-const { data: refreshedData } =
-await supabaseClient
-.from("school_communication_book")
-.select("*")
-.eq("school_code", schoolCode)
-.eq("student_id", selectedCommunicationStudent.id)
-.order("created_at",{ascending:true});
-
-conversation.innerHTML = "";
-
-refreshedData.forEach(msg => {
-
-    // your existing bubble creation code
-
-});
+        conversation.innerHTML =
+            "<p>Unable to load messages.</p>";
 
         return;
 
@@ -1011,11 +1041,25 @@ refreshedData.forEach(msg => {
     if (!data || data.length === 0) {
 
         conversation.innerHTML =
-        "<p>No messages yet.</p>";
+            "<p>No messages yet.</p>";
 
         return;
 
     }
+
+    // ==========================================
+    // Mark Parent messages as read
+    // ==========================================
+
+    await supabaseClient
+        .from("school_communication_book")
+        .update({
+            is_read: true
+        })
+        .eq("school_code", schoolCode)
+        .eq("student_id", selectedCommunicationStudent.id)
+        .eq("sender_type", "Parent")
+        .eq("is_read", false);
 
     conversation.innerHTML = "";
 
@@ -1024,24 +1068,26 @@ refreshedData.forEach(msg => {
         const bubble =
             document.createElement("div");
 
-        bubble.className = "chat-bubble";
+        bubble.className =
+            "chat-bubble";
 
-    let sender = "Unknown";
+        let sender = "Unknown";
 
-switch (msg.sender_type) {
+        switch(msg.sender_type){
 
-    case "Parent":
-        sender = "👨‍👩‍👧 Parent";
-        break;
+            case "Parent":
+                sender = "👨‍👩‍👧 Parent";
+                break;
 
-    case "Teacher":
-        sender = "👨‍🏫 Teacher";
-        break;
+            case "Teacher":
+                sender = "👨‍🏫 Teacher";
+                break;
 
-    case "Admin":
-        sender = "🏫 Admin";
-        break;
-}
+            case "Admin":
+                sender = "🏫 Admin";
+                break;
+
+        }
 
         bubble.innerHTML = `
             <div class="chat-sender">
@@ -1053,9 +1099,7 @@ switch (msg.sender_type) {
             </div>
 
             <div class="chat-time">
-                ${new Date(
-                    msg.created_at
-                ).toLocaleString()}
+                ${new Date(msg.created_at).toLocaleString()}
             </div>
         `;
 

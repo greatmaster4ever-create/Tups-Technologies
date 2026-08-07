@@ -546,12 +546,13 @@ Save Item
 
             <label>Search Student</label>
 
-            <input
-                id="commStudentSearch"
-                type="text"
-                placeholder="Search student..."
-                autocomplete="off"
-            >
+           <input
+    id="commStudentSearch"
+    type="text"
+    placeholder="Search student..."
+    autocomplete="off"
+    onkeyup="searchCommunicationStudents()"
+>
 
             <div id="commStudentResults" class="communication-results"></div>
 
