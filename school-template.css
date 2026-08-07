@@ -2586,8 +2586,9 @@ font-size:32px;
 }
 
 .admin-card{
-    width:460px;
     flex:0 0 460px;
-
+	max-width:1250px;
+    width:100%;
+	text-align:center;
     background:rgba(255,255,255,.95);
 }
