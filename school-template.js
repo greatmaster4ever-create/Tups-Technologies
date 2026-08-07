@@ -776,11 +776,23 @@ async function openCommunicationBook(){
     document.getElementById("adminContent").innerHTML =
         communicationBookHTML;
 
+    await loadCommunicationDepartments();
+
     await loadCommunicationCalendarData();
 
-renderAdminCalendar();
+    renderAdminCalendar();
 
 }
+
+document.addEventListener("change",function(e){
+
+    if(e.target.id==="commDepartment"){
+
+        loadCommunicationClasses();
+
+    }
+
+});
 
 function renderAdminCalendar(){
 
@@ -1326,6 +1338,59 @@ async function sendAdminReply(studentId){
 
 }
 
+async function loadCommunicationDepartments(){
+
+    const deptSelect =
+        document.getElementById("commDepartment");
+
+    deptSelect.innerHTML =
+        '<option value="">Loading...</option>';
+
+    const { data, error } =
+        await supabaseClient
+
+        .from("students")
+
+        .select("department")
+
+        .eq("school_code", schoolCode);
+
+    if(error){
+
+        console.error(error);
+
+        deptSelect.innerHTML =
+        '<option value="">No Department</option>';
+
+        return;
+
+    }
+
+    const departments =
+
+        [...new Set(
+
+            data.map(row=>row.department)
+
+        )].sort();
+
+    deptSelect.innerHTML =
+        '<option value="">Select Department</option>';
+
+    departments.forEach(dept=>{
+
+        const option =
+            document.createElement("option");
+
+        option.value = dept;
+
+        option.textContent = dept;
+
+        deptSelect.appendChild(option);
+
+    });
+
+}
 
 async function loadCommunicationClasses() {
 
