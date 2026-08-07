@@ -2858,9 +2858,9 @@ color:var(--primary-color);
 
 display:grid;
 
-grid-template-columns:repeat(7,35px);
+grid-template-columns:repeat(7,30px);
 
-gap:6px;
+gap:5px;
 
 justify-content:center;
 
@@ -2880,11 +2880,12 @@ padding-bottom:8px;
 
 .calendar-day{
 
-width:35px;
+width:30px;
 
-height:35px;
+height:30px;
 
 display:flex;
+font-size:13px;
 
 align-items:center;
 
