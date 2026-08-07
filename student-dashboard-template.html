@@ -1606,6 +1606,8 @@ await loadSchoolFeesPaymentHistory();
 
 await loadOptionalPaymentHistory();
 
+await loadCommunicationBook();
+
         console.log(
             "Student Dashboard Loaded:",
             studentData
@@ -1892,6 +1894,127 @@ setInterval(
     }
 
 }
+
+/* =========================================================
+   LOAD COMMUNICATION BOOK
+========================================================= */
+
+async function loadCommunicationBook() {
+
+    const container =
+        document.getElementById(
+            "communicationMessages"
+        );
+
+    if (!container) return;
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_communication_book"
+                )
+
+                .select("*")
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                )
+
+                .eq(
+                    "student_id",
+                    window.currentStudent.id
+                )
+
+                .order(
+                    "created_at",
+                    {
+                        ascending: true
+                    }
+                );
+
+        if (error)
+            throw error;
+
+        if (!data || !data.length) {
+
+            container.innerHTML = `
+
+                <div class="empty-state">
+
+                    No communication yet.
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+        container.innerHTML =
+
+            data.map(
+
+                row => `
+
+<div class="communication-message ${row.sender_type.toLowerCase()}">
+
+    <div class="message-header">
+
+        <span class="message-sender">
+
+            ${row.sender_type}
+
+        </span>
+
+        <span class="message-date">
+
+            ${new Date(row.created_at)
+                .toLocaleString()}
+
+        </span>
+
+    </div>
+
+    <div class="message-text">
+
+        ${row.message}
+
+    </div>
+
+</div>
+
+`
+
+            ).join("");
+
+    }
+
+    catch (err) {
+
+        console.error(err);
+
+        container.innerHTML =
+
+            `<div class="empty-state">
+
+                Unable to load messages.
+
+            </div>`;
+
+    }
+
+}
+
+
+
 /* =========================================================
    LOAD SCHOOL FEES PAYMENT HISTORY
 ========================================================= */

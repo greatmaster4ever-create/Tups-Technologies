@@ -282,3 +282,27 @@
 .student-dashboard-logout:hover {
     background: #a80000;
 }
+
+.communication-message.parent{
+
+    background:#eef8ff;
+
+    border-left:5px solid #0077ff;
+
+}
+
+.communication-message.teacher{
+
+    background:#fff8e5;
+
+    border-left:5px solid orange;
+
+}
+
+.communication-message.admin{
+
+    background:#f3fff3;
+
+    border-left:5px solid green;
+
+}
