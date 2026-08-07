@@ -153,7 +153,7 @@
     type="button"
     id="teacherCommunicationBtn" 
 	class="communication-btn"
-	onclick=""
+	onclick="openTeacherCommunicationBook()"
 >
     📖 Communication Book
 </button>
@@ -626,6 +626,127 @@ Save Item
   <div id="schoolPhone">
   
   </div>
+
+</div>
+
+<!-- ===========================
+     TEACHER COMMUNICATION BOOK
+=========================== -->
+
+<div id="teacherCommunicationModal" class="communication-modal" style="display:none;">
+
+    <div class="communication-modal-content">
+
+        <div class="communication-header">
+            <h2>📖 Communication Book</h2>
+
+            <span
+                class="communication-close"
+                onclick="closeTeacherCommunicationBook()"
+            >
+                &times;
+            </span>
+        </div>
+
+        <!-- Department -->
+
+        <div class="communication-field">
+
+            <label>Department</label>
+
+            <select id="commDepartment">
+
+                <option value="">Select Department</option>
+
+                <option>KG</option>
+                <option>Nursery</option>
+                <option>Creche</option>
+                <option>Primary</option>
+                <option>JSec</option>
+                <option>SSec</option>
+
+            </select>
+
+        </div>
+
+        <!-- Class -->
+
+        <div class="communication-field">
+
+            <label>Class</label>
+
+            <select id="commClass">
+
+                <option value="">Select Class</option>
+
+            </select>
+
+        </div>
+
+        <!-- Student Search -->
+
+        <div class="communication-field">
+
+            <label>Search Student</label>
+
+            <input
+                id="commStudentSearch"
+                type="text"
+                placeholder="Search student..."
+                autocomplete="off"
+            >
+
+            <div id="commStudentResults" class="communication-results"></div>
+
+        </div>
+
+        <!-- Conversation -->
+
+        <div class="communication-field">
+
+            <label>Conversation</label>
+
+            <div
+                id="teacherConversationThread"
+                class="teacher-conversation"
+            >
+
+                <div
+                    style="
+                        text-align:center;
+                        color:#777;
+                        padding:30px;
+                    "
+                >
+                    Select a student to view messages.
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Teacher Reply -->
+
+        <div class="communication-field">
+
+            <label>Teacher Reply</label>
+
+            <textarea
+                id="teacherReply"
+                rows="5"
+                placeholder="Type your reply here..."
+            ></textarea>
+
+        </div>
+
+        <button
+            class="teacher-send-btn"
+            onclick="sendTeacherReply()"
+        >
+            Send Reply
+        </button>
+
+    </div>
 
 </div>
 

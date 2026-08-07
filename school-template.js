@@ -688,6 +688,22 @@ adminDashboardHTML;
     }
   );
 
+function openTeacherCommunicationBook(){
+
+    document.getElementById(
+        "teacherCommunicationModal"
+    ).style.display="flex";
+
+}
+
+function closeTeacherCommunicationBook(){
+
+    document.getElementById(
+        "teacherCommunicationModal"
+    ).style.display="none";
+
+}
+
 async function showOptionalPaymentsSetup(){
 
 const {
