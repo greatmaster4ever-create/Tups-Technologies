@@ -468,75 +468,85 @@ Save Item
 
   </div>
   
-  <!-- =========================================================
-     TEACHER COMMUNICATION BOOK MODAL
-========================================================= -->
+ 
+        <!-- Student -->
 
-<div
-    id="communicationBookModal"
-    class="communication-modal"
-    style="display:none;"
->
+        <div class="communication-field">
 
-    <div class="communication-modal-content">
+            <label>
 
-        <div class="communication-header">
+                Search Student
 
-            <h2>Communication Book</h2>
+            </label>
 
-            <span
-                id="closeCommunicationBook"
-                class="communication-close"
+            <input
+                type="text"
+                id="communicationStudentSearch"
+                placeholder="Type student name..."
             >
-                &times;
-            </span>
+
+            <div
+                id="communicationStudentResults"
+                class="communication-results"
+            ></div>
 
         </div>
 
 
-        <!-- Department -->
+        <!-- Parent Messages -->
 
-        <div class="communication-field">
+        <div class="communication-section">
 
-            <label>
+            <h3>
 
-                Department
+                Parent Messages
 
-            </label>
+            </h3>
 
-            <select id="communicationDepartment">
+            <div
+                id="teacherConversation"
+                class="teacher-conversation"
+            >
 
-                <option value="">
-                    Select Department
-                </option>
+                Select a student.
 
-            </select>
-
-        </div>
-
-
-        <!-- Class -->
-
-        <div class="communication-field">
-
-            <label>
-
-                Class
-
-            </label>
-
-            <select id="communicationClass">
-
-                <option value="">
-                    Select Class
-                </option>
-
-            </select>
+            </div>
 
         </div>
 
 
-       
+        <!-- Teacher Reply -->
+
+        <div class="communication-section">
+
+            <h3>
+
+                Teacher Reply
+
+            </h3>
+
+            <textarea
+                id="teacherReply"
+                rows="5"
+                placeholder="Type your reply here..."
+            ></textarea>
+
+        </div>
+
+
+        <button
+            id="sendTeacherReply"
+            class="teacher-send-btn"
+        >
+
+            Send Reply
+
+        </button>
+
+    </div>
+
+</div>
+
  <div class="school-contact">
 
   <h3 class="contact-title">
