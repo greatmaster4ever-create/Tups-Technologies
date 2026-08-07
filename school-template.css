@@ -2806,17 +2806,19 @@ border:1px solid #ddd;
 
 border-radius:10px;
 
-height:320px;
+width:280px;
 
-display:flex;
+padding:15px;
 
-align-items:center;
+margin-left:auto;
 
-justify-content:center;
+margin-right:auto;
 
 color:#888;
 
 font-size:14px;
+
+overflow:hidden;
 
 }
 
@@ -2856,9 +2858,55 @@ color:var(--primary-color);
 
 display:grid;
 
-grid-template-columns:repeat(7,1fr);
+grid-template-columns:repeat(7,35px);
 
 gap:6px;
+
+justify-content:center;
+
+}
+
+.calendar-head{
+
+text-align:center;
+
+font-weight:bold;
+
+font-size:14px;
+
+padding-bottom:8px;
+
+}
+
+.calendar-day{
+
+width:35px;
+
+height:35px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+border:1px solid #ddd;
+
+border-radius:8px;
+
+cursor:pointer;
+
+background:#fff;
+
+transition:.2s;
+
+}
+
+.calendar-day:hover{
+
+background:#000066;
+
+color:#fff;
 
 }
 
