@@ -868,7 +868,7 @@ async function loadCommunicationStudents() {
 
 }
 
-function searchCommunicationStudents(){
+async function searchCommunicationStudents(){
 
     const keyword =
         document.getElementById("commStudentSearch")
