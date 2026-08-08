@@ -994,13 +994,9 @@ async function loadAdminCommunicationList(){
 
     const list =
 
-        document.getElementById(
+       document.getElementById("conversationMessages");
 
-            "conversationList"
-
-        );
-
-    list.innerHTML =
+   conversationMessages.innerHTML =
 
         "<p>Loading...</p>";
 
