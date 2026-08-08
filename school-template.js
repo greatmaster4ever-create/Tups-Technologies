@@ -648,7 +648,7 @@ const communicationBookHTML = `
             Communication Book
         </h2>
 
-        <div id="conversationList">
+        <div id="conversationMessages">
 
             Select a class to load conversations.
 
@@ -1749,42 +1749,63 @@ async function loadCommunicationConversation() {
     data.forEach(msg => {
 
         const bubble =
-            document.createElement("div");
+    document.createElement("div");
 
-        bubble.className =
-            "chat-bubble";
+if(msg.sender_type === "Parent"){
 
-        let sender = "Unknown";
+    bubble.className =
+        "chat-bubble chat-parent";
 
-        switch(msg.sender_type){
+}else{
 
-            case "Parent":
-                sender = "👨‍👩‍👧 Parent";
-                break;
+    bubble.className =
+        "chat-bubble chat-teacher";
 
-            case "Teacher":
-                sender = "👨‍🏫 Teacher";
-                break;
+}
 
-            case "Admin":
-                sender = "🏫 Admin";
-                break;
+       let sender = "Unknown";
 
-        }
+if(msg.sender_type === "Parent"){
 
-        bubble.innerHTML = `
-            <div class="chat-sender">
-                ${sender}
-            </div>
+    sender = "👨‍👩‍👧 Parent";
 
-            <div class="chat-message">
-                ${msg.message}
-            </div>
+}
 
-            <div class="chat-time">
-                ${new Date(msg.created_at).toLocaleString()}
-            </div>
-        `;
+else if(msg.sender_type === "Teacher"){
+
+    sender = "👨‍🏫 Teacher";
+
+}
+
+else if(msg.sender_type === "Admin"){
+
+    sender = "🏫 Admin";
+
+}
+
+     bubble.innerHTML = `
+
+    <div class="chat-sender">
+
+        ${sender}
+
+    </div>
+
+    <div class="chat-message">
+
+        ${msg.message}
+
+    </div>
+
+    <div class="chat-time">
+
+        ${new Date(
+            msg.created_at
+        ).toLocaleString()}
+
+    </div>
+
+`;
 
         conversation.appendChild(bubble);
 

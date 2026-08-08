@@ -2589,39 +2589,111 @@ font-size:32px;
     background:rgba(255,255,255,.95);
 }
 
-.chat-bubble{
-    background:#fff;
-    border:1px solid #ddd;
-    padding:10px 14px;
-    margin-bottom:8px;
-    border-radius:10px;
-    box-shadow:0 1px 3px rgba(0,0,0,.06);
+/* =====================================================
+   ADMIN COMMUNICATION — CHAT BUBBLES
+===================================================== */
 
-    display:flex;
-    flex-direction:column;
-    gap:6px;
+.chat-bubble{
+
+    width:fit-content;
+    max-width:70%;
+
+    padding:12px 15px;
+
+    margin:10px 0;
+
+    border-radius:12px;
+
+    box-shadow:0 1px 4px rgba(0,0,0,.10);
+
+    word-wrap:break-word;
+    overflow-wrap:break-word;
+
 }
+
+
+/* Parent message */
+
+.chat-parent{
+
+    background:#ffffff;
+
+    margin-right:auto;
+    margin-left:0;
+
+    border-left:5px solid #000066;
+
+}
+
+
+/* Teacher/Admin message */
+
+.chat-teacher{
+
+    background:#eaf7ff;
+
+    margin-left:auto;
+    margin-right:0;
+
+    border-right:5px solid #198754;
+
+}
+
+
+/* Sender */
 
 .chat-sender{
+
     font-weight:700;
+
+    font-size:14px;
+
+    margin-bottom:7px;
+
     color:#000066;
-    font-size:15px;
-    margin:0;
+
 }
+
+
+/* Message */
 
 .chat-message{
-    white-space:pre-wrap;
-    line-height:1.45;
+
+    font-size:15px;
+
+    line-height:1.55;
+
     color:#333;
-    margin:0;
-    word-break:break-word;
+
+    text-align:left;
+
+    white-space:pre-wrap;
+
 }
 
+
+/* Time */
+
 .chat-time{
+
+    margin-top:8px;
+
     font-size:11px;
-    color:#888;
+
+    color:#777;
+
     text-align:right;
-    margin-top:2px;
+
+}
+
+#conversationMessages{
+
+    display:flex;
+
+    flex-direction:column;
+
+    padding:10px 5px;
+
 }
 
 .student-result-row{
