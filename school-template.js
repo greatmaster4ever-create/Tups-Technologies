@@ -944,6 +944,180 @@ function openTeacherCommunicationBook(){
 
 }
 
+async function sendAdminReply() {
+
+    // -----------------------------------------
+    // Make sure a student conversation is open
+    // -----------------------------------------
+
+    if (!selectedCommunicationStudent) {
+
+        alert("Please select a student conversation.");
+
+        return;
+
+    }
+
+    const replyBox =
+        document.getElementById(
+            "adminReplyMessage"
+        );
+
+    if (!replyBox) {
+
+        console.error(
+            "adminReplyMessage textarea not found."
+        );
+
+        return;
+
+    }
+
+    const message =
+        replyBox.value.trim();
+
+    if (!message) {
+
+        alert("Please type a reply.");
+
+        replyBox.focus();
+
+        return;
+
+    }
+
+    const student =
+        selectedCommunicationStudent;
+
+    // -----------------------------------------
+    // Disable button while sending
+    // -----------------------------------------
+
+    const sendButton =
+        document.getElementById(
+            "sendAdminReply"
+        );
+
+    if (sendButton) {
+
+        sendButton.disabled = true;
+
+        sendButton.textContent =
+            "Sending...";
+
+    }
+
+    // -----------------------------------------
+    // Insert admin reply
+    // -----------------------------------------
+
+    const {
+        error
+    } = await supabaseClient
+
+        .from("school_communication_book")
+
+        .insert([{
+
+            school_code:
+                schoolCode,
+
+            department:
+                student.department,
+
+            class:
+                student.class,
+
+            student_id:
+                student.id,
+
+            reg_no:
+                student.reg_no,
+
+            student_name:
+                student.student_name ||
+                student.name ||
+                student.full_name ||
+                "Unknown Student",
+
+            sender_type:
+                "Admin",
+
+            sender_name:
+                "Admin",
+
+            message:
+                message,
+
+            is_read:
+                false
+
+        }]);
+
+    // -----------------------------------------
+    // Handle error
+    // -----------------------------------------
+
+    if (error) {
+
+        console.error(
+            "Error sending admin reply:",
+            error
+        );
+
+        alert(
+            "Unable to send reply: " +
+            error.message
+        );
+
+        if (sendButton) {
+
+            sendButton.disabled = false;
+
+            sendButton.textContent =
+                "Send Reply";
+
+        }
+
+        return;
+
+    }
+
+    // -----------------------------------------
+    // Clear reply box
+    // -----------------------------------------
+
+    replyBox.value = "";
+
+    // -----------------------------------------
+    // Reload conversation
+    // -----------------------------------------
+
+    await loadAdminConversationMessages(
+        student
+    );
+
+    // -----------------------------------------
+    // Refresh message tags
+    // -----------------------------------------
+
+    await loadAdminMessageTags();
+
+    // -----------------------------------------
+    // Restore button
+    // -----------------------------------------
+
+    if (sendButton) {
+
+        sendButton.disabled = false;
+
+        sendButton.textContent =
+            "Send Reply";
+
+    }
+
+}
+
 function closeTeacherCommunicationBook(){
 
     clearInterval(
@@ -1150,6 +1324,22 @@ async function openCommunicationBook(){
 
     }
 
+    // ==========================================
+    // SEND ADMIN REPLY
+    // ==========================================
+
+    const sendReplyButton =
+        document.getElementById(
+            "sendAdminReply"
+        );
+
+    if (sendReplyButton) {
+
+        sendReplyButton.onclick =
+            sendAdminReply;
+
+    }
+	
 }
 
 async function loadAdminMessageTags() {
