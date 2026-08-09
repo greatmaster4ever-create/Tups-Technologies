@@ -959,26 +959,538 @@ function closeTeacherCommunicationBook(){
 
 async function openCommunicationBook(){
 
+    // ==========================================
+    // LOAD COMMUNICATION BOOK UI
+    // ==========================================
+
     document.getElementById("adminContent").innerHTML =
         communicationBookHTML;
 
+
+    // ==========================================
+    // LOAD DEPARTMENTS
+    // ==========================================
+
     await loadCommunicationDepartments();
+
+
+    // ==========================================
+    // LOAD CALENDAR DATA
+    // ==========================================
 
     await loadCommunicationCalendarData();
 
     renderAdminCalendar();
-	
-	const closeButton =
-    document.getElementById(
-        "closeAdminConversation"
-    );
 
-if (closeButton) {
 
-    closeButton.onclick =
-        closeAdminConversation;
+    // ==========================================
+    // FILTER ELEMENTS
+    // ==========================================
+
+    const departmentSelect =
+        document.getElementById("commDepartment");
+
+    const classSelect =
+        document.getElementById("commClass");
+
+    const sortSelect =
+        document.getElementById("commSort");
+
+    const searchInput =
+        document.getElementById("adminStudentSearch");
+
+
+    // ==========================================
+    // CLASS CHANGE
+    // ==========================================
+
+    if (classSelect) {
+
+        classSelect.addEventListener(
+            "change",
+            function(){
+
+                // Clear old student tags
+
+                const tagsContainer =
+                    document.getElementById(
+                        "adminMessageTags"
+                    );
+
+                if (tagsContainer) {
+
+                    tagsContainer.innerHTML = `
+
+                        <div class="communication-empty-state">
+
+                            <div class="empty-icon">
+                                📅
+                            </div>
+
+                            <h3>
+                                Select a date
+                            </h3>
+
+                            <p>
+                                Select a date from the calendar
+                                to view messages for this class.
+                            </p>
+
+                        </div>
+
+                    `;
+
+                }
+
+                // Load messages if a date
+                // has already been selected
+
+                if (
+                    window.adminSelectedCommunicationDate
+                ) {
+
+                    loadAdminMessageTags();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // ==========================================
+    // SORT CHANGE
+    // ==========================================
+
+    if (sortSelect) {
+
+        sortSelect.addEventListener(
+            "change",
+            function(){
+
+                if (
+                    window.adminSelectedCommunicationDate
+                ) {
+
+                    loadAdminMessageTags();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // ==========================================
+    // STUDENT SEARCH
+    // ==========================================
+
+    if (searchInput) {
+
+        searchInput.addEventListener(
+            "input",
+            function(){
+
+                const search =
+                    this.value
+                        .trim()
+                        .toLowerCase();
+
+
+                const tags =
+                    document.querySelectorAll(
+                        ".admin-message-tag"
+                    );
+
+
+                tags.forEach(tag => {
+
+                    const nameElement =
+                        tag.querySelector(
+                            ".admin-message-tag-name"
+                        );
+
+                    const name =
+                        nameElement
+                            ? nameElement.textContent
+                                .trim()
+                                .toLowerCase()
+                            : "";
+
+
+                    tag.style.display =
+                        name.includes(search)
+                            ? ""
+                            : "none";
+
+                });
+
+            }
+        );
+
+    }
+
+
+    // ==========================================
+    // CLOSE CONVERSATION MODAL
+    // ==========================================
+
+    const closeButton =
+        document.getElementById(
+            "closeAdminConversation"
+        );
+
+
+    if (closeButton) {
+
+        closeButton.onclick =
+            closeAdminConversation;
+
+    }
 
 }
+
+async function loadAdminMessageTags() {
+
+    const tagsContainer =
+        document.getElementById("adminMessageTags");
+
+    const departmentSelect =
+        document.getElementById("commDepartment");
+
+    const classSelect =
+        document.getElementById("commClass");
+
+    if (!tagsContainer ||
+        !departmentSelect ||
+        !classSelect) {
+        return;
+    }
+
+    const department =
+        departmentSelect.value;
+
+    const className =
+        classSelect.value;
+
+    const selectedDate =
+        window.adminSelectedCommunicationDate;
+
+    // -----------------------------------------
+    // Validate filters
+    // -----------------------------------------
+
+    if (!department ||
+        !className ||
+        !selectedDate) {
+
+        tagsContainer.innerHTML = `
+
+            <div class="communication-empty-state">
+
+                <div class="empty-icon">
+                    📖
+                </div>
+
+                <h3>
+                    No messages selected
+                </h3>
+
+                <p>
+                    Select a department, class and date
+                    to view messages.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+    tagsContainer.innerHTML = `
+
+        <div class="communication-empty-state">
+
+            <div class="empty-icon">
+                ⏳
+            </div>
+
+            <p>
+                Loading messages...
+            </p>
+
+        </div>
+
+    `;
+
+    // -----------------------------------------
+    // Get students in selected department/class
+    // -----------------------------------------
+
+    const {
+        data: students,
+        error: studentError
+    } = await supabaseClient
+        .from("students")
+        .select("*")
+        .eq("school_code", schoolCode)
+        .eq("department", department)
+        .eq("class", className);
+
+    if (studentError) {
+
+        console.error(
+            "Error loading students:",
+            studentError
+        );
+
+        tagsContainer.innerHTML = `
+
+            <div class="communication-empty-state">
+
+                <div class="empty-icon">
+                    ⚠️
+                </div>
+
+                <h3>
+                    Unable to load students
+                </h3>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+    if (!students || students.length === 0) {
+
+        tagsContainer.innerHTML = `
+
+            <div class="communication-empty-state">
+
+                <div class="empty-icon">
+                    👨‍🎓
+                </div>
+
+                <h3>
+                    No students found
+                </h3>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+    // -----------------------------------------
+    // Get messages for selected date
+    // -----------------------------------------
+
+    const startOfDay =
+        `${selectedDate}T00:00:00`;
+
+    const endOfDay =
+        `${selectedDate}T23:59:59`;
+
+    const {
+        data: messages,
+        error: messageError
+    } = await supabaseClient
+        .from("school_communication_book")
+        .select("*")
+        .eq("school_code", schoolCode)
+        .gte("created_at", startOfDay)
+        .lte("created_at", endOfDay)
+        .order("created_at", {
+            ascending: true
+        });
+
+    if (messageError) {
+
+        console.error(
+            "Error loading communication messages:",
+            messageError
+        );
+
+        tagsContainer.innerHTML = `
+
+            <div class="communication-empty-state">
+
+                <div class="empty-icon">
+                    ⚠️
+                </div>
+
+                <h3>
+                    Unable to load messages
+                </h3>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+    // -----------------------------------------
+    // Only students who actually have messages
+    // -----------------------------------------
+
+    const messageMap = {};
+
+    (messages || []).forEach(msg => {
+
+        if (!messageMap[msg.student_id]) {
+
+            messageMap[msg.student_id] = [];
+
+        }
+
+        messageMap[msg.student_id].push(msg);
+
+    });
+
+    const studentsWithMessages =
+        students.filter(student =>
+            messageMap[student.id]
+        );
+
+    // -----------------------------------------
+    // No messages
+    // -----------------------------------------
+
+    if (studentsWithMessages.length === 0) {
+
+        tagsContainer.innerHTML = `
+
+            <div class="communication-empty-state">
+
+                <div class="empty-icon">
+                    📖
+                </div>
+
+                <h3>
+                    No messages
+                </h3>
+
+                <p>
+                    There are no messages for this
+                    class on the selected date.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+    // -----------------------------------------
+    // Sort students
+    // -----------------------------------------
+
+    const sortSelect =
+        document.getElementById("commSort");
+
+    const sort =
+        sortSelect
+            ? sortSelect.value
+            : "newest";
+
+    studentsWithMessages.sort((a, b) => {
+
+        const aMessages =
+            messageMap[a.id];
+
+        const bMessages =
+            messageMap[b.id];
+
+        const aTime =
+            new Date(
+                aMessages[aMessages.length - 1].created_at
+            );
+
+        const bTime =
+            new Date(
+                bMessages[bMessages.length - 1].created_at
+            );
+
+        return sort === "oldest"
+            ? aTime - bTime
+            : bTime - aTime;
+
+    });
+
+    // -----------------------------------------
+    // Render ONLY name + count
+    // -----------------------------------------
+
+    tagsContainer.innerHTML = "";
+
+    studentsWithMessages.forEach(student => {
+
+        const studentMessages =
+            messageMap[student.id];
+
+        const unreadCount =
+            studentMessages.filter(
+                msg =>
+                    msg.sender_type === "Parent" &&
+                    msg.is_read === false
+            ).length;
+
+        const totalCount =
+            studentMessages.length;
+
+        const tag =
+            document.createElement("button");
+
+        tag.type = "button";
+
+        tag.className =
+            unreadCount > 0
+                ? "admin-message-tag unread"
+                : "admin-message-tag";
+
+        const studentName =
+            student.name ||
+            student.student_name ||
+            student.full_name ||
+            `${student.first_name || ""} ${student.last_name || ""}`.trim() ||
+            "Unknown Student";
+
+        tag.innerHTML = `
+
+            <span class="admin-message-tag-name">
+                ${studentName}
+            </span>
+
+            <span class="admin-message-count">
+                ${totalCount}
+            </span>
+
+        `;
+
+        // -------------------------------------
+        // CLICK → OPEN POPUP
+        // -------------------------------------
+
+        tag.addEventListener(
+            "click",
+            function() {
+
+                openAdminConversation(student);
+
+            }
+        );
+
+        tagsContainer.appendChild(tag);
+
+    });
 
 }
 

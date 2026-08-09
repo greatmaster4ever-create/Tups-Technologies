@@ -2963,9 +2963,9 @@ justify-content:center;
 
 border-radius:12px;
 
-background:#000066;
+background:var(--secondary-color, #00f5ff);
 
-color:#fff;
+color:#000;
 
 font-size:11px;
 
@@ -2975,15 +2975,15 @@ font-weight:bold;
 
 .admin-message-tag.unread{
 
-    border-color:#e63946;
+    background:#fff7f7;
 
-    background:#fff5f5;
+    border:2px solid #e53935;
 
 }
 
 .admin-message-tag.unread .admin-message-tag-name{
 
-    color:#b4232f;
+    color:#b71c1c;
 
 }
 
