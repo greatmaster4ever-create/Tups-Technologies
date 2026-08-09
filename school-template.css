@@ -2731,7 +2731,7 @@ border:0;
 
 border-radius:6px;
 
-background:#000066;
+background:var(--primary-color, #00f5ff);
 
 color:#fff;
 
