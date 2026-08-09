@@ -3085,351 +3085,389 @@ font-size:13px;
 }
 
 /* =========================================================
-CONVERSATION MODAL
+   ADMIN CONVERSATION POPUP MODAL
 ========================================================= */
 
-.admin-conversation-modal{
+.admin-conversation-modal {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 99999;
 
-position:fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-inset:0;
-
-z-index:99999;
-
-
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-.admin-conversation-overlay{
+/* Dark background */
 
+.admin-conversation-overlay {
+    position: absolute;
+    inset: 0;
 
-position:absolute;
-
-inset:0;
-
-background:rgba(0,0,0,.55);
-
-
-}
-
-.admin-conversation-dialog{
-
-
-position:relative;
-
-width:min(650px, calc(100% - 30px));
-
-max-height:90vh;
-
-margin:5vh auto 0;
-
-background:#fff;
-
-border-radius:14px;
-
-overflow:hidden;
-
-display:flex;
-
-flex-direction:column;
-
-box-shadow:0 10px 40px rgba(0,0,0,.25);
-
-
-}
-
-/* Modal header */
-
-.admin-conversation-header{
-
-
-display:flex;
-
-align-items:center;
-
-justify-content:space-between;
-
-padding:15px 18px;
-
-border-bottom:1px solid #eee;
-
-flex-shrink:0;
-
-
-}
-
-.admin-conversation-header h2{
-
-
-margin:0;
-
-font-size:18px;
-
-color:#000066;
-
-
-}
-
-.admin-conversation-header p{
-
-
-margin:3px 0 0;
-
-font-size:12px;
-
-color:#777;
-
-
-}
-
-.admin-conversation-close{
-
-
-width:34px;
-
-height:34px;
-
-border:0;
-
-border-radius:50%;
-
-background:#f1f1f1;
-
-color:#555;
-
-font-size:24px;
-
-line-height:1;
-
-cursor:pointer;
-
-
-}
-
-.admin-conversation-close:hover{
-
-
-background:#e5e5e5;
-
-
+    background: rgba(0, 0, 0, 0.60);
 }
 
 /* =========================================================
-CONVERSATION MESSAGES
+   MODAL DIALOG
 ========================================================= */
 
-.conversation-messages{
+.admin-conversation-dialog {
+    position: relative;
 
+    width: min(700px, 100%);
+    height: min(90vh, 760px);
+    max-height: 90vh;
 
-flex:1;
+    background: #fff;
 
-overflow-y:auto;
+    border-radius: 16px;
 
-padding:18px;
+    overflow: hidden;
 
-min-height:220px;
+    display: flex;
+    flex-direction: column;
 
-max-height:55vh;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.30);
 
-background:#f7f8fa;
-
-
-}
-
-/* Message bubbles */
-
-.admin-chat-bubble{
-
-
-max-width:78%;
-
-padding:10px 13px;
-
-margin-bottom:12px;
-
-border-radius:12px;
-
-line-height:1.45;
-
-font-size:14px;
-
-word-wrap:break-word;
-
-
-}
-
-.admin-chat-parent{
-
-
-margin-right:auto;
-
-background:#fff;
-
-border:1px solid #ddd;
-
-
-}
-
-.admin-chat-teacher{
-
-
-margin-left:auto;
-
-background:#e8f0ff;
-
-
-}
-
-.admin-chat-sender{
-
-
-font-weight:700;
-
-font-size:12px;
-
-margin-bottom:4px;
-
-color:#000066;
-
-
-}
-
-.admin-chat-message{
-
-
-color:#333;
-
-white-space:pre-wrap;
-
-
-}
-
-.admin-chat-time{
-
-
-margin-top:5px;
-
-text-align:right;
-
-font-size:10px;
-
-color:#888;
-
-
+    z-index: 1;
 }
 
 /* =========================================================
-ADMIN REPLY
+   MODAL HEADER
 ========================================================= */
 
-.admin-reply-area{
+.admin-conversation-header {
 
+    display: flex;
 
-display:flex;
+    align-items: center;
 
-gap:8px;
+    justify-content: space-between;
 
-padding:12px;
+    gap: 15px;
 
-border-top:1px solid #ddd;
+    padding: 16px 20px;
 
-background:#fff;
+    border-bottom: 1px solid #eee;
 
-flex-shrink:0;
+    background: #fff;
 
-
+    flex-shrink: 0;
 }
 
-#adminReplyMessage{
+.admin-conversation-header h2 {
 
+    margin: 0;
 
-flex:1;
+    font-size: 19px;
 
-resize:none;
-
-min-height:45px;
-
-max-height:100px;
-
-border:1px solid #ccc;
-
-border-radius:8px;
-
-padding:9px 10px;
-
-font-family:inherit;
-
-font-size:14px;
-
-box-sizing:border-box;
-
-
+    color: #000066;
 }
 
-.admin-send-reply-btn{
+.admin-conversation-header p {
 
+    margin: 4px 0 0;
 
-align-self:flex-end;
+    font-size: 12px;
 
-height:42px;
-
-padding:0 16px;
-
-border:0;
-
-border-radius:8px;
-
-background:#000066;
-
-color:#fff;
-
-cursor:pointer;
-
-font-weight:600;
-
-
+    color: #777;
 }
 
-.admin-send-reply-btn:hover{
+/* Close button */
 
+.admin-conversation-close {
 
-opacity:.9;
+    flex-shrink: 0;
 
+    width: 36px;
+    height: 36px;
 
+    border: 0;
+
+    border-radius: 50%;
+
+    background: #f1f1f1;
+
+    color: #555;
+
+    font-size: 25px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    transition:
+        background 0.2s,
+        transform 0.15s;
+}
+
+.admin-conversation-close:hover {
+
+    background: #e5e5e5;
+
+    transform: scale(1.05);
 }
 
 /* =========================================================
-MOBILE RESPONSIVENESS
+   CONVERSATION MESSAGE AREA
+   THIS AREA SCROLLS — NOT THE WHOLE PAGE
 ========================================================= */
 
-@media(max-width:700px){
-	
-.admin-message-tags{
+.conversation-messages {
 
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
+    flex: 1;
 
-    gap:9px;
+    min-height: 0;
 
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    padding: 20px;
+
+    background: #f7f8fa;
+
+    scroll-behavior: smooth;
+
+    box-sizing: border-box;
 }
 
-.admin-message-tag{
+/* =========================================================
+   MESSAGE BUBBLES
+========================================================= */
 
-    padding:10px;
+.admin-chat-bubble {
 
+    max-width: 78%;
+
+    padding: 11px 14px;
+
+    margin-bottom: 13px;
+
+    border-radius: 13px;
+
+    line-height: 1.45;
+
+    font-size: 14px;
+
+    word-wrap: break-word;
+
+    overflow-wrap: anywhere;
 }
 
-.admin-message-tag-name{
+.admin-chat-parent {
 
-    font-size:13px;
+    margin-right: auto;
 
+    background: #fff;
+
+    border: 1px solid #ddd;
 }
 
-.admin-message-tag-info{
+.admin-chat-teacher {
 
-    font-size:11px;
+    margin-left: auto;
 
+    background: #e8f0ff;
 }
 
+.admin-chat-sender {
+
+    font-weight: 700;
+
+    font-size: 12px;
+
+    margin-bottom: 5px;
+
+    color: #000066;
+}
+
+.admin-chat-message {
+
+    color: #333;
+
+    white-space: pre-wrap;
+}
+
+.admin-chat-time {
+
+    margin-top: 6px;
+
+    text-align: right;
+
+    font-size: 10px;
+
+    color: #888;
+}
+
+/* =========================================================
+   ADMIN REPLY AREA
+   ALWAYS STAYS AT BOTTOM OF MODAL
+========================================================= */
+
+.admin-reply-area {
+
+    display: flex;
+
+    align-items: flex-end;
+
+    gap: 9px;
+
+    padding: 12px;
+
+    border-top: 1px solid #ddd;
+
+    background: #fff;
+
+    flex-shrink: 0;
+
+    box-sizing: border-box;
+}
+
+#adminReplyMessage {
+
+    flex: 1;
+
+    min-width: 0;
+
+    min-height: 48px;
+
+    max-height: 120px;
+
+    resize: vertical;
+
+    border: 1px solid #ccc;
+
+    border-radius: 9px;
+
+    padding: 10px 11px;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    box-sizing: border-box;
+
+    outline: none;
+}
+
+#adminReplyMessage:focus {
+
+    border-color: #000066;
+
+    box-shadow: 0 0 0 2px rgba(0, 0, 102, 0.08);
+}
+
+.admin-send-reply-btn {
+
+    flex-shrink: 0;
+
+    min-height: 44px;
+
+    padding: 0 17px;
+
+    border: 0;
+
+    border-radius: 9px;
+
+    background: #000066;
+
+    color: #fff;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    font-size: 14px;
+}
+
+.admin-send-reply-btn:hover {
+
+    opacity: 0.9;
+}
+
+/* =========================================================
+   MOBILE RESPONSIVENESS
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .admin-conversation-modal {
+
+        padding: 8px;
+    }
+
+    .admin-conversation-dialog {
+
+        width: 100%;
+
+        height: 94vh;
+
+        max-height: 94vh;
+
+        border-radius: 13px;
+    }
+
+    .admin-conversation-header {
+
+        padding: 13px 14px;
+    }
+
+    .admin-conversation-header h2 {
+
+        font-size: 17px;
+    }
+
+    .conversation-messages {
+
+        padding: 12px;
+    }
+
+    .admin-chat-bubble {
+
+        max-width: 88%;
+
+        font-size: 13px;
+
+        padding: 10px 12px;
+    }
+
+    .admin-reply-area {
+
+        padding: 8px;
+
+        gap: 7px;
+    }
+
+    #adminReplyMessage {
+
+        min-height: 44px;
+
+        font-size: 13px;
+    }
+
+    .admin-send-reply-btn {
+
+        min-height: 42px;
+
+        padding: 0 12px;
+
+        font-size: 13px;
+    }
+
+}
 
 .communication-layout{
 
