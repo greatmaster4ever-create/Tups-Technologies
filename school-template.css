@@ -2595,7 +2595,6 @@ ADMIN COMMUNICATION BOOK — NEW LAYOUT
 
 .communication-layout{
 
-```
 display:flex;
 
 width:100%;
@@ -2603,7 +2602,6 @@ width:100%;
 min-height:520px;
 
 gap:18px;
-```
 
 }
 
@@ -2613,7 +2611,6 @@ LEFT SIDEBAR
 
 .communication-sidebar{
 
-```
 width:250px;
 
 flex-shrink:0;
@@ -2629,34 +2626,28 @@ padding:16px;
 box-sizing:border-box;
 
 overflow:hidden;
-```
 
 }
 
 .communication-sidebar-title{
 
-```
 margin:0 0 15px 0;
 
 color:#000066;
 
 font-size:18px;
-```
 
 }
 
 .communication-filter{
 
-```
 margin-bottom:12px;
-```
 
 }
 
 .communication-filter label,
 .communication-calendar-section > label{
 
-```
 display:block;
 
 font-size:13px;
@@ -2666,13 +2657,11 @@ font-weight:600;
 color:#555;
 
 margin-bottom:5px;
-```
 
 }
 
 .communication-filter select{
 
-```
 width:100%;
 
 height:38px;
@@ -2686,7 +2675,6 @@ padding:0 9px;
 background:#fff;
 
 font-size:14px;
-```
 
 }
 
@@ -2696,15 +2684,12 @@ CALENDAR
 
 .communication-calendar-section{
 
-```
 margin-top:15px;
-```
 
 }
 
 #adminCalendar{
 
-```
 margin-top:7px;
 
 background:#fff;
@@ -2718,7 +2703,6 @@ padding:8px;
 width:100%;
 
 box-sizing:border-box;
-```
 
 }
 
@@ -2726,7 +2710,6 @@ box-sizing:border-box;
 
 .calendar-nav{
 
-```
 display:flex;
 
 align-items:center;
@@ -2734,13 +2717,12 @@ align-items:center;
 justify-content:space-between;
 
 margin-bottom:8px;
-```
+
 
 }
 
 .calendar-nav button{
 
-```
 width:28px;
 
 height:28px;
@@ -2754,19 +2736,16 @@ background:#000066;
 color:#fff;
 
 cursor:pointer;
-```
 
 }
 
 .calendar-nav span{
 
-```
 font-size:13px;
 
 font-weight:600;
 
 color:#000066;
-```
 
 }
 
@@ -2774,19 +2753,16 @@ color:#000066;
 
 .calendar-grid{
 
-```
 display:grid;
 
 grid-template-columns:repeat(7,1fr);
 
 gap:3px;
-```
 
 }
 
 .calendar-head{
 
-```
 text-align:center;
 
 font-size:10px;
@@ -2796,13 +2772,12 @@ font-weight:700;
 color:#777;
 
 padding:4px 0;
-```
 
 }
 
 .calendar-day{
 
-```
+
 min-height:27px;
 
 display:flex;
@@ -2818,37 +2793,30 @@ font-size:12px;
 cursor:pointer;
 
 color:#333;
-```
 
 }
 
 .calendar-day:hover{
 
-```
 background:#e8f0ff;
-```
 
 }
 
 .calendar-day.today{
 
-```
 background:#000066;
 
 color:#fff;
 
 font-weight:bold;
-```
 
 }
 
 .calendar-day.selected{
 
-```
 outline:2px solid #00aaff;
 
 background:#e8f0ff;
-```
 
 }
 
@@ -2858,7 +2826,6 @@ RIGHT MAIN PANEL
 
 .communication-main{
 
-```
 flex:1;
 
 min-width:0;
@@ -2872,43 +2839,36 @@ border-radius:12px;
 padding:18px;
 
 box-sizing:border-box;
-```
 
 }
 
 .communication-main-header{
 
-```
 border-bottom:1px solid #eee;
 
 padding-bottom:10px;
 
 margin-bottom:15px;
-```
 
 }
 
 .communication-main-header h2{
 
-```
 margin:0;
 
 color:#000066;
 
 font-size:20px;
-```
 
 }
 
 .communication-main-header p{
 
-```
 margin:5px 0 0;
 
 color:#777;
 
 font-size:13px;
-```
 
 }
 
@@ -2918,19 +2878,16 @@ STUDENT MESSAGE TAGS
 
 .admin-message-tags{
 
-```
 display:flex;
 
 flex-direction:column;
 
 gap:9px;
-```
 
 }
 
 .admin-message-tag{
 
-```
 width:100%;
 
 padding:13px 15px;
@@ -2946,47 +2903,39 @@ cursor:pointer;
 transition:background .2s, transform .15s;
 
 box-sizing:border-box;
-```
 
 }
 
 .admin-message-tag:hover{
 
-```
 background:#eef4ff;
 
 transform:translateY(-1px);
-```
 
 }
 
 .admin-message-tag-name{
 
-```
 font-weight:600;
 
 color:#000066;
 
 font-size:14px;
-```
 
 }
 
 .admin-message-tag-info{
 
-```
 margin-top:3px;
 
 font-size:12px;
 
 color:#777;
-```
 
 }
 
 .admin-message-count{
 
-```
 float:right;
 
 min-width:22px;
@@ -3010,7 +2959,6 @@ color:#fff;
 font-size:11px;
 
 font-weight:bold;
-```
 
 }
 
@@ -3020,43 +2968,39 @@ EMPTY STATE
 
 .communication-empty-state{
 
-```
 text-align:center;
 
 padding:40px 20px;
 
 color:#777;
-```
 
 }
 
 .communication-empty-state .empty-icon{
 
-```
+
 font-size:34px;
 
 margin-bottom:8px;
-```
+
 
 }
 
 .communication-empty-state h3{
 
-```
+
 margin:5px 0;
 
 color:#555;
-```
+
 
 }
 
 .communication-empty-state p{
 
-```
 margin:5px 0;
 
 font-size:13px;
-```
 
 }
 
@@ -3066,31 +3010,30 @@ CONVERSATION MODAL
 
 .admin-conversation-modal{
 
-```
 position:fixed;
 
 inset:0;
 
 z-index:99999;
-```
+
 
 }
 
 .admin-conversation-overlay{
 
-```
+
 position:absolute;
 
 inset:0;
 
 background:rgba(0,0,0,.55);
-```
+
 
 }
 
 .admin-conversation-dialog{
 
-```
+
 position:relative;
 
 width:min(650px, calc(100% - 30px));
@@ -3110,7 +3053,7 @@ display:flex;
 flex-direction:column;
 
 box-shadow:0 10px 40px rgba(0,0,0,.25);
-```
+
 
 }
 
@@ -3118,7 +3061,7 @@ box-shadow:0 10px 40px rgba(0,0,0,.25);
 
 .admin-conversation-header{
 
-```
+
 display:flex;
 
 align-items:center;
@@ -3130,37 +3073,37 @@ padding:15px 18px;
 border-bottom:1px solid #eee;
 
 flex-shrink:0;
-```
+
 
 }
 
 .admin-conversation-header h2{
 
-```
+
 margin:0;
 
 font-size:18px;
 
 color:#000066;
-```
+
 
 }
 
 .admin-conversation-header p{
 
-```
+
 margin:3px 0 0;
 
 font-size:12px;
 
 color:#777;
-```
+
 
 }
 
 .admin-conversation-close{
 
-```
+
 width:34px;
 
 height:34px;
@@ -3178,15 +3121,15 @@ font-size:24px;
 line-height:1;
 
 cursor:pointer;
-```
+
 
 }
 
 .admin-conversation-close:hover{
 
-```
+
 background:#e5e5e5;
-```
+
 
 }
 
@@ -3196,7 +3139,7 @@ CONVERSATION MESSAGES
 
 .conversation-messages{
 
-```
+
 flex:1;
 
 overflow-y:auto;
@@ -3208,7 +3151,7 @@ min-height:220px;
 max-height:55vh;
 
 background:#f7f8fa;
-```
+
 
 }
 
@@ -3216,7 +3159,7 @@ background:#f7f8fa;
 
 .admin-chat-bubble{
 
-```
+
 max-width:78%;
 
 padding:10px 13px;
@@ -3230,35 +3173,35 @@ line-height:1.45;
 font-size:14px;
 
 word-wrap:break-word;
-```
+
 
 }
 
 .admin-chat-parent{
 
-```
+
 margin-right:auto;
 
 background:#fff;
 
 border:1px solid #ddd;
-```
+
 
 }
 
 .admin-chat-teacher{
 
-```
+
 margin-left:auto;
 
 background:#e8f0ff;
-```
+
 
 }
 
 .admin-chat-sender{
 
-```
+
 font-weight:700;
 
 font-size:12px;
@@ -3266,23 +3209,23 @@ font-size:12px;
 margin-bottom:4px;
 
 color:#000066;
-```
+
 
 }
 
 .admin-chat-message{
 
-```
+
 color:#333;
 
 white-space:pre-wrap;
-```
+
 
 }
 
 .admin-chat-time{
 
-```
+
 margin-top:5px;
 
 text-align:right;
@@ -3290,7 +3233,7 @@ text-align:right;
 font-size:10px;
 
 color:#888;
-```
+
 
 }
 
@@ -3300,7 +3243,7 @@ ADMIN REPLY
 
 .admin-reply-area{
 
-```
+
 display:flex;
 
 gap:8px;
@@ -3312,13 +3255,13 @@ border-top:1px solid #ddd;
 background:#fff;
 
 flex-shrink:0;
-```
+
 
 }
 
 #adminReplyMessage{
 
-```
+
 flex:1;
 
 resize:none;
@@ -3338,13 +3281,13 @@ font-family:inherit;
 font-size:14px;
 
 box-sizing:border-box;
-```
+
 
 }
 
 .admin-send-reply-btn{
 
-```
+
 align-self:flex-end;
 
 height:42px;
@@ -3362,15 +3305,15 @@ color:#fff;
 cursor:pointer;
 
 font-weight:600;
-```
+
 
 }
 
 .admin-send-reply-btn:hover{
 
-```
+
 opacity:.9;
-```
+
 
 }
 
@@ -3380,7 +3323,7 @@ MOBILE RESPONSIVENESS
 
 @media(max-width:700px){
 
-```
+
 .communication-layout{
 
     flex-direction:column;
@@ -3512,6 +3455,5 @@ MOBILE RESPONSIVENESS
     font-size:13px;
 
 }
-```
 
-}
+

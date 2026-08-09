@@ -608,7 +608,6 @@ const communicationBookHTML = `
 
 <div class="communication-layout">
 
-```
 <!-- =====================================================
      LEFT SIDEBAR — FILTERS + CALENDAR
 ====================================================== -->
@@ -746,7 +745,7 @@ const communicationBookHTML = `
     </div>
 
 </main>
-```
+
 
 </div>
 
@@ -760,7 +759,6 @@ const communicationBookHTML = `
     style="display:none;"
 >
 
-```
 <div class="admin-conversation-overlay"></div>
 
 
@@ -832,7 +830,6 @@ const communicationBookHTML = `
     </div>
 
 </div>
-```
 
 </div>
 
