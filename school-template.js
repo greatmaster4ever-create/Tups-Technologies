@@ -720,6 +720,16 @@ const communicationBookHTML = `
 
     <!-- Student message tags -->
 
+	<div class="admin-message-search">
+
+    <input
+        type="text"
+        id="adminStudentSearch"
+        placeholder="🔍 Search student..."
+        autocomplete="off"
+    >
+
+	</div>
     <div
         id="adminMessageTags"
         class="admin-message-tags"
@@ -957,6 +967,18 @@ async function openCommunicationBook(){
     await loadCommunicationCalendarData();
 
     renderAdminCalendar();
+	
+	const closeButton =
+    document.getElementById(
+        "closeAdminConversation"
+    );
+
+if (closeButton) {
+
+    closeButton.onclick =
+        closeAdminConversation;
+
+}
 
 }
 
@@ -1248,6 +1270,784 @@ if (dateDisplay) {
 // for this exact department + class + date
 loadAdminMessageTags();
 
+
+}
+
+async function loadAdminMessageTags() {
+
+
+const tagsContainer =
+    document.getElementById("adminMessageTags");
+
+if (!tagsContainer) return;
+
+
+const department =
+    document.getElementById("commDepartment")?.value;
+
+const selectedClass =
+    document.getElementById("commClass")?.value;
+
+const sort =
+    document.getElementById("commSort")?.value || "newest";
+
+const selectedDate =
+    window.adminSelectedCommunicationDate;
+
+
+// ==========================================
+// Validate filters
+// ==========================================
+
+if (
+    !department ||
+    !selectedClass ||
+    !selectedDate
+) {
+
+    tagsContainer.innerHTML = `
+
+        <div class="communication-empty-state">
+
+            <div class="empty-icon">
+                📖
+            </div>
+
+            <h3>
+                No messages selected
+            </h3>
+
+            <p>
+                Select a department, class and date
+                to view messages.
+            </p>
+
+        </div>
+
+    `;
+
+    return;
+
+}
+
+
+// ==========================================
+// Loading state
+// ==========================================
+
+tagsContainer.innerHTML = `
+
+    <div class="communication-empty-state">
+
+        <div class="empty-icon">
+            ⏳
+        </div>
+
+        <h3>
+            Loading messages...
+        </h3>
+
+    </div>
+
+`;
+
+
+// ==========================================
+// Get students belonging to selected
+// department + class
+// ==========================================
+
+const {
+    data: students,
+    error: studentsError
+} = await supabaseClient
+
+    .from("students")
+
+    .select("*")
+
+    .eq("school_code", schoolCode)
+
+    .eq("department", department)
+
+    .eq("class", selectedClass);
+
+
+if (studentsError) {
+
+    console.error(
+        "Error loading students:",
+        studentsError
+    );
+
+    tagsContainer.innerHTML = `
+
+        <div class="communication-empty-state">
+
+            <div class="empty-icon">
+                ⚠️
+            </div>
+
+            <h3>
+                Unable to load students
+            </h3>
+
+            <p>
+                Please try again.
+            </p>
+
+        </div>
+
+    `;
+
+    return;
+
+}
+
+
+if (!students || students.length === 0) {
+
+    tagsContainer.innerHTML = `
+
+        <div class="communication-empty-state">
+
+            <div class="empty-icon">
+                👨‍🎓
+            </div>
+
+            <h3>
+                No students found
+            </h3>
+
+            <p>
+                No students were found in
+                ${selectedClass}.
+            </p>
+
+        </div>
+
+    `;
+
+    return;
+
+}
+
+
+// ==========================================
+// Student IDs
+// ==========================================
+
+const studentIds =
+    students.map(student => student.id);
+
+
+// ==========================================
+// Load messages for selected date
+// ==========================================
+
+const startOfDay =
+    `${selectedDate}T00:00:00`;
+
+const endOfDay =
+    `${selectedDate}T23:59:59.999`;
+
+
+const {
+    data: messages,
+    error: messagesError
+} = await supabaseClient
+
+    .from("school_communication_book")
+
+    .select("*")
+
+    .eq("school_code", schoolCode)
+
+    .in("student_id", studentIds)
+
+    .gte("created_at", startOfDay)
+
+    .lte("created_at", endOfDay);
+
+
+if (messagesError) {
+
+    console.error(
+        "Error loading communication messages:",
+        messagesError
+    );
+
+    tagsContainer.innerHTML = `
+
+        <div class="communication-empty-state">
+
+            <div class="empty-icon">
+                ⚠️
+            </div>
+
+            <h3>
+                Unable to load messages
+            </h3>
+
+            <p>
+                Please try again.
+            </p>
+
+        </div>
+
+    `;
+
+    return;
+
+}
+
+
+if (!messages || messages.length === 0) {
+
+    tagsContainer.innerHTML = `
+
+        <div class="communication-empty-state">
+
+            <div class="empty-icon">
+                📭
+            </div>
+
+            <h3>
+                No messages
+            </h3>
+
+            <p>
+                There are no messages for
+                ${selectedClass} on this date.
+            </p>
+
+        </div>
+
+    `;
+
+    return;
+
+}
+
+
+// ==========================================
+// Group messages by student
+// ==========================================
+
+const grouped =
+    {};
+
+
+messages.forEach(msg => {
+
+    if (!grouped[msg.student_id]) {
+
+        grouped[msg.student_id] = [];
+
+    }
+
+    grouped[msg.student_id].push(msg);
+
+});
+
+
+// ==========================================
+// Build student message tag data
+// ==========================================
+
+const studentTags =
+    Object.keys(grouped).map(studentId => {
+
+        const student =
+            students.find(
+                s => String(s.id) === String(studentId)
+            );
+
+        const studentMessages =
+            grouped[studentId];
+
+
+        if (!student) return null;
+
+
+        // Sort messages inside student group
+
+        studentMessages.sort(
+            (a, b) =>
+                new Date(a.created_at) -
+                new Date(b.created_at)
+        );
+
+
+        const latestMessage =
+            sort === "newest"
+
+                ? studentMessages[
+                    studentMessages.length - 1
+                ]
+
+                : studentMessages[0];
+
+
+        const hasUnread =
+            studentMessages.some(
+                msg =>
+                    msg.sender_type === "Parent" &&
+                    msg.is_read === false
+            );
+
+
+        return {
+
+            student,
+
+            messages: studentMessages,
+
+            latestMessage,
+
+            hasUnread,
+
+            count:
+                studentMessages.length
+
+        };
+
+    }).filter(Boolean);
+
+
+// ==========================================
+// Sort student tags
+// ==========================================
+
+studentTags.sort((a, b) => {
+
+    const dateA =
+        new Date(
+            a.latestMessage.created_at
+        );
+
+    const dateB =
+        new Date(
+            b.latestMessage.created_at
+        );
+
+    return sort === "newest"
+
+        ? dateB - dateA
+
+        : dateA - dateB;
+
+});
+
+
+// ==========================================
+// Display student message tags
+// ==========================================
+
+tagsContainer.innerHTML = "";
+
+
+studentTags.forEach(item => {
+
+    const student =
+        item.student;
+
+
+    const studentName =
+        student.full_name ||
+        student.student_name ||
+        student.name ||
+        `${student.first_name || ""} ${student.last_name || ""}`.trim() ||
+        "Unknown Student";
+
+
+    const preview =
+        item.latestMessage.message
+            ? item.latestMessage.message
+                .replace(/\s+/g, " ")
+                .trim()
+            : "No message";
+
+
+    const tag =
+        document.createElement("div");
+
+
+    tag.className =
+        item.hasUnread
+
+            ? "admin-message-tag unread"
+
+            : "admin-message-tag";
+
+
+    tag.innerHTML = `
+
+        <div class="admin-message-tag-name">
+
+            ${studentName}
+
+            ${
+                item.hasUnread
+
+                ? `<span class="admin-message-unread-dot"></span>`
+
+                : ""
+
+            }
+
+        </div>
+
+
+        <div class="admin-message-tag-info">
+
+            ${preview.substring(0, 65)}
+            ${preview.length > 65 ? "..." : ""}
+
+        </div>
+
+
+        <span class="admin-message-count">
+
+            ${item.count}
+
+        </span>
+
+    `;
+
+
+    // ==========================================
+    // Open student conversation popup
+    // ==========================================
+
+    tag.addEventListener(
+        "click",
+        function() {
+
+            openAdminConversationModal(
+                student,
+                item.messages
+            );
+
+        }
+    );
+
+
+    tagsContainer.appendChild(tag);
+
+});
+
+
+}
+
+async function openAdminConversation(student) {
+
+    if (!student) return;
+
+    const modal =
+        document.getElementById("adminConversationModal");
+
+    const studentName =
+        document.getElementById(
+            "adminConversationStudentName"
+        );
+
+    const studentInfo =
+        document.getElementById(
+            "adminConversationStudentInfo"
+        );
+
+    const conversation =
+        document.getElementById(
+            "conversationMessages"
+        );
+
+    const replyBox =
+        document.getElementById(
+            "adminReplyMessage"
+        );
+
+    if (!modal || !conversation) {
+        console.error(
+            "Communication conversation modal elements not found."
+        );
+        return;
+    }
+
+    // -----------------------------------------
+    // Store selected student
+    // -----------------------------------------
+
+    selectedCommunicationStudent = student;
+
+    // -----------------------------------------
+    // Student information
+    // -----------------------------------------
+
+    if (studentName) {
+
+        studentName.textContent =
+            student.name ||
+            student.student_name ||
+            student.full_name ||
+            "Student Conversation";
+
+    }
+
+    if (studentInfo) {
+
+        const studentClass =
+            student.class ||
+            "";
+
+        const department =
+            student.department ||
+            "";
+
+        studentInfo.textContent =
+            [studentClass, department]
+                .filter(Boolean)
+                .join(" • ");
+
+    }
+
+    // -----------------------------------------
+    // Clear previous reply
+    // -----------------------------------------
+
+    if (replyBox) {
+
+        replyBox.value = "";
+
+    }
+
+    // -----------------------------------------
+    // Show modal
+    // -----------------------------------------
+
+    modal.style.display = "block";
+
+    document.body.style.overflow = "hidden";
+
+    // -----------------------------------------
+    // Load conversation
+    // -----------------------------------------
+
+    conversation.innerHTML = `
+
+        <div class="communication-empty-state">
+
+            <div class="empty-icon">
+                ⏳
+            </div>
+
+            <p>
+                Loading conversation...
+            </p>
+
+        </div>
+
+    `;
+
+    await loadAdminConversationMessages(student);
+
+}
+
+async function loadAdminConversationMessages(student) {
+
+    const conversation =
+        document.getElementById(
+            "conversationMessages"
+        );
+
+    if (!conversation || !student) return;
+
+    const { data, error } =
+        await supabaseClient
+        .from("school_communication_book")
+        .select("*")
+        .eq("school_code", schoolCode)
+        .eq("student_id", student.id)
+        .order("created_at", {
+            ascending: true
+        });
+
+    if (error) {
+
+        console.error(
+            "Error loading admin conversation:",
+            error
+        );
+
+        conversation.innerHTML = `
+
+            <div class="communication-empty-state">
+
+                <div class="empty-icon">
+                    ⚠️
+                </div>
+
+                <h3>
+                    Unable to load conversation
+                </h3>
+
+                <p>
+                    Please try again.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+    if (!data || data.length === 0) {
+
+        conversation.innerHTML = `
+
+            <div class="communication-empty-state">
+
+                <div class="empty-icon">
+                    📖
+                </div>
+
+                <h3>
+                    No messages yet
+                </h3>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+    // -----------------------------------------
+    // Mark parent messages as read
+    // -----------------------------------------
+
+    await supabaseClient
+        .from("school_communication_book")
+        .update({
+            is_read: true
+        })
+        .eq("school_code", schoolCode)
+        .eq("student_id", student.id)
+        .eq("sender_type", "Parent")
+        .eq("is_read", false);
+
+    // -----------------------------------------
+    // Render messages
+    // -----------------------------------------
+
+    conversation.innerHTML = "";
+
+    data.forEach(msg => {
+
+        const bubble =
+            document.createElement("div");
+
+        if (msg.sender_type === "Parent") {
+
+            bubble.className =
+                "admin-chat-bubble admin-chat-parent";
+
+        } else {
+
+            bubble.className =
+                "admin-chat-bubble admin-chat-teacher";
+
+        }
+
+        let sender = "Unknown";
+
+        if (msg.sender_type === "Parent") {
+
+            sender = "👨‍👩‍👧 Parent";
+
+        }
+
+        else if (msg.sender_type === "Teacher") {
+
+            sender = "👨‍🏫 Teacher";
+
+        }
+
+        else if (msg.sender_type === "Admin") {
+
+            sender = "🏫 Admin";
+
+        }
+
+        bubble.innerHTML = `
+
+            <div class="admin-chat-sender">
+
+                ${sender}
+
+            </div>
+
+            <div class="admin-chat-message">
+
+                ${msg.message || ""}
+
+            </div>
+
+            <div class="admin-chat-time">
+
+                ${new Date(
+                    msg.created_at
+                ).toLocaleString()}
+
+            </div>
+
+        `;
+
+        conversation.appendChild(bubble);
+
+    });
+
+    // -----------------------------------------
+    // Scroll to newest message
+    // -----------------------------------------
+
+    conversation.scrollTop =
+        conversation.scrollHeight;
+
+}
+
+function closeAdminConversation() {
+
+    const modal =
+        document.getElementById(
+            "adminConversationModal"
+        );
+
+    if (!modal) return;
+
+    modal.style.display = "none";
+
+    document.body.style.overflow = "";
+
+    const conversation =
+        document.getElementById(
+            "conversationMessages"
+        );
+
+    if (conversation) {
+
+        conversation.innerHTML = `
+
+            <div class="communication-empty-state">
+
+                Select a student message.
+
+            </div>
+
+        `;
+
+    }
 
 }
 

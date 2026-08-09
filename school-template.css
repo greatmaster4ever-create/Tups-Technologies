@@ -2878,39 +2878,50 @@ STUDENT MESSAGE TAGS
 
 .admin-message-tags{
 
-display:flex;
+    display:grid;
 
-flex-direction:column;
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
 
-gap:9px;
+    gap:12px;
+
+    width:100%;
 
 }
 
 .admin-message-tag{
 
-width:100%;
+    width:100%;
 
-padding:13px 15px;
+    min-width:0;
 
-background:#f8f9fb;
+    padding:12px;
 
-border:1px solid #ddd;
+    background:#ffffff;
 
-border-radius:9px;
+    border:2px solid #d9dce3;
 
-cursor:pointer;
+    border-radius:10px;
 
-transition:background .2s, transform .15s;
+    cursor:pointer;
 
-box-sizing:border-box;
+    box-sizing:border-box;
+
+    transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
 
 }
 
 .admin-message-tag:hover{
 
-background:#eef4ff;
+    transform:translateY(-2px);
 
-transform:translateY(-1px);
+    box-shadow:
+        0 4px 12px rgba(0,0,0,.08);
+
+    background:#f8faff;
 
 }
 
@@ -2959,6 +2970,75 @@ color:#fff;
 font-size:11px;
 
 font-weight:bold;
+
+}
+
+.admin-message-tag.unread{
+
+    border-color:#e63946;
+
+    background:#fff5f5;
+
+}
+
+.admin-message-tag.unread .admin-message-tag-name{
+
+    color:#b4232f;
+
+}
+
+.admin-message-tag.unread .admin-message-count{
+
+    background:#e63946;
+
+}
+
+.admin-message-tag.read{
+
+    border-color:#cfd4dc;
+
+    background:#ffffff;
+
+}
+
+.admin-message-search{
+
+    width:100%;
+
+    margin-bottom:15px;
+
+}
+
+#adminStudentSearch{
+
+    width:100%;
+
+    height:40px;
+
+    padding:0 12px;
+
+    border:1px solid #d0d4dc;
+
+    border-radius:8px;
+
+    outline:none;
+
+    box-sizing:border-box;
+
+    font-family:inherit;
+
+    font-size:14px;
+
+    background:#fff;
+
+}
+
+#adminStudentSearch:focus{
+
+    border-color:#000066;
+
+    box-shadow:
+        0 0 0 2px rgba(0,0,102,.08);
 
 }
 
@@ -3322,6 +3402,33 @@ MOBILE RESPONSIVENESS
 ========================================================= */
 
 @media(max-width:700px){
+	
+.admin-message-tags{
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap:9px;
+
+}
+
+.admin-message-tag{
+
+    padding:10px;
+
+}
+
+.admin-message-tag-name{
+
+    font-size:13px;
+
+}
+
+.admin-message-tag-info{
+
+    font-size:11px;
+
+}
 
 
 .communication-layout{
@@ -3392,11 +3499,6 @@ MOBILE RESPONSIVENESS
 }
 
 
-.admin-message-tag{
-
-    padding:12px;
-
-}
 
 
 .admin-conversation-dialog{
@@ -3455,5 +3557,13 @@ MOBILE RESPONSIVENESS
     font-size:13px;
 
 }
+@media(max-width:430px){
 
+    .admin-message-tags{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
 
