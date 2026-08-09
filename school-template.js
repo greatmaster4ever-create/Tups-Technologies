@@ -1154,345 +1154,605 @@ async function openCommunicationBook(){
 
 async function loadAdminMessageTags() {
 
-    const tagsContainer =
-        document.getElementById("adminMessageTags");
 
-    const departmentSelect =
-        document.getElementById("commDepartment");
+const tagsContainer =
+    document.getElementById("adminMessageTags");
 
-    const classSelect =
-        document.getElementById("commClass");
+const departmentSelect =
+    document.getElementById("commDepartment");
 
-    if (!tagsContainer ||
-        !departmentSelect ||
-        !classSelect) {
-        return;
-    }
+const classSelect =
+    document.getElementById("commClass");
 
-    const department =
-        departmentSelect.value;
+if (
+    !tagsContainer ||
+    !departmentSelect ||
+    !classSelect
+) {
+    return;
+}
 
-    const className =
-        classSelect.value;
 
-    const selectedDate =
-        window.adminSelectedCommunicationDate;
+const department =
+    departmentSelect.value;
 
-    // -----------------------------------------
-    // Validate filters
-    // -----------------------------------------
+const selectedClass =
+    classSelect.value;
 
-    if (!department ||
-        !className ||
-        !selectedDate) {
+const selectedDate =
+    window.adminSelectedCommunicationDate;
 
-        tagsContainer.innerHTML = `
+const sortSelect =
+    document.getElementById("commSort");
 
-            <div class="communication-empty-state">
+const sort =
+    sortSelect?.value || "newest";
 
-                <div class="empty-icon">
-                    📖
-                </div>
 
-                <h3>
-                    No messages selected
-                </h3>
+// =====================================================
+// STUDENT SEARCH
+// =====================================================
 
-                <p>
-                    Select a department, class and date
-                    to view messages.
-                </p>
+const searchInput =
+    document.getElementById("commStudentSearch");
 
-            </div>
+const searchTerm =
+    searchInput
+        ? searchInput.value
+            .trim()
+            .toLowerCase()
+        : "";
 
-        `;
 
-        return;
-    }
+// =====================================================
+// VALIDATE FILTERS
+// =====================================================
+
+if (
+    !department ||
+    !selectedClass ||
+    !selectedDate
+) {
 
     tagsContainer.innerHTML = `
 
         <div class="communication-empty-state">
 
             <div class="empty-icon">
-                ⏳
+                📖
             </div>
 
+            <h3>
+                No messages selected
+            </h3>
+
             <p>
-                Loading messages...
+                Select a department, class and date
+                to view messages.
             </p>
 
         </div>
 
     `;
 
-    // -----------------------------------------
-    // Get students in selected department/class
-    // -----------------------------------------
+    return;
+}
 
-    const {
-        data: students,
-        error: studentError
-    } = await supabaseClient
-        .from("students")
-        .select("*")
-        .eq("school_code", schoolCode)
-        .eq("department", department)
-        .eq("class", className);
 
-    if (studentError) {
+// =====================================================
+// LOADING STATE
+// =====================================================
 
-        console.error(
-            "Error loading students:",
-            studentError
-        );
+tagsContainer.innerHTML = `
 
-        tagsContainer.innerHTML = `
+    <div class="communication-empty-state">
 
-            <div class="communication-empty-state">
+        <div class="empty-icon">
+            ⏳
+        </div>
 
-                <div class="empty-icon">
-                    ⚠️
-                </div>
+        <p>
+            Loading messages...
+        </p>
 
-                <h3>
-                    Unable to load students
-                </h3>
+    </div>
 
+`;
+
+
+// =====================================================
+// GET STUDENTS FOR DEPARTMENT + CLASS
+// =====================================================
+
+const {
+    data: students,
+    error: studentsError
+} = await supabaseClient
+
+    .from("students")
+
+    .select("*")
+
+    .eq("school_code", schoolCode)
+
+    .eq("department", department)
+
+    .eq("class", selectedClass);
+
+
+if (studentsError) {
+
+    console.error(
+        "Error loading communication students:",
+        studentsError
+    );
+
+    tagsContainer.innerHTML = `
+
+        <div class="communication-empty-state">
+
+            <div class="empty-icon">
+                ⚠️
             </div>
 
-        `;
+            <h3>
+                Unable to load students
+            </h3>
 
-        return;
-    }
+            <p>
+                Please try again.
+            </p>
 
-    if (!students || students.length === 0) {
+        </div>
 
-        tagsContainer.innerHTML = `
+    `;
 
-            <div class="communication-empty-state">
+    return;
+}
 
-                <div class="empty-icon">
-                    👨‍🎓
-                </div>
 
-                <h3>
-                    No students found
-                </h3>
+if (
+    !students ||
+    students.length === 0
+) {
 
+    tagsContainer.innerHTML = `
+
+        <div class="communication-empty-state">
+
+            <div class="empty-icon">
+                👨‍🎓
             </div>
 
-        `;
+            <h3>
+                No students found
+            </h3>
 
-        return;
-    }
+            <p>
+                No students were found in
+                ${selectedClass}.
+            </p>
 
-    // -----------------------------------------
-    // Get messages for selected date
-    // -----------------------------------------
+        </div>
 
-    const startOfDay =
-        `${selectedDate}T00:00:00`;
+    `;
 
-    const endOfDay =
-        `${selectedDate}T23:59:59`;
+    return;
+}
 
-    const {
-        data: messages,
-        error: messageError
-    } = await supabaseClient
-        .from("school_communication_book")
-        .select("*")
-        .eq("school_code", schoolCode)
-        .gte("created_at", startOfDay)
-        .lte("created_at", endOfDay)
-        .order("created_at", {
-            ascending: true
-        });
 
-    if (messageError) {
+// =====================================================
+// STUDENT SEARCH FILTER
+// =====================================================
 
-        console.error(
-            "Error loading communication messages:",
-            messageError
-        );
+let filteredStudents =
+    students.filter(student => {
 
-        tagsContainer.innerHTML = `
-
-            <div class="communication-empty-state">
-
-                <div class="empty-icon">
-                    ⚠️
-                </div>
-
-                <h3>
-                    Unable to load messages
-                </h3>
-
-            </div>
-
-        `;
-
-        return;
-    }
-
-    // -----------------------------------------
-    // Only students who actually have messages
-    // -----------------------------------------
-
-    const messageMap = {};
-
-    (messages || []).forEach(msg => {
-
-        if (!messageMap[msg.student_id]) {
-
-            messageMap[msg.student_id] = [];
-
+        if (!searchTerm) {
+            return true;
         }
 
-        messageMap[msg.student_id].push(msg);
+        const name =
+            student.full_name ||
+            student.student_name ||
+            student.name ||
+            `${student.first_name || ""} ${student.last_name || ""}`.trim() ||
+            "";
+
+        return name
+            .toLowerCase()
+            .includes(searchTerm);
 
     });
 
-    const studentsWithMessages =
-        students.filter(student =>
-            messageMap[student.id]
-        );
 
-    // -----------------------------------------
-    // No messages
-    // -----------------------------------------
+// =====================================================
+// STUDENT IDs
+// =====================================================
 
-    if (studentsWithMessages.length === 0) {
+const studentIds =
+    filteredStudents.map(
+        student => student.id
+    );
 
-        tagsContainer.innerHTML = `
 
-            <div class="communication-empty-state">
+if (studentIds.length === 0) {
 
-                <div class="empty-icon">
-                    📖
-                </div>
+    tagsContainer.innerHTML = `
 
-                <h3>
-                    No messages
-                </h3>
+        <div class="communication-empty-state">
 
-                <p>
-                    There are no messages for this
-                    class on the selected date.
-                </p>
-
+            <div class="empty-icon">
+                🔍
             </div>
 
-        `;
+            <h3>
+                Student not found
+            </h3>
 
-        return;
+            <p>
+                No student in this class matches
+                your search.
+            </p>
+
+        </div>
+
+    `;
+
+    return;
+}
+
+
+// =====================================================
+// DATE RANGE
+// =====================================================
+
+const startOfDay =
+    `${selectedDate}T00:00:00`;
+
+const endOfDay =
+    `${selectedDate}T23:59:59.999`;
+
+
+// =====================================================
+// LOAD ONLY MESSAGES BELONGING TO THE
+// SELECTED CLASS + SELECTED DATE
+// =====================================================
+
+const {
+    data: messages,
+    error: messagesError
+} = await supabaseClient
+
+    .from("school_communication_book")
+
+    .select("*")
+
+    .eq("school_code", schoolCode)
+
+    .in(
+        "student_id",
+        studentIds
+    )
+
+    .gte(
+        "created_at",
+        startOfDay
+    )
+
+    .lte(
+        "created_at",
+        endOfDay
+    );
+
+
+if (messagesError) {
+
+    console.error(
+        "Error loading communication messages:",
+        messagesError
+    );
+
+    tagsContainer.innerHTML = `
+
+        <div class="communication-empty-state">
+
+            <div class="empty-icon">
+                ⚠️
+            </div>
+
+            <h3>
+                Unable to load messages
+            </h3>
+
+            <p>
+                Please try again.
+            </p>
+
+        </div>
+
+    `;
+
+    return;
+}
+
+
+// =====================================================
+// NO MESSAGES
+// =====================================================
+
+if (
+    !messages ||
+    messages.length === 0
+) {
+
+    tagsContainer.innerHTML = `
+
+        <div class="communication-empty-state">
+
+            <div class="empty-icon">
+                📭
+            </div>
+
+            <h3>
+                No messages
+            </h3>
+
+            <p>
+                There are no messages for
+                ${selectedClass} on this date.
+            </p>
+
+        </div>
+
+    `;
+
+    return;
+}
+
+
+// =====================================================
+// GROUP MESSAGES BY STUDENT
+// =====================================================
+
+const messageMap = {};
+
+
+messages.forEach(msg => {
+
+    if (!messageMap[msg.student_id]) {
+
+        messageMap[msg.student_id] = [];
+
     }
 
-    // -----------------------------------------
-    // Sort students
-    // -----------------------------------------
+    messageMap[msg.student_id].push(msg);
 
-    const sortSelect =
-        document.getElementById("commSort");
+});
 
-    const sort =
-        sortSelect
-            ? sortSelect.value
-            : "newest";
 
-    studentsWithMessages.sort((a, b) => {
+// =====================================================
+// BUILD STUDENT TAG DATA
+// =====================================================
 
-        const aMessages =
-            messageMap[a.id];
+const studentTags =
+    filteredStudents
 
-        const bMessages =
-            messageMap[b.id];
+        .filter(student =>
+            messageMap[student.id]
+        )
 
-        const aTime =
-            new Date(
-                aMessages[aMessages.length - 1].created_at
+        .map(student => {
+
+            const studentMessages =
+                messageMap[student.id];
+
+
+            studentMessages.sort(
+                (a, b) =>
+                    new Date(a.created_at) -
+                    new Date(b.created_at)
             );
 
-        const bTime =
+
+            const latestMessage =
+                studentMessages[
+                    studentMessages.length - 1
+                ];
+
+
+            const unreadCount =
+                studentMessages.filter(
+                    msg =>
+                        msg.sender_type === "Parent" &&
+                        msg.is_read === false
+                ).length;
+
+
+            const studentName =
+                student.full_name ||
+                student.student_name ||
+                student.name ||
+                `${student.first_name || ""} ${student.last_name || ""}`.trim() ||
+                "Unknown Student";
+
+
+            return {
+
+                student,
+
+                studentName,
+
+                messages:
+                    studentMessages,
+
+                latestMessage,
+
+                unreadCount,
+
+                totalCount:
+                    studentMessages.length
+
+            };
+
+        });
+
+
+// =====================================================
+// SORT STUDENT TAGS
+// =====================================================
+
+studentTags.sort(
+    (a, b) => {
+
+        const timeA =
             new Date(
-                bMessages[bMessages.length - 1].created_at
+                a.latestMessage.created_at
             );
+
+        const timeB =
+            new Date(
+                b.latestMessage.created_at
+            );
+
 
         return sort === "oldest"
-            ? aTime - bTime
-            : bTime - aTime;
 
-    });
+            ? timeA - timeB
 
-    // -----------------------------------------
-    // Render ONLY name + count
-    // -----------------------------------------
+            : timeB - timeA;
 
-    tagsContainer.innerHTML = "";
+    }
+);
 
-    studentsWithMessages.forEach(student => {
 
-        const studentMessages =
-            messageMap[student.id];
+// =====================================================
+// NO STUDENTS WITH MESSAGES
+// =====================================================
 
-        const unreadCount =
-            studentMessages.filter(
-                msg =>
-                    msg.sender_type === "Parent" &&
-                    msg.is_read === false
-            ).length;
+if (
+    studentTags.length === 0
+) {
 
-        const totalCount =
-            studentMessages.length;
+    tagsContainer.innerHTML = `
 
-        const tag =
-            document.createElement("button");
+        <div class="communication-empty-state">
 
-        tag.type = "button";
+            <div class="empty-icon">
+                📭
+            </div>
 
-        tag.className =
-            unreadCount > 0
-                ? "admin-message-tag unread"
-                : "admin-message-tag";
+            <h3>
+                No messages
+            </h3>
 
-        const studentName =
-            student.name ||
-            student.student_name ||
-            student.full_name ||
-            `${student.first_name || ""} ${student.last_name || ""}`.trim() ||
-            "Unknown Student";
+            <p>
+                There are no messages for
+                ${selectedClass} on this date.
+            </p>
 
-        tag.innerHTML = `
+        </div>
 
-            <span class="admin-message-tag-name">
-                ${studentName}
-            </span>
+    `;
 
-            <span class="admin-message-count">
-                ${totalCount}
-            </span>
+    return;
+}
 
-        `;
 
-        // -------------------------------------
-        // CLICK → OPEN POPUP
-        // -------------------------------------
+// =====================================================
+// RENDER STUDENT TAGS
+// ONLY NAME + COUNT
+// =====================================================
 
-        tag.addEventListener(
-            "click",
-            function() {
+tagsContainer.innerHTML = "";
 
-                openAdminConversation(student);
 
-            }
-        );
+studentTags.forEach(item => {
 
-        tagsContainer.appendChild(tag);
+    const tag =
+        document.createElement("button");
 
-    });
+
+    tag.type =
+        "button";
+
+
+    tag.className =
+        item.unreadCount > 0
+            ? "admin-message-tag unread"
+            : "admin-message-tag";
+
+
+    // -------------------------------------------------
+    // STUDENT NAME
+    // -------------------------------------------------
+
+    const nameElement =
+        document.createElement("span");
+
+
+    nameElement.className =
+        "admin-message-tag-name";
+
+
+    nameElement.textContent =
+        item.studentName;
+
+
+    // -------------------------------------------------
+    // MESSAGE COUNT
+    // -------------------------------------------------
+
+    const countElement =
+        document.createElement("span");
+
+
+    countElement.className =
+        "admin-message-count";
+
+
+    countElement.textContent =
+        item.totalCount;
+
+
+    // -------------------------------------------------
+    // BUILD TAG
+    // -------------------------------------------------
+
+    tag.appendChild(
+        nameElement
+    );
+
+    tag.appendChild(
+        countElement
+    );
+
+
+    // =================================================
+    // CLICK → OPEN CONVERSATION MODAL
+    // =================================================
+
+    tag.addEventListener(
+        "click",
+        async function() {
+
+            await openAdminConversation(
+                item.student
+            );
+
+        }
+    );
+
+
+    tagsContainer.appendChild(
+        tag
+    );
+
+});
+
 
 }
+
 
 document.addEventListener("change",function(e){
 
@@ -1647,58 +1907,7 @@ communicationDates[key];
 
 }
 
-function selectCommunicationDate(day){
 
-
-selectedCommunicationDate =
-    new Date(
-        commCalendarDate.getFullYear(),
-        commCalendarDate.getMonth(),
-        day
-    );
-
-const year =
-    selectedCommunicationDate.getFullYear();
-
-const month =
-    String(
-        selectedCommunicationDate.getMonth() + 1
-    ).padStart(2, "0");
-
-const date =
-    String(
-        selectedCommunicationDate.getDate()
-    ).padStart(2, "0");
-
-window.adminSelectedCommunicationDate =
-    `${year}-${month}-${date}`;
-
-renderAdminCalendar();
-
-const dateDisplay =
-    document.getElementById(
-        "communicationSelectedDate"
-    );
-
-if (dateDisplay) {
-
-    dateDisplay.textContent =
-        selectedCommunicationDate.toLocaleDateString(
-            undefined,
-            {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric"
-            }
-        );
-
-}
-
-loadAdminMessageTags();
-
-
-}
 
 
 
@@ -1785,472 +1994,7 @@ loadAdminMessageTags();
 
 }
 
-async function loadAdminMessageTags() {
 
-
-const tagsContainer =
-    document.getElementById("adminMessageTags");
-
-if (!tagsContainer) return;
-
-
-const department =
-    document.getElementById("commDepartment")?.value;
-
-const selectedClass =
-    document.getElementById("commClass")?.value;
-
-const sort =
-    document.getElementById("commSort")?.value || "newest";
-
-const selectedDate =
-    window.adminSelectedCommunicationDate;
-
-
-// ==========================================
-// Validate filters
-// ==========================================
-
-if (
-    !department ||
-    !selectedClass ||
-    !selectedDate
-) {
-
-    tagsContainer.innerHTML = `
-
-        <div class="communication-empty-state">
-
-            <div class="empty-icon">
-                📖
-            </div>
-
-            <h3>
-                No messages selected
-            </h3>
-
-            <p>
-                Select a department, class and date
-                to view messages.
-            </p>
-
-        </div>
-
-    `;
-
-    return;
-
-}
-
-
-// ==========================================
-// Loading state
-// ==========================================
-
-tagsContainer.innerHTML = `
-
-    <div class="communication-empty-state">
-
-        <div class="empty-icon">
-            ⏳
-        </div>
-
-        <h3>
-            Loading messages...
-        </h3>
-
-    </div>
-
-`;
-
-
-// ==========================================
-// Get students belonging to selected
-// department + class
-// ==========================================
-
-const {
-    data: students,
-    error: studentsError
-} = await supabaseClient
-
-    .from("students")
-
-    .select("*")
-
-    .eq("school_code", schoolCode)
-
-    .eq("department", department)
-
-    .eq("class", selectedClass);
-
-
-if (studentsError) {
-
-    console.error(
-        "Error loading students:",
-        studentsError
-    );
-
-    tagsContainer.innerHTML = `
-
-        <div class="communication-empty-state">
-
-            <div class="empty-icon">
-                ⚠️
-            </div>
-
-            <h3>
-                Unable to load students
-            </h3>
-
-            <p>
-                Please try again.
-            </p>
-
-        </div>
-
-    `;
-
-    return;
-
-}
-
-
-if (!students || students.length === 0) {
-
-    tagsContainer.innerHTML = `
-
-        <div class="communication-empty-state">
-
-            <div class="empty-icon">
-                👨‍🎓
-            </div>
-
-            <h3>
-                No students found
-            </h3>
-
-            <p>
-                No students were found in
-                ${selectedClass}.
-            </p>
-
-        </div>
-
-    `;
-
-    return;
-
-}
-
-
-// ==========================================
-// Student IDs
-// ==========================================
-
-const studentIds =
-    students.map(student => student.id);
-
-
-// ==========================================
-// Load messages for selected date
-// ==========================================
-
-const startOfDay =
-    `${selectedDate}T00:00:00`;
-
-const endOfDay =
-    `${selectedDate}T23:59:59.999`;
-
-
-const {
-    data: messages,
-    error: messagesError
-} = await supabaseClient
-
-    .from("school_communication_book")
-
-    .select("*")
-
-    .eq("school_code", schoolCode)
-
-    .in("student_id", studentIds)
-
-    .gte("created_at", startOfDay)
-
-    .lte("created_at", endOfDay);
-
-
-if (messagesError) {
-
-    console.error(
-        "Error loading communication messages:",
-        messagesError
-    );
-
-    tagsContainer.innerHTML = `
-
-        <div class="communication-empty-state">
-
-            <div class="empty-icon">
-                ⚠️
-            </div>
-
-            <h3>
-                Unable to load messages
-            </h3>
-
-            <p>
-                Please try again.
-            </p>
-
-        </div>
-
-    `;
-
-    return;
-
-}
-
-
-if (!messages || messages.length === 0) {
-
-    tagsContainer.innerHTML = `
-
-        <div class="communication-empty-state">
-
-            <div class="empty-icon">
-                📭
-            </div>
-
-            <h3>
-                No messages
-            </h3>
-
-            <p>
-                There are no messages for
-                ${selectedClass} on this date.
-            </p>
-
-        </div>
-
-    `;
-
-    return;
-
-}
-
-
-// ==========================================
-// Group messages by student
-// ==========================================
-
-const grouped =
-    {};
-
-
-messages.forEach(msg => {
-
-    if (!grouped[msg.student_id]) {
-
-        grouped[msg.student_id] = [];
-
-    }
-
-    grouped[msg.student_id].push(msg);
-
-});
-
-
-// ==========================================
-// Build student message tag data
-// ==========================================
-
-const studentTags =
-    Object.keys(grouped).map(studentId => {
-
-        const student =
-            students.find(
-                s => String(s.id) === String(studentId)
-            );
-
-        const studentMessages =
-            grouped[studentId];
-
-
-        if (!student) return null;
-
-
-        // Sort messages inside student group
-
-        studentMessages.sort(
-            (a, b) =>
-                new Date(a.created_at) -
-                new Date(b.created_at)
-        );
-
-
-        const latestMessage =
-            sort === "newest"
-
-                ? studentMessages[
-                    studentMessages.length - 1
-                ]
-
-                : studentMessages[0];
-
-
-        const hasUnread =
-            studentMessages.some(
-                msg =>
-                    msg.sender_type === "Parent" &&
-                    msg.is_read === false
-            );
-
-
-        return {
-
-            student,
-
-            messages: studentMessages,
-
-            latestMessage,
-
-            hasUnread,
-
-            count:
-                studentMessages.length
-
-        };
-
-    }).filter(Boolean);
-
-
-// ==========================================
-// Sort student tags
-// ==========================================
-
-studentTags.sort((a, b) => {
-
-    const dateA =
-        new Date(
-            a.latestMessage.created_at
-        );
-
-    const dateB =
-        new Date(
-            b.latestMessage.created_at
-        );
-
-    return sort === "newest"
-
-        ? dateB - dateA
-
-        : dateA - dateB;
-
-});
-
-
-// ==========================================
-// Display student message tags
-// ==========================================
-
-tagsContainer.innerHTML = "";
-
-
-studentTags.forEach(item => {
-
-    const student =
-        item.student;
-
-
-    const studentName =
-        student.full_name ||
-        student.student_name ||
-        student.name ||
-        `${student.first_name || ""} ${student.last_name || ""}`.trim() ||
-        "Unknown Student";
-
-
-    const preview =
-        item.latestMessage.message
-            ? item.latestMessage.message
-                .replace(/\s+/g, " ")
-                .trim()
-            : "No message";
-
-
-    const tag =
-        document.createElement("div");
-
-
-    tag.className =
-        item.hasUnread
-
-            ? "admin-message-tag unread"
-
-            : "admin-message-tag";
-
-
-    tag.innerHTML = `
-
-        <div class="admin-message-tag-name">
-
-            ${studentName}
-
-            ${
-                item.hasUnread
-
-                ? `<span class="admin-message-unread-dot"></span>`
-
-                : ""
-
-            }
-
-        </div>
-
-
-        <div class="admin-message-tag-info">
-
-            ${preview.substring(0, 65)}
-            ${preview.length > 65 ? "..." : ""}
-
-        </div>
-
-
-        <span class="admin-message-count">
-
-            ${item.count}
-
-        </span>
-
-    `;
-
-
-    // ==========================================
-    // Open student conversation popup
-    // ==========================================
-
-    tag.addEventListener(
-        "click",
-        function() {
-
-            openAdminConversationModal(
-                student,
-                item.messages
-            );
-
-        }
-    );
-
-
-    tagsContainer.appendChild(tag);
-
-});
-
-
-}
 
 async function openAdminConversation(student) {
 
@@ -2564,359 +2308,11 @@ function closeAdminConversation() {
 }
 
 
-async function loadAdminCommunicationList(){
 
-    if(!selectedCommunicationDate) return;
 
-    const dateString =
 
-        selectedCommunicationDate
 
-        .toISOString()
 
-        .split("T")[0];
-
-    const list =
-
-       document.getElementById("conversationMessages");
-
-   conversationMessages.innerHTML =
-
-        "<p>Loading...</p>";
-
-    const { data,error } =
-
-        await supabaseClient
-
-        .from("school_communication_book")
-
-        .select("*")
-
-        .eq("school_code",schoolCode)
-
-        .gte(
-
-            "created_at",
-
-            dateString+"T00:00:00"
-
-        )
-
-        .lte(
-
-            "created_at",
-
-            dateString+"T23:59:59"
-
-        )
-
-        .order(
-
-            "created_at",
-
-            {
-
-                ascending:false
-
-            }
-
-        );
-
-    if(error){
-
-        console.error(error);
-
-        list.innerHTML =
-
-            "<p>No messages.</p>";
-
-        return;
-
-    }
-
-    if(!data || data.length===0){
-
-        list.innerHTML =
-
-            "<p>No messages on this date.</p>";
-
-        return;
-
-    }
-
-    list.innerHTML="";
-
-    data.forEach(msg=>{
-
-        const row=
-
-            document.createElement("div");
-
-        row.className=
-
-            "conversation-row";
-
-        row.innerHTML=`
-
-        <div class="conversation-name">
-
-            ${msg.student_name}
-
-        </div>
-
-        <div class="conversation-preview">
-
-            ${msg.message.substring(0,60)}...
-
-        </div>
-
-        `;
-
-        row.onclick=()=>{
-
-            openConversation(msg.student_id);
-
-        };
-
-        list.appendChild(row);
-
-    });
-
-}
-
-async function openConversation(studentId){
-
-    const rightPanel =
-        document.getElementById("conversationViewer");
-
-    rightPanel.innerHTML =
-        "<p>Loading conversation...</p>";
-
-    const { data,error } =
-        await supabaseClient
-
-        .from("school_communication_book")
-
-        .select("*")
-
-        .eq("school_code",schoolCode)
-
-        .eq("student_id",studentId)
-
-        .order("created_at",{ascending:true});
-
-    if(error){
-
-        console.error(error);
-
-        rightPanel.innerHTML =
-        "<p>No conversation.</p>";
-
-        return;
-
-    }
-
-    if(!data.length){
-
-        rightPanel.innerHTML =
-        "<p>No messages.</p>";
-
-        return;
-
-    }
-
-    const student = data[0];
-
-    let html = `
-
-    <div class="conversation-header">
-
-        <h3>
-
-            ${student.student_name}
-
-        </h3>
-
-        <div>
-
-            ${student.class}
-
-        </div>
-
-        <div>
-
-            ${student.reg_no}
-
-        </div>
-
-    </div>
-
-    <div id="conversationMessages">
-
-    `;
-
-    data.forEach(msg=>{
-
-        let sender="";
-
-        if(msg.sender_type==="Parent")
-            sender="👨‍👩‍👧 Parent";
-
-        if(msg.sender_type==="Teacher")
-            sender="👨‍🏫 Teacher";
-
-        if(msg.sender_type==="Admin")
-            sender="🏫 Admin";
-
-        html +=`
-
-        <div class="chat-bubble">
-
-            <div class="chat-sender">
-
-                ${sender}
-
-            </div>
-
-            <div class="chat-message">
-
-                ${msg.message}
-
-            </div>
-
-            <div class="chat-time">
-
-                ${new Date(msg.created_at)
-
-                    .toLocaleString()}
-
-            </div>
-
-        </div>
-
-        `;
-
-    });
-
-    html +=`
-
-    </div>
-
-    <textarea
-
-        id="adminReply"
-
-        placeholder="Type reply..."
-
-        rows="5"
-
-    ></textarea>
-
-    <button
-
-        class="teacher-send-btn"
-
-        onclick="sendAdminReply(${studentId})"
-
-    >
-
-        Send Reply
-
-    </button>
-
-    `;
-
-    rightPanel.innerHTML=html;
-	
-	clearInterval(adminConversationRefresh);
-
-adminConversationRefresh = setInterval(function(){
-
-    openConversation(studentId);
-
-},5000);
-
-}
-
-async function sendAdminReply(studentId){
-
-    const message =
-        document
-        .getElementById("adminReply")
-        .value
-        .trim();
-
-    if(!message){
-
-        alert("Please type a reply.");
-
-        return;
-
-    }
-
-    // Find the selected student from cache
-
-    const student =
-        communicationStudents.find(
-
-            s => s.id == studentId
-
-        );
-
-    if(!student){
-
-        alert("Student not found.");
-
-        return;
-
-    }
-
-    const { error } =
-        await supabaseClient
-
-        .from("school_communication_book")
-
-        .insert([{
-
-            school_code : schoolCode,
-
-            department : student.department,
-
-            class : student.class,
-
-            student_id : student.id,
-
-            reg_no : student.reg_no,
-
-            student_name : student.student_name,
-
-            sender_type : "Admin",
-
-            sender_name : "Admin",
-
-            message : message,
-
-            is_read : false
-
-        }]);
-
-    if(error){
-
-        console.error(error);
-
-        alert(error.message);
-
-        return;
-
-    }
-
-    document
-    .getElementById("adminReply")
-    .value = "";
-
-    openConversation(studentId);
-
-}
 
 async function loadCommunicationDepartments(){
 
