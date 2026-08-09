@@ -1113,6 +1113,306 @@ communicationDates[key];
 
 }
 
+async function loadAdminMessageTags() {
+
+```
+const department =
+    document.getElementById("commDepartment")?.value;
+
+const className =
+    document.getElementById("commClass")?.value;
+
+const tagsContainer =
+    document.getElementById("adminMessageTags");
+
+if (!tagsContainer) return;
+
+// No class selected
+if (!department || !className) {
+
+    tagsContainer.innerHTML = `
+        <div class="communication-empty-state">
+            <div class="empty-icon">📖</div>
+
+            <h3>Select a department and class</h3>
+
+            <p>
+                Choose a department and class to view
+                communication messages.
+            </p>
+        </div>
+    `;
+
+    return;
+}
+
+// Get selected calendar date
+const selectedDate =
+    window.adminSelectedCommunicationDate;
+
+if (!selectedDate) {
+
+    tagsContainer.innerHTML = `
+        <div class="communication-empty-state">
+            <div class="empty-icon">📅</div>
+
+            <h3>Select a date</h3>
+
+            <p>
+                Select a date from the calendar
+                to view messages.
+            </p>
+        </div>
+    `;
+
+    return;
+}
+
+tagsContainer.innerHTML =
+    `<div class="communication-empty-state">
+        Loading messages...
+    </div>`;
+
+// --------------------------------------------------
+// Get students belonging to selected department/class
+// --------------------------------------------------
+
+const {
+    data: students,
+    error: studentsError
+} = await supabaseClient
+    .from("students")
+    .select(`
+        id,
+        student_name,
+        reg_no,
+        department,
+        class
+    `)
+    .eq("school_code", schoolCode)
+    .eq("department", department)
+    .eq("class", className);
+
+if (studentsError) {
+
+    console.error(
+        "Error loading communication students:",
+        studentsError
+    );
+
+    tagsContainer.innerHTML =
+        `<div class="communication-empty-state">
+            Unable to load students.
+        </div>`;
+
+    return;
+}
+
+if (!students || students.length === 0) {
+
+    tagsContainer.innerHTML =
+        `<div class="communication-empty-state">
+            No students found for this class.
+        </div>`;
+
+    return;
+}
+
+// --------------------------------------------------
+// Get communication messages for selected date
+// --------------------------------------------------
+
+const startDate =
+    `${selectedDate}T00:00:00`;
+
+const endDate =
+    `${selectedDate}T23:59:59`;
+
+const {
+    data: messages,
+    error: messagesError
+} = await supabaseClient
+    .from("school_communication_book")
+    .select(`
+        id,
+        student_id,
+        sender_type,
+        message,
+        created_at,
+        is_read
+    `)
+    .eq("school_code", schoolCode)
+    .gte("created_at", startDate)
+    .lte("created_at", endDate)
+    .order("created_at", {
+        ascending: false
+    });
+
+if (messagesError) {
+
+    console.error(
+        "Error loading communication messages:",
+        messagesError
+    );
+
+    tagsContainer.innerHTML =
+        `<div class="communication-empty-state">
+            Unable to load messages.
+        </div>`;
+
+    return;
+}
+
+// --------------------------------------------------
+// Keep ONLY messages belonging to selected class
+// --------------------------------------------------
+
+const studentMap =
+    new Map(
+        students.map(student => [
+            student.id,
+            student
+        ])
+    );
+
+const grouped =
+    {};
+
+(messages || []).forEach(msg => {
+
+    const student =
+        studentMap.get(msg.student_id);
+
+    if (!student) return;
+
+    if (!grouped[msg.student_id]) {
+
+        grouped[msg.student_id] = {
+
+            student: student,
+
+            messages: []
+
+        };
+
+    }
+
+    grouped[msg.student_id]
+        .messages
+        .push(msg);
+
+});
+
+const studentGroups =
+    Object.values(grouped);
+
+// --------------------------------------------------
+// No messages
+// --------------------------------------------------
+
+if (studentGroups.length === 0) {
+
+    tagsContainer.innerHTML =
+        `<div class="communication-empty-state">
+
+            <div class="empty-icon">📭</div>
+
+            <h3>No messages</h3>
+
+            <p>
+                No communication messages were found
+                for ${className} on this date.
+            </p>
+
+        </div>`;
+
+    return;
+}
+
+// --------------------------------------------------
+// Sort students
+// --------------------------------------------------
+
+const sort =
+    document.getElementById("commSort")?.value ||
+    "newest";
+
+studentGroups.sort((a, b) => {
+
+    const dateA =
+        new Date(
+            a.messages[0].created_at
+        );
+
+    const dateB =
+        new Date(
+            b.messages[0].created_at
+        );
+
+    if (sort === "oldest") {
+
+        return dateA - dateB;
+
+    }
+
+    return dateB - dateA;
+
+});
+
+// --------------------------------------------------
+// Render student message tags
+// --------------------------------------------------
+
+tagsContainer.innerHTML = "";
+
+studentGroups.forEach(group => {
+
+    const student =
+        group.student;
+
+    const count =
+        group.messages.length;
+
+    const tag =
+        document.createElement("div");
+
+    tag.className =
+        "admin-message-tag";
+
+    tag.innerHTML = `
+
+        <span class="admin-message-count">
+            ${count}
+        </span>
+
+        <div class="admin-message-tag-name">
+            ${student.student_name}
+        </div>
+
+        <div class="admin-message-tag-info">
+            ${student.reg_no}
+            · ${count} message${count === 1 ? "" : "s"}
+        </div>
+
+    `;
+
+    tag.onclick = function () {
+
+        openAdminConversation(
+            student,
+            group.messages
+        );
+
+    };
+
+    tagsContainer.appendChild(tag);
+
+});
+```
+
+}
+
+
 function previousCommMonth(){
 
     commCalendarDate.setMonth(
@@ -1140,21 +1440,62 @@ function nextCommMonth(){
 
 function selectCommunicationDate(day){
 
-    selectedCommunicationDate =
+```
+selectedCommunicationDate =
+    new Date(
+        commCalendarDate.getFullYear(),
+        commCalendarDate.getMonth(),
+        day
+    );
 
-        new Date(
+// Store the selected date in YYYY-MM-DD format
+const year =
+    selectedCommunicationDate.getFullYear();
 
-            commCalendarDate.getFullYear(),
+const month =
+    String(
+        selectedCommunicationDate.getMonth() + 1
+    ).padStart(2, "0");
 
-            commCalendarDate.getMonth(),
+const date =
+    String(
+        selectedCommunicationDate.getDate()
+    ).padStart(2, "0");
 
-            day
+window.adminSelectedCommunicationDate =
+    `${year}-${month}-${date}`;
 
+// Highlight selected calendar date
+renderAdminCalendar();
+
+// Update the date shown above the message tags
+const dateDisplay =
+    document.getElementById(
+        "communicationSelectedDate"
+    );
+
+if (dateDisplay) {
+
+    dateDisplay.textContent =
+        selectedCommunicationDate.toLocaleDateString(
+            undefined,
+            {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
         );
 
-    loadAdminCommunicationList();
+}
+
+// Load students who have messages
+// for this exact department + class + date
+loadAdminMessageTags();
+```
 
 }
+
 
 async function loadAdminCommunicationList(){
 
