@@ -2963,9 +2963,9 @@ justify-content:center;
 
 border-radius:12px;
 
-background:var(--secondary-color, #00f5ff);
+background:var(--primary-color, #00f5ff);
 
-color:#000;
+color:#fff;
 
 font-size:11px;
 
