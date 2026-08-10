@@ -6122,179 +6122,159 @@ storagePath,
 ========================================================= */
 
 async function deleteAdvertisement(
-    advertisementId,
-    storagePath
+advertisementId,
+storagePath
 ) {
 
-    const confirmed =
-        confirm(
-            "Are you sure you want to delete this advertisement?"
+
+const confirmed =
+    confirm(
+        "Are you sure you want to delete this advertisement?"
+    );
+
+if (!confirmed) {
+    return;
+}
+
+try {
+
+    // ==========================================
+    // VALIDATION
+    // ==========================================
+
+    if (!schoolCode) {
+
+        throw new Error(
+            "School code is unavailable."
         );
 
+    }
 
-    if (!confirmed) {
-        return;
+    if (!advertisementId) {
+
+        throw new Error(
+            "Advertisement ID is missing."
+        );
+
     }
 
 
-    try {
+    // ==========================================
+    // DELETE IMAGE FROM SUPABASE STORAGE
+    // Bucket: school-media
+    // ==========================================
 
-        /* -----------------------------------------
-           VALIDATION
-        ----------------------------------------- */
+    if (storagePath) {
 
-        if (!schoolCode) {
+        console.log(
+            "Deleting advertisement file:",
+            storagePath
+        );
 
-            throw new Error(
-                "School code is unavailable."
+        const {
+            error: storageError
+        } =
+            await supabaseClient
+                .storage
+                .from("school-media")
+                .remove([
+                    storagePath
+                ]);
+
+
+        if (storageError) {
+
+            console.error(
+                "Supabase Storage Delete Error:",
+                storageError
             );
+
+            throw storageError;
 
         }
 
+    } else {
 
-       if (!storagePath) {
+        console.warn(
+            "No storage path found. Skipping storage deletion."
+        );
 
-    throw new Error(
-        "Storage path is missing."
+    }
+
+
+    // ==========================================
+    // DELETE ADVERTISEMENT DATABASE RECORD
+    // ==========================================
+
+    const {
+        error: deleteError
+    } =
+        await supabaseClient
+
+            .from(
+                "school_communications"
+            )
+
+            .delete()
+
+            .eq(
+                "id",
+                advertisementId
+            )
+
+            .eq(
+                "school_code",
+                schoolCode
+            );
+
+
+    if (deleteError) {
+
+        console.error(
+            "Advertisement Database Delete Error:",
+            deleteError
+        );
+
+        throw deleteError;
+
+    }
+
+
+    // ==========================================
+    // REFRESH ADVERTISEMENT LIST
+    // ==========================================
+
+    await loadAdvertisements();
+
+
+    // ==========================================
+    // SUCCESS MESSAGE
+    // ==========================================
+
+    alert(
+        "Advertisement deleted successfully."
+    );
+
+
+}
+catch (error) {
+
+    console.error(
+        "Delete Advertisement Error:",
+        error
+    );
+
+
+    alert(
+        error?.message ||
+        "Unable to delete advertisement."
     );
 
 }
 
-/* -----------------------------------------
-   DELETE FILE FROM SUPABASE STORAGE
------------------------------------------ */
-
-const formData =
-    new URLSearchParams();
-
-formData.append(
-    "action",
-    "deleteSchoolMedia"
-);
-
-formData.append(
-    "schoolCode",
-    schoolCode
-);
-
-formData.append(
-    "mediaType",
-    "advertisement"
-);
-
-formData.append(
-    "storagePath",
-    storagePath
-);
-
-        const response =
-            await fetch(
-
-                "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
-
-                {
-
-                    method:
-                        "POST",
-
-                    body:
-                        formData
-
-                }
-
-            );
-
-
-        const result =
-            await response.json();
-
-
-       console.log(
-    "DELETE SUPABASE MEDIA RESPONSE:",
-    result
-);
-
-
-        /* -----------------------------------------
-           APPS SCRIPT ERROR
-        ----------------------------------------- */
-
-        if (
-            !result ||
-            !result.success
-        ) {
-
-            throw new Error(
-                result?.error ||
-                "Media deletion failed."
-            );
-
-        }
-
-
-        /* -----------------------------------------
-           DELETE SUPABASE RECORD
-        ----------------------------------------- */
-
-        const {
-            error:
-                deleteError
-        } =
-            await supabaseClient
-
-                .from(
-                    "school_communications"
-                )
-
-                .delete()
-
-                .eq(
-                    "id",
-                    advertisementId
-                )
-
-                .eq(
-                    "school_code",
-                    schoolCode
-                );
-
-
-        if (deleteError) {
-
-            throw deleteError;
-
-        }
-
-
-        /* -----------------------------------------
-           REFRESH ADVERTISEMENT LIST
-        ----------------------------------------- */
-
-        await loadAdvertisements();
-
-
-        alert(
-            "Advertisement deleted successfully."
-        );
-
-
-    }
-    catch (error) {
-
-        console.error(
-            "Delete Advertisement Error:",
-            error
-        );
-
-
-        alert(
-            error.message ||
-            "Unable to delete advertisement."
-        );
-
-    }
 
 }
+
 
 /* =========================================================
    MOVE ADVERTISEMENT UP
