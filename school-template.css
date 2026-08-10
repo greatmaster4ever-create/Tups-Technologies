@@ -3711,3 +3711,41 @@ Teacher card above Admin card on small screens
 
 }
 
+/* =========================================================
+   ANNOUNCEMENT TITLE + COUNTDOWN
+========================================================= */
+
+.announcement-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.announcement-title-row .advert-small-title {
+    margin: 0;
+}
+
+.announcement-countdown {
+    color: #d00000;
+    font-family: "Courier New", monospace;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 600px) {
+
+    .announcement-title-row {
+        align-items: flex-start;
+    }
+
+    .announcement-countdown {
+        font-size: 12px;
+        letter-spacing: .7px;
+    }
+
+}

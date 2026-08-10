@@ -356,6 +356,7 @@ function toggleChangePassword() {
 // ==========================
 loadSchoolInfo();
 loadSubjects();
+loadSchoolAnnouncement();
 
 // ==========================
 // CADRE / DEPARTMENT LOGIC
@@ -444,12 +445,62 @@ const adminDashboardHTML = `
      NEW — ADVERTS
 ===================================================== -->
 
-<button
-  class="admin-tab"
-  onclick="showAdverts()"
->
-  📢 Adverts
-</button>
+<!-- =====================================================
+     ADVERTS DROPDOWN
+===================================================== -->
+
+<div class="admin-dropdown">
+
+    <button
+        class="admin-tab-btn"
+        type="button"
+        onclick="toggleAdvertsMenu()"
+    >
+        📢 Adverts
+    </button>
+
+
+    <div
+        id="advertsDropdown"
+        style="
+            display:none;
+            position:absolute;
+            margin-top:5px;
+            width:210px;
+            z-index:1000;
+        "
+    >
+
+        <!-- Advertisements -->
+
+        <button
+            type="button"
+            class="admin-btn payment-item"
+            onclick="
+                toggleAdvertsMenu();
+                showAdverts();
+            "
+        >
+            📢 Manage Advertisements
+        </button>
+
+
+        <!-- Announcement -->
+
+        <button
+            type="button"
+            class="admin-btn payment-item"
+            onclick="
+                toggleAdvertsMenu();
+                showAnnouncementEditor();
+            "
+        >
+            📣 Announcement
+        </button>
+
+    </div>
+
+</div>
 
 
 <!-- =====================================================
@@ -5471,6 +5522,561 @@ async function showAdverts() {
 }
 
 /* =========================================================
+   ANNOUNCEMENT MODULE
+========================================================= */
+
+async function showAnnouncementEditor() {
+
+    const adminContent =
+        document.getElementById("adminContent");
+
+    if (!adminContent) {
+        return;
+    }
+
+    adminContent.innerHTML = `
+
+        <div
+            class="announcement-admin-module"
+            style="
+                max-width:800px;
+                margin:0 auto;
+            "
+        >
+
+            <h3
+                style="
+                    margin:0 0 6px 0;
+                    color:#000066;
+                "
+            >
+                📣 School Announcement
+            </h3>
+
+            <p
+                style="
+                    margin:0 0 20px 0;
+                    color:#666;
+                    font-size:14px;
+                "
+            >
+                Edit the announcement that will appear
+                on the Student Dashboard.
+            </p>
+
+
+            <div
+                style="
+                    background:#f8f9fa;
+                    border:1px solid #ddd;
+                    border-radius:12px;
+                    padding:20px;
+                "
+            >
+
+                <!-- Announcement -->
+
+                <label
+                    for="adminAnnouncementText"
+                    style="
+                        display:block;
+                        font-weight:600;
+                        margin-bottom:6px;
+                    "
+                >
+                    Announcement
+                </label>
+
+                <textarea
+                    id="adminAnnouncementText"
+                    rows="6"
+                    placeholder="Type your school announcement here..."
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        resize:vertical;
+                        border:1px solid #ccc;
+                        border-radius:8px;
+                        padding:12px;
+                        font-family:inherit;
+                        font-size:14px;
+                    "
+                ></textarea>
+
+
+                <!-- Expiry -->
+
+                <label
+                    for="adminAnnouncementExpiry"
+                    style="
+                        display:block;
+                        font-weight:600;
+                        margin:16px 0 6px 0;
+                    "
+                >
+                    Announcement Expiry
+                </label>
+
+                <input
+                    type="datetime-local"
+                    id="adminAnnouncementExpiry"
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        height:42px;
+                        border:1px solid #ccc;
+                        border-radius:8px;
+                        padding:0 10px;
+                        font-size:14px;
+                    "
+                />
+
+
+                <!-- Buttons -->
+
+                <div
+                    style="
+                        display:flex;
+                        gap:10px;
+                        flex-wrap:wrap;
+                        margin-top:18px;
+                    "
+                >
+
+                    <button
+                        type="button"
+                        class="admin-btn"
+                        onclick="saveSchoolAnnouncement()"
+                    >
+                        📣 Update Announcement
+                    </button>
+
+                    <button
+                        type="button"
+                        class="admin-btn"
+                        onclick="clearSchoolAnnouncement()"
+                    >
+                        🗑 Clear Announcement
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="announcementAdminStatus"
+                    style="
+                        margin-top:12px;
+                        font-size:14px;
+                    "
+                ></div>
+
+            </div>
+
+        </div>
+
+    `;
+
+    await loadAdminAnnouncement();
+
+}
+
+
+/* =========================================================
+   LOAD CURRENT ANNOUNCEMENT INTO ADMIN EDITOR
+========================================================= */
+
+async function loadAdminAnnouncement() {
+
+    const textInput =
+        document.getElementById(
+            "adminAnnouncementText"
+        );
+
+    const expiryInput =
+        document.getElementById(
+            "adminAnnouncementExpiry"
+        );
+
+    if (!textInput || !expiryInput) {
+        return;
+    }
+
+    if (!schoolCode) {
+        return;
+    }
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+
+            .from("school_announcements")
+
+            .select(
+                "announcement_text, expires_at"
+            )
+
+            .eq(
+                "school_code",
+                schoolCode
+            )
+
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Admin announcement load error:",
+            error
+        );
+
+        return;
+
+    }
+
+
+    if (!data) {
+
+        textInput.value = "";
+        expiryInput.value = "";
+
+        return;
+
+    }
+
+
+    textInput.value =
+        data.announcement_text || "";
+
+
+    if (data.expires_at) {
+
+        const expiry =
+            new Date(
+                data.expires_at
+            );
+
+        const localISO =
+            new Date(
+                expiry.getTime()
+                -
+                expiry.getTimezoneOffset() * 60000
+            )
+            .toISOString()
+            .slice(0,16);
+
+        expiryInput.value =
+            localISO;
+
+    }
+
+}
+
+
+/* =========================================================
+   SAVE / UPDATE ANNOUNCEMENT
+========================================================= */
+
+async function saveSchoolAnnouncement() {
+
+    const textInput =
+        document.getElementById(
+            "adminAnnouncementText"
+        );
+
+    const expiryInput =
+        document.getElementById(
+            "adminAnnouncementExpiry"
+        );
+
+    const status =
+        document.getElementById(
+            "announcementAdminStatus"
+        );
+
+
+    if (!textInput ||
+        !expiryInput) {
+
+        return;
+
+    }
+
+
+    const announcement =
+        textInput.value.trim();
+
+    const expiry =
+        expiryInput.value;
+
+
+    if (!announcement) {
+
+        alert(
+            "Please enter an announcement."
+        );
+
+        return;
+
+    }
+
+
+    if (!expiry) {
+
+        alert(
+            "Please select an expiry date and time."
+        );
+
+        return;
+
+    }
+
+
+    const expiryDate =
+        new Date(expiry);
+
+
+    if (
+        isNaN(expiryDate.getTime())
+    ) {
+
+        alert(
+            "Please enter a valid expiry date and time."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        expiryDate.getTime() <= Date.now()
+    ) {
+
+        alert(
+            "The expiry time must be in the future."
+        );
+
+        return;
+
+    }
+
+
+    if (status) {
+
+        status.style.color =
+            "#555";
+
+        status.textContent =
+            "Updating announcement...";
+
+    }
+
+
+    try {
+
+        const {
+            error
+        } =
+            await supabaseClient
+
+                .from("school_announcements")
+
+                .upsert(
+                    {
+                        school_code:
+                            schoolCode,
+
+                        announcement_text:
+                            announcement,
+
+                        expires_at:
+                            expiryDate.toISOString(),
+
+                        updated_at:
+                            new Date().toISOString()
+
+                    },
+                    {
+                        onConflict:
+                            "school_code"
+                    }
+                );
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        if (status) {
+
+            status.style.color =
+                "green";
+
+            status.textContent =
+                "✓ Announcement updated successfully.";
+
+        }
+
+
+        /*
+         * If the student dashboard is currently
+         * visible in this same page, refresh it.
+         */
+
+        if (
+            typeof loadSchoolAnnouncement ===
+            "function"
+        ) {
+
+            await loadSchoolAnnouncement();
+
+        }
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Save Announcement Error:",
+            error
+        );
+
+
+        if (status) {
+
+            status.style.color =
+                "red";
+
+            status.textContent =
+                error.message ||
+                "Unable to update announcement.";
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   CLEAR ANNOUNCEMENT
+========================================================= */
+
+async function clearSchoolAnnouncement() {
+
+    const confirmed =
+        confirm(
+            "Clear the current announcement?"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    const status =
+        document.getElementById(
+            "announcementAdminStatus"
+        );
+
+
+    try {
+
+        const {
+            error
+        } =
+            await supabaseClient
+
+                .from("school_announcements")
+
+                .delete()
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                );
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        const textInput =
+            document.getElementById(
+                "adminAnnouncementText"
+            );
+
+        const expiryInput =
+            document.getElementById(
+                "adminAnnouncementExpiry"
+            );
+
+
+        if (textInput) {
+            textInput.value = "";
+        }
+
+
+        if (expiryInput) {
+            expiryInput.value = "";
+        }
+
+
+        if (status) {
+
+            status.style.color =
+                "green";
+
+            status.textContent =
+                "✓ Announcement cleared.";
+
+        }
+
+
+        if (
+            typeof loadSchoolAnnouncement ===
+            "function"
+        ) {
+
+            await loadSchoolAnnouncement();
+
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Clear Announcement Error:",
+            error
+        );
+
+
+        if (status) {
+
+            status.style.color =
+                "red";
+
+            status.textContent =
+                error.message ||
+                "Unable to clear announcement.";
+
+        }
+
+    }
+
+}
+
+/* =========================================================
    OPEN ADVERTISEMENT UPLOAD
 ========================================================= */
 
@@ -6488,6 +7094,235 @@ async function moveAdvertisementUp(
         );
 
     }
+
+}
+
+let announcementCountdownTimer = null;
+
+
+/* =========================================================
+   LOAD SCHOOL ANNOUNCEMENT
+========================================================= */
+
+async function loadSchoolAnnouncement() {
+
+    const announcementElement =
+        document.getElementById("announcements");
+
+    const countdownElement =
+        document.getElementById(
+            "announcementCountdown"
+        );
+
+
+    if (!announcementElement) {
+        return;
+    }
+
+
+    // Stop any previous countdown
+
+    if (announcementCountdownTimer) {
+
+        clearInterval(
+            announcementCountdownTimer
+        );
+
+        announcementCountdownTimer = null;
+
+    }
+
+
+    if (!schoolCode) {
+
+        announcementElement.textContent =
+            "No announcements available.";
+
+        if (countdownElement) {
+            countdownElement.textContent =
+                "00:00:00";
+        }
+
+        return;
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+
+            .from("school_announcements")
+
+            .select(
+                "announcement_text, expires_at"
+            )
+
+            .eq(
+                "school_code",
+                schoolCode
+            )
+
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Announcement loading error:",
+            error
+        );
+
+        announcementElement.textContent =
+            "No announcements available.";
+
+        if (countdownElement) {
+            countdownElement.textContent =
+                "00:00:00";
+        }
+
+        return;
+
+    }
+
+
+    // No announcement record
+
+    if (!data) {
+
+        announcementElement.textContent =
+            "No announcements available.";
+
+        if (countdownElement) {
+            countdownElement.textContent =
+                "00:00:00";
+        }
+
+        return;
+
+    }
+
+
+    const expiryTime =
+        new Date(data.expires_at).getTime();
+
+
+    const now =
+        Date.now();
+
+
+    // Already expired
+
+    if (
+        !expiryTime ||
+        expiryTime <= now
+    ) {
+
+        announcementElement.textContent =
+            "No announcements available.";
+
+        if (countdownElement) {
+            countdownElement.textContent =
+                "00:00:00";
+        }
+
+        return;
+
+    }
+
+
+    // Display announcement
+
+    announcementElement.textContent =
+        data.announcement_text || "";
+
+
+    // Start countdown
+
+    function updateAnnouncementCountdown() {
+
+        const remaining =
+            expiryTime - Date.now();
+
+
+        if (remaining <= 0) {
+
+            clearInterval(
+                announcementCountdownTimer
+            );
+
+            announcementCountdownTimer =
+                null;
+
+
+            announcementElement.textContent =
+                "No announcements available.";
+
+
+            if (countdownElement) {
+
+                countdownElement.textContent =
+                    "00:00:00";
+
+            }
+
+            return;
+
+        }
+
+
+        const totalSeconds =
+            Math.floor(
+                remaining / 1000
+            );
+
+
+        const hours =
+            Math.floor(
+                totalSeconds / 3600
+            );
+
+
+        const minutes =
+            Math.floor(
+                (totalSeconds % 3600) / 60
+            );
+
+
+        const seconds =
+            totalSeconds % 60;
+
+
+        if (countdownElement) {
+
+            countdownElement.textContent =
+
+                String(hours)
+                    .padStart(2, "0")
+                + ":" +
+
+                String(minutes)
+                    .padStart(2, "0")
+                + ":" +
+
+                String(seconds)
+                    .padStart(2, "0");
+
+        }
+
+    }
+
+
+    updateAnnouncementCountdown();
+
+
+    announcementCountdownTimer =
+        setInterval(
+            updateAnnouncementCountdown,
+            1000
+        );
 
 }
 
@@ -11602,6 +12437,23 @@ function togglePaymentsMenu() {
       ? "none"
       : "block";
 
+}
+
+function toggleAdvertsMenu() {
+
+    const menu =
+        document.getElementById(
+            "advertsDropdown"
+        );
+
+    if (!menu) {
+        return;
+    }
+
+    menu.style.display =
+        menu.style.display === "block"
+            ? "none"
+            : "block";
 }
 
 async function loadTermFees() {
