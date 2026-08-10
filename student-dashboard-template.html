@@ -1169,34 +1169,137 @@ body {
                 <div class="advertisement-lower">
 
 
-                   <div class="announcement-card">
+<div class="announcement-card">
 
     <div class="announcement-header">
 
         <div class="announcement-title-row">
 
-    <h3 class="advert-small-title">
-        ANNOUNCEMENTS
-    </h3>
+            <h3 class="advert-small-title">
+                ANNOUNCEMENTS
+            </h3>
 
-    <span
-        id="announcementCountdown"
-        class="announcement-countdown"
-    >
-        00:00:00
-    </span>
+        </div>
 
-         </div>
-
-       
     </div>
+
+
+    <!-- ANNOUNCEMENT MESSAGE -->
 
     <div
         id="announcements"
         class="announcement-content"
     >
-
         No announcements available.
+    </div>
+
+
+    <!-- COUNTDOWN -->
+
+    <div
+        id="announcementCountdownBox"
+        class="announcement-countdown-box"
+        style="display:none;"
+    >
+
+        <div class="announcement-countdown-label">
+            ⏰ TIME REMAINING
+        </div>
+
+
+        <div
+            id="announcementCountdown"
+            class="announcement-countdown"
+        >
+
+            <div class="countdown-unit">
+
+                <span
+                    id="announcementDays"
+                    class="countdown-number"
+                >
+                    00
+                </span>
+
+                <span class="countdown-label">
+                    DAYS
+                </span>
+
+            </div>
+
+
+            <div class="countdown-separator">
+                :
+            </div>
+
+
+            <div class="countdown-unit">
+
+                <span
+                    id="announcementHours"
+                    class="countdown-number"
+                >
+                    00
+                </span>
+
+                <span class="countdown-label">
+                    HOURS
+                </span>
+
+            </div>
+
+
+            <div class="countdown-separator">
+                :
+            </div>
+
+
+            <div class="countdown-unit">
+
+                <span
+                    id="announcementMinutes"
+                    class="countdown-number"
+                >
+                    00
+                </span>
+
+                <span class="countdown-label">
+                    MINS
+                </span>
+
+            </div>
+
+
+            <div class="countdown-separator">
+                :
+            </div>
+
+
+            <div class="countdown-unit">
+
+                <span
+                    id="announcementSeconds"
+                    class="countdown-number"
+                >
+                    00
+                </span>
+
+                <span class="countdown-label">
+                    SECS
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- EXPIRY INFORMATION -->
+
+        <div
+            id="announcementExpiryNotice"
+            class="announcement-expiry-notice"
+        >
+        </div>
 
     </div>
 
@@ -1205,7 +1308,7 @@ body {
                     <div class="flyer-card">
 
                         <h3 class="advert-small-title">
-                            SCHOOL INFORMATION
+                            SCHOOL CALENDAR
                         </h3>
 
                         <img
@@ -1649,6 +1752,521 @@ await loadCommunicationBook();
 }
 
 /* =========================================================
+   STUDENT DASHBOARD — LOAD SCHOOL ANNOUNCEMENT
+========================================================= */
+
+let announcementCountdownTimer = null;
+
+
+async function loadSchoolAnnouncement() {
+
+    const announcementElement =
+        document.getElementById(
+            "announcements"
+        );
+
+    const countdownBox =
+        document.getElementById(
+            "announcementCountdownBox"
+        );
+
+    const daysElement =
+        document.getElementById(
+            "announcementDays"
+        );
+
+    const hoursElement =
+        document.getElementById(
+            "announcementHours"
+        );
+
+    const minutesElement =
+        document.getElementById(
+            "announcementMinutes"
+        );
+
+    const secondsElement =
+        document.getElementById(
+            "announcementSeconds"
+        );
+
+    const expiryNotice =
+        document.getElementById(
+            "announcementExpiryNotice"
+        );
+
+
+    /* -------------------------------------------------------
+       MAKE SURE THE ANNOUNCEMENT CARD EXISTS
+    ------------------------------------------------------- */
+
+    if (!announcementElement) {
+
+        console.warn(
+            "Announcement element not found."
+        );
+
+        return;
+
+    }
+
+
+    /* -------------------------------------------------------
+       STOP ANY PREVIOUS COUNTDOWN
+    ------------------------------------------------------- */
+
+    if (announcementCountdownTimer) {
+
+        clearInterval(
+            announcementCountdownTimer
+        );
+
+        announcementCountdownTimer =
+            null;
+
+    }
+
+
+    /* -------------------------------------------------------
+       RESET DISPLAY
+    ------------------------------------------------------- */
+
+    announcementElement.textContent =
+        "No announcements available.";
+
+
+    if (countdownBox) {
+
+        countdownBox.style.display =
+            "none";
+
+    }
+
+
+    if (daysElement) {
+        daysElement.textContent = "00";
+    }
+
+    if (hoursElement) {
+        hoursElement.textContent = "00";
+    }
+
+    if (minutesElement) {
+        minutesElement.textContent = "00";
+    }
+
+    if (secondsElement) {
+        secondsElement.textContent = "00";
+    }
+
+    if (expiryNotice) {
+
+        expiryNotice.textContent =
+            "";
+
+    }
+
+
+    /* -------------------------------------------------------
+       VALIDATE SCHOOL CODE
+    ------------------------------------------------------- */
+
+    if (!schoolCode) {
+
+        console.warn(
+            "School code unavailable for announcement."
+        );
+
+        return;
+
+    }
+
+
+    try {
+
+        /* ---------------------------------------------------
+           LOAD CURRENT ANNOUNCEMENT
+        --------------------------------------------------- */
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_announcements"
+                )
+
+                .select(
+                    "announcement_text, expires_at"
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                )
+
+                .maybeSingle();
+
+
+        /* ---------------------------------------------------
+           DATABASE ERROR
+        --------------------------------------------------- */
+
+        if (error) {
+
+            console.error(
+                "Student Announcement Load Error:",
+                error
+            );
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------------
+           NO ANNOUNCEMENT
+        --------------------------------------------------- */
+
+        if (!data) {
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------------
+           VALIDATE ANNOUNCEMENT TEXT
+        --------------------------------------------------- */
+
+        const announcementText =
+            (
+                data.announcement_text ||
+                ""
+            ).trim();
+
+
+        if (!announcementText) {
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------------
+           VALIDATE EXPIRY
+        --------------------------------------------------- */
+
+        if (!data.expires_at) {
+
+            console.warn(
+                "Announcement has no expiry date."
+            );
+
+            return;
+
+        }
+
+
+        const expiryTime =
+            new Date(
+                data.expires_at
+            ).getTime();
+
+
+        if (
+            isNaN(expiryTime)
+        ) {
+
+            console.warn(
+                "Invalid announcement expiry date."
+            );
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------------
+           CHECK IF ALREADY EXPIRED
+        --------------------------------------------------- */
+
+        if (
+            expiryTime <= Date.now()
+        ) {
+
+            return;
+
+        }
+
+
+        /* ---------------------------------------------------
+           DISPLAY ANNOUNCEMENT
+        --------------------------------------------------- */
+
+        announcementElement.textContent =
+            announcementText;
+
+
+        /* ---------------------------------------------------
+           SHOW COUNTDOWN
+        --------------------------------------------------- */
+
+        if (countdownBox) {
+
+            countdownBox.style.display =
+                "block";
+
+        }
+
+
+        /* ---------------------------------------------------
+           DISPLAY EXPIRY DATE
+        --------------------------------------------------- */
+
+        if (expiryNotice) {
+
+            const expiryDate =
+                new Date(
+                    data.expires_at
+                );
+
+
+            expiryNotice.textContent =
+                "Expires " +
+                expiryDate.toLocaleDateString(
+                    "en-GB",
+                    {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric"
+                    }
+                ) +
+                " at " +
+                expiryDate.toLocaleTimeString(
+                    "en-US",
+                    {
+                        hour: "numeric",
+                        minute: "2-digit"
+                    }
+                );
+
+        }
+
+
+        /* ===================================================
+           COUNTDOWN UPDATE
+        =================================================== */
+
+        function updateAnnouncementCountdown() {
+
+            const remaining =
+                expiryTime -
+                Date.now();
+
+
+            /* ------------------------------------------------
+               ANNOUNCEMENT HAS EXPIRED
+            ------------------------------------------------ */
+
+            if (
+                remaining <= 0
+            ) {
+
+                clearInterval(
+                    announcementCountdownTimer
+                );
+
+                announcementCountdownTimer =
+                    null;
+
+
+                announcementElement.textContent =
+                    "No announcements available.";
+
+
+                if (countdownBox) {
+
+                    countdownBox.style.display =
+                        "none";
+
+                }
+
+
+                if (expiryNotice) {
+
+                    expiryNotice.textContent =
+                        "";
+
+                }
+
+
+                if (daysElement) {
+                    daysElement.textContent =
+                        "00";
+                }
+
+                if (hoursElement) {
+                    hoursElement.textContent =
+                        "00";
+                }
+
+                if (minutesElement) {
+                    minutesElement.textContent =
+                        "00";
+                }
+
+                if (secondsElement) {
+                    secondsElement.textContent =
+                        "00";
+                }
+
+
+                return;
+
+            }
+
+
+            /* ------------------------------------------------
+               CALCULATE TIME
+            ------------------------------------------------ */
+
+            const totalSeconds =
+                Math.floor(
+                    remaining / 1000
+                );
+
+
+            const days =
+                Math.floor(
+                    totalSeconds / 86400
+                );
+
+
+            const hours =
+                Math.floor(
+                    (
+                        totalSeconds % 86400
+                    ) / 3600
+                );
+
+
+            const minutes =
+                Math.floor(
+                    (
+                        totalSeconds % 3600
+                    ) / 60
+                );
+
+
+            const seconds =
+                totalSeconds % 60;
+
+
+            /* ------------------------------------------------
+               UPDATE DIGITS
+            ------------------------------------------------ */
+
+            if (daysElement) {
+
+                daysElement.textContent =
+                    String(days)
+                        .padStart(
+                            2,
+                            "0"
+                        );
+
+            }
+
+
+            if (hoursElement) {
+
+                hoursElement.textContent =
+                    String(hours)
+                        .padStart(
+                            2,
+                            "0"
+                        );
+
+            }
+
+
+            if (minutesElement) {
+
+                minutesElement.textContent =
+                    String(minutes)
+                        .padStart(
+                            2,
+                            "0"
+                        );
+
+            }
+
+
+            if (secondsElement) {
+
+                secondsElement.textContent =
+                    String(seconds)
+                        .padStart(
+                            2,
+                            "0"
+                        );
+
+            }
+
+        }
+
+
+        /* ---------------------------------------------------
+           RUN IMMEDIATELY
+        --------------------------------------------------- */
+
+        updateAnnouncementCountdown();
+
+
+        /* ---------------------------------------------------
+           UPDATE EVERY SECOND
+        --------------------------------------------------- */
+
+        announcementCountdownTimer =
+            setInterval(
+                updateAnnouncementCountdown,
+                1000
+            );
+
+
+        console.log(
+            "Student announcement loaded successfully."
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Student Dashboard Announcement Error:",
+            error
+        );
+
+
+        announcementElement.textContent =
+            "No announcements available.";
+
+
+        if (countdownBox) {
+
+            countdownBox.style.display =
+                "none";
+
+        }
+
+    }
+
+}
+
+/* =========================================================
    LOAD STUDENT DASHBOARD ADVERTISEMENTS
 ========================================================= */
 
@@ -1919,14 +2537,48 @@ let announcementCountdownTimer = null;
    LOAD SCHOOL ANNOUNCEMENT
 ========================================================= */
 
+/* =========================================================
+   STUDENT DASHBOARD ANNOUNCEMENT
+========================================================= */
+
+let announcementCountdownTimer = null;
+
+
 async function loadSchoolAnnouncement() {
 
     const announcementElement =
-        document.getElementById("announcements");
-
-    const countdownElement =
         document.getElementById(
-            "announcementCountdown"
+            "announcements"
+        );
+
+    const countdownBox =
+        document.getElementById(
+            "announcementCountdownBox"
+        );
+
+    const daysElement =
+        document.getElementById(
+            "announcementDays"
+        );
+
+    const hoursElement =
+        document.getElementById(
+            "announcementHours"
+        );
+
+    const minutesElement =
+        document.getElementById(
+            "announcementMinutes"
+        );
+
+    const secondsElement =
+        document.getElementById(
+            "announcementSeconds"
+        );
+
+    const expiryNotice =
+        document.getElementById(
+            "announcementExpiryNotice"
         );
 
 
@@ -1935,7 +2587,9 @@ async function loadSchoolAnnouncement() {
     }
 
 
-    // Stop any previous countdown
+    /* -----------------------------------------
+       STOP PREVIOUS COUNTDOWN
+    ----------------------------------------- */
 
     if (announcementCountdownTimer) {
 
@@ -1943,57 +2597,308 @@ async function loadSchoolAnnouncement() {
             announcementCountdownTimer
         );
 
-        announcementCountdownTimer = null;
+        announcementCountdownTimer =
+            null;
 
     }
 
 
-    // -----------------------------------------
-    // Validate school code
-    // -----------------------------------------
+    /* -----------------------------------------
+       RESET UI
+    ----------------------------------------- */
+
+    announcementElement.textContent =
+        "No announcements available.";
+
+
+    if (countdownBox) {
+
+        countdownBox.style.display =
+            "none";
+
+    }
+
+
+    if (expiryNotice) {
+
+        expiryNotice.textContent =
+            "";
+
+    }
+
+
+    /* -----------------------------------------
+       SCHOOL CODE
+    ----------------------------------------- */
 
     if (!schoolCode) {
+        return;
+    }
 
-        announcementElement.textContent =
-            "No announcements available.";
 
-        if (countdownElement) {
+    try {
 
-            countdownElement.textContent =
-                "00:00:00";
+        /* -----------------------------------------
+           LOAD ANNOUNCEMENT
+        ----------------------------------------- */
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_announcements"
+                )
+
+                .select(
+                    "announcement_text, expires_at"
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                )
+
+                .maybeSingle();
+
+
+        if (error) {
+
+            throw error;
 
         }
 
-        return;
+
+        /* -----------------------------------------
+           NO ANNOUNCEMENT
+        ----------------------------------------- */
+
+        if (!data) {
+
+            return;
+
+        }
+
+
+        /* -----------------------------------------
+           EXPIRY
+        ----------------------------------------- */
+
+        const expiryTime =
+            new Date(
+                data.expires_at
+            ).getTime();
+
+
+        if (
+            !expiryTime ||
+            expiryTime <= Date.now()
+        ) {
+
+            return;
+
+        }
+
+
+        /* -----------------------------------------
+           DISPLAY ANNOUNCEMENT
+        ----------------------------------------- */
+
+        announcementElement.textContent =
+            data.announcement_text || "";
+
+
+        /* -----------------------------------------
+           SHOW COUNTDOWN
+        ----------------------------------------- */
+
+        if (countdownBox) {
+
+            countdownBox.style.display =
+                "block";
+
+        }
+
+
+        /* -----------------------------------------
+           EXPIRY DATE DISPLAY
+        ----------------------------------------- */
+
+        if (expiryNotice) {
+
+            const expiryDate =
+                new Date(
+                    data.expires_at
+                );
+
+
+            expiryNotice.textContent =
+                "This announcement expires on " +
+                expiryDate.toLocaleDateString(
+                    "en-GB",
+                    {
+                        weekday: "long",
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric"
+                    }
+                ) +
+                " at " +
+                expiryDate.toLocaleTimeString(
+                    "en-US",
+                    {
+                        hour: "numeric",
+                        minute: "2-digit"
+                    }
+                );
+
+        }
+
+
+        /* -----------------------------------------
+           COUNTDOWN FUNCTION
+        ----------------------------------------- */
+
+        function updateAnnouncementCountdown() {
+
+            const remaining =
+                expiryTime - Date.now();
+
+
+            /* -------------------------------------
+               EXPIRED
+            ------------------------------------- */
+
+            if (remaining <= 0) {
+
+                clearInterval(
+                    announcementCountdownTimer
+                );
+
+                announcementCountdownTimer =
+                    null;
+
+
+                announcementElement.textContent =
+                    "No announcements available.";
+
+
+                if (countdownBox) {
+
+                    countdownBox.style.display =
+                        "none";
+
+                }
+
+
+                if (expiryNotice) {
+
+                    expiryNotice.textContent =
+                        "";
+
+                }
+
+
+                return;
+
+            }
+
+
+            /* -------------------------------------
+               CALCULATE DAYS
+            ------------------------------------- */
+
+            const totalSeconds =
+                Math.floor(
+                    remaining / 1000
+                );
+
+
+            const days =
+                Math.floor(
+                    totalSeconds / 86400
+                );
+
+
+            const hours =
+                Math.floor(
+                    (totalSeconds % 86400) / 3600
+                );
+
+
+            const minutes =
+                Math.floor(
+                    (totalSeconds % 3600) / 60
+                );
+
+
+            const seconds =
+                totalSeconds % 60;
+
+
+            /* -------------------------------------
+               DISPLAY
+            ------------------------------------- */
+
+            if (daysElement) {
+
+                daysElement.textContent =
+                    String(days)
+                        .padStart(2, "0");
+
+            }
+
+
+            if (hoursElement) {
+
+                hoursElement.textContent =
+                    String(hours)
+                        .padStart(2, "0");
+
+            }
+
+
+            if (minutesElement) {
+
+                minutesElement.textContent =
+                    String(minutes)
+                        .padStart(2, "0");
+
+            }
+
+
+            if (secondsElement) {
+
+                secondsElement.textContent =
+                    String(seconds)
+                        .padStart(2, "0");
+
+            }
+
+        }
+
+
+        /* -----------------------------------------
+           INITIAL COUNTDOWN
+        ----------------------------------------- */
+
+        updateAnnouncementCountdown();
+
+
+        /* -----------------------------------------
+           UPDATE EVERY SECOND
+        ----------------------------------------- */
+
+        announcementCountdownTimer =
+            setInterval(
+                updateAnnouncementCountdown,
+                1000
+            );
 
     }
-
-
-    // -----------------------------------------
-    // Load announcement
-    // -----------------------------------------
-
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-
-            .from("school_announcements")
-
-            .select(
-                "announcement_text, expires_at"
-            )
-
-            .eq(
-                "school_code",
-                schoolCode
-            )
-
-            .maybeSingle();
-
-
-    if (error) {
+    catch (error) {
 
         console.error(
             "Student Dashboard Announcement Error:",
@@ -2003,165 +2908,14 @@ async function loadSchoolAnnouncement() {
         announcementElement.textContent =
             "No announcements available.";
 
-        if (countdownElement) {
+        if (countdownBox) {
 
-            countdownElement.textContent =
-                "00:00:00";
-
-        }
-
-        return;
-
-    }
-
-
-    // -----------------------------------------
-    // No announcement
-    // -----------------------------------------
-
-    if (!data) {
-
-        announcementElement.textContent =
-            "No announcements available.";
-
-        if (countdownElement) {
-
-            countdownElement.textContent =
-                "00:00:00";
-
-        }
-
-        return;
-
-    }
-
-
-    // -----------------------------------------
-    // Check expiry
-    // -----------------------------------------
-
-    const expiryTime =
-        new Date(
-            data.expires_at
-        ).getTime();
-
-
-    if (
-        !expiryTime ||
-        expiryTime <= Date.now()
-    ) {
-
-        announcementElement.textContent =
-            "No announcements available.";
-
-        if (countdownElement) {
-
-            countdownElement.textContent =
-                "00:00:00";
-
-        }
-
-        return;
-
-    }
-
-
-    // -----------------------------------------
-    // Display announcement
-    // -----------------------------------------
-
-    announcementElement.textContent =
-        data.announcement_text || "";
-
-
-    // -----------------------------------------
-    // Countdown
-    // -----------------------------------------
-
-    function updateAnnouncementCountdown() {
-
-        const remaining =
-            expiryTime - Date.now();
-
-
-        if (remaining <= 0) {
-
-            clearInterval(
-                announcementCountdownTimer
-            );
-
-            announcementCountdownTimer =
-                null;
-
-
-            announcementElement.textContent =
-                "No announcements available.";
-
-
-            if (countdownElement) {
-
-                countdownElement.textContent =
-                    "00:00:00";
-
-            }
-
-            return;
-
-        }
-
-
-        const totalSeconds =
-            Math.floor(
-                remaining / 1000
-            );
-
-
-        const hours =
-            Math.floor(
-                totalSeconds / 3600
-            );
-
-
-        const minutes =
-            Math.floor(
-                (totalSeconds % 3600) / 60
-            );
-
-
-        const seconds =
-            totalSeconds % 60;
-
-
-        if (countdownElement) {
-
-            countdownElement.textContent =
-
-                String(hours)
-                    .padStart(2, "0")
-
-                + ":" +
-
-                String(minutes)
-                    .padStart(2, "0")
-
-                + ":" +
-
-                String(seconds)
-                    .padStart(2, "0");
+            countdownBox.style.display =
+                "none";
 
         }
 
     }
-
-
-    updateAnnouncementCountdown();
-
-
-    announcementCountdownTimer =
-        setInterval(
-            updateAnnouncementCountdown,
-            1000
-        );
 
 }
 
