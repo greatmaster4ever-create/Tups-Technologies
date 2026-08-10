@@ -1371,6 +1371,8 @@ console.log(
         await loadStudentDashboard();
 
         await loadStudentAdvertisements();
+		
+		await loadSchoolAnnouncement();
 
     }
 );
@@ -1907,6 +1909,259 @@ setInterval(
         `;
 
     }
+
+}
+
+let announcementCountdownTimer = null;
+
+
+/* =========================================================
+   LOAD SCHOOL ANNOUNCEMENT
+========================================================= */
+
+async function loadSchoolAnnouncement() {
+
+    const announcementElement =
+        document.getElementById("announcements");
+
+    const countdownElement =
+        document.getElementById(
+            "announcementCountdown"
+        );
+
+
+    if (!announcementElement) {
+        return;
+    }
+
+
+    // Stop any previous countdown
+
+    if (announcementCountdownTimer) {
+
+        clearInterval(
+            announcementCountdownTimer
+        );
+
+        announcementCountdownTimer = null;
+
+    }
+
+
+    // -----------------------------------------
+    // Validate school code
+    // -----------------------------------------
+
+    if (!schoolCode) {
+
+        announcementElement.textContent =
+            "No announcements available.";
+
+        if (countdownElement) {
+
+            countdownElement.textContent =
+                "00:00:00";
+
+        }
+
+        return;
+
+    }
+
+
+    // -----------------------------------------
+    // Load announcement
+    // -----------------------------------------
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+
+            .from("school_announcements")
+
+            .select(
+                "announcement_text, expires_at"
+            )
+
+            .eq(
+                "school_code",
+                schoolCode
+            )
+
+            .maybeSingle();
+
+
+    if (error) {
+
+        console.error(
+            "Student Dashboard Announcement Error:",
+            error
+        );
+
+        announcementElement.textContent =
+            "No announcements available.";
+
+        if (countdownElement) {
+
+            countdownElement.textContent =
+                "00:00:00";
+
+        }
+
+        return;
+
+    }
+
+
+    // -----------------------------------------
+    // No announcement
+    // -----------------------------------------
+
+    if (!data) {
+
+        announcementElement.textContent =
+            "No announcements available.";
+
+        if (countdownElement) {
+
+            countdownElement.textContent =
+                "00:00:00";
+
+        }
+
+        return;
+
+    }
+
+
+    // -----------------------------------------
+    // Check expiry
+    // -----------------------------------------
+
+    const expiryTime =
+        new Date(
+            data.expires_at
+        ).getTime();
+
+
+    if (
+        !expiryTime ||
+        expiryTime <= Date.now()
+    ) {
+
+        announcementElement.textContent =
+            "No announcements available.";
+
+        if (countdownElement) {
+
+            countdownElement.textContent =
+                "00:00:00";
+
+        }
+
+        return;
+
+    }
+
+
+    // -----------------------------------------
+    // Display announcement
+    // -----------------------------------------
+
+    announcementElement.textContent =
+        data.announcement_text || "";
+
+
+    // -----------------------------------------
+    // Countdown
+    // -----------------------------------------
+
+    function updateAnnouncementCountdown() {
+
+        const remaining =
+            expiryTime - Date.now();
+
+
+        if (remaining <= 0) {
+
+            clearInterval(
+                announcementCountdownTimer
+            );
+
+            announcementCountdownTimer =
+                null;
+
+
+            announcementElement.textContent =
+                "No announcements available.";
+
+
+            if (countdownElement) {
+
+                countdownElement.textContent =
+                    "00:00:00";
+
+            }
+
+            return;
+
+        }
+
+
+        const totalSeconds =
+            Math.floor(
+                remaining / 1000
+            );
+
+
+        const hours =
+            Math.floor(
+                totalSeconds / 3600
+            );
+
+
+        const minutes =
+            Math.floor(
+                (totalSeconds % 3600) / 60
+            );
+
+
+        const seconds =
+            totalSeconds % 60;
+
+
+        if (countdownElement) {
+
+            countdownElement.textContent =
+
+                String(hours)
+                    .padStart(2, "0")
+
+                + ":" +
+
+                String(minutes)
+                    .padStart(2, "0")
+
+                + ":" +
+
+                String(seconds)
+                    .padStart(2, "0");
+
+        }
+
+    }
+
+
+    updateAnnouncementCountdown();
+
+
+    announcementCountdownTimer =
+        setInterval(
+            updateAnnouncementCountdown,
+            1000
+        );
 
 }
 
