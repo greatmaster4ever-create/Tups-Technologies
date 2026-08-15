@@ -5980,109 +5980,117 @@ async function saveSchoolAnnouncement() {
 
 async function clearSchoolAnnouncement() {
 
-    const confirmed =
-        confirm(
-            "Clear the current announcement?"
-        );
+    showTUPSConfirmation(
 
+        "Clear the current announcement?",
 
-    if (!confirmed) {
-        return;
-    }
+        async function () {
 
-
-    const status =
-        document.getElementById(
-            "announcementAdminStatus"
-        );
-
-
-    try {
-
-        const {
-            error
-        } =
-            await supabaseClient
-
-                .from("school_announcements")
-
-                .delete()
-
-                .eq(
-                    "school_code",
-                    schoolCode
+            const status =
+                document.getElementById(
+                    "announcementAdminStatus"
                 );
 
 
-        if (error) {
+            try {
 
-            throw error;
+                const {
+                    error
+                } =
+                    await supabaseClient
+
+                        .from("school_announcements")
+
+                        .delete()
+
+                        .eq(
+                            "school_code",
+                            schoolCode
+                        );
+
+
+                if (error) {
+
+                    throw error;
+
+                }
+
+
+                const textInput =
+                    document.getElementById(
+                        "adminAnnouncementText"
+                    );
+
+
+                const expiryInput =
+                    document.getElementById(
+                        "adminAnnouncementExpiry"
+                    );
+
+
+                if (textInput) {
+                    textInput.value = "";
+                }
+
+
+                if (expiryInput) {
+                    expiryInput.value = "";
+                }
+
+
+                if (status) {
+
+                    status.style.color =
+                        "green";
+
+                    status.textContent =
+                        "✓ Announcement cleared.";
+
+                }
+
+
+                if (
+                    typeof loadSchoolAnnouncement ===
+                    "function"
+                ) {
+
+                    await loadSchoolAnnouncement();
+
+                }
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Clear Announcement Error:",
+                    error
+                );
+
+
+                if (status) {
+
+                    status.style.color =
+                        "red";
+
+                    status.textContent =
+                        error.message ||
+                        "Unable to clear announcement.";
+
+                }
+
+            }
+
+        },
+
+        function () {
+
+            // User cancelled.
+            // Do nothing.
 
         }
 
-
-        const textInput =
-            document.getElementById(
-                "adminAnnouncementText"
-            );
-
-        const expiryInput =
-            document.getElementById(
-                "adminAnnouncementExpiry"
-            );
-
-
-        if (textInput) {
-            textInput.value = "";
-        }
-
-
-        if (expiryInput) {
-            expiryInput.value = "";
-        }
-
-
-        if (status) {
-
-            status.style.color =
-                "green";
-
-            status.textContent =
-                "✓ Announcement cleared.";
-
-        }
-
-
-        if (
-            typeof loadSchoolAnnouncement ===
-            "function"
-        ) {
-
-            await loadSchoolAnnouncement();
-
-        }
-
-    }
-    catch (error) {
-
-        console.error(
-            "Clear Announcement Error:",
-            error
-        );
-
-
-        if (status) {
-
-            status.style.color =
-                "red";
-
-            status.textContent =
-                error.message ||
-                "Unable to clear announcement.";
-
-        }
-
-    }
+    );
 
 }
 
