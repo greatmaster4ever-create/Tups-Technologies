@@ -12929,41 +12929,54 @@ function printFeesTable() {
 window.printFeesTable =
   printFeesTable;
   
-  async function clearAllFees() {
+async function clearAllFees() {
 
-  const confirmed =
-    confirm(
-      "This will delete ALL class fees. Continue?"
-    );
+  showTUPSConfirmation(
 
-  if (!confirmed) return;
+    "This will delete ALL class fees. Continue?",
 
-  const { error } =
-    await supabaseClient
-      .from("class_fees")
-      .delete()
-      .eq(
-        "school_code",
-        currentSchoolCode
+    async function () {
+
+      const { error } =
+        await supabaseClient
+          .from("class_fees")
+          .delete()
+          .eq(
+            "school_code",
+            currentSchoolCode
+          );
+
+
+      if (error) {
+
+        console.error(error);
+
+        alert(
+          error.message
+        );
+
+        return;
+
+      }
+
+
+      alert(
+        "All fees cleared successfully."
       );
 
-  if (error) {
 
-    console.error(error);
+      await loadTermFees();
 
-    alert(
-      error.message
-    );
+    },
 
-    return;
+    function () {
 
-  }
+      // User cancelled.
+      // Do nothing.
 
-  alert(
-    "All fees cleared successfully."
+    }
+
   );
-
-  await loadTermFees();
 
 }
 
