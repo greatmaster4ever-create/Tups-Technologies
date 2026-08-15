@@ -1,11 +1,16 @@
-const CACHE_NAME = "tups-school-v1";
+const CACHE_NAME = "tups-school-v2.0";
 
 const urlsToCache = [
   "/",
   "/index.html",
-  "/sch001.html",
-  "/school.css",
-  "/school.js"
+  "/manifest.json",
+  "/school-template.html",
+  "/school-template.css",
+  "/student-dashboard-template.html",
+  "/student-dashboard-template.css",
+  "/icons-192.png",
+  "/icons-512.png",
+  "/school-template.js"
 ];
 
 self.addEventListener("install", event => {
@@ -17,9 +22,38 @@ self.addEventListener("install", event => {
 });
 
 self.addEventListener("fetch", event => {
+
+  const requestURL =
+    new URL(event.request.url);
+
+  // ==========================================
+  // ONLY HANDLE TUPS TECHNOLOGIES REQUESTS
+  // ==========================================
+
+  if (
+    requestURL.origin !== self.location.origin
+  ) {
+
+    return;
+
+  }
+
+
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
+
+    caches.match(
+      event.request
+    )
+
+    .then(response => {
+
+      return (
+        response ||
+        fetch(event.request)
+      );
+
     })
+
   );
+
 });
