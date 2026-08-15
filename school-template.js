@@ -13668,9 +13668,9 @@ function filterFeesTable() {
 
 async function restoreLastRollover() {
 
-const proceed = confirm(
+    showTUPSConfirmation(
 
-`This will restore the LAST cleared payment records.
+        `This will restore the LAST cleared payment records.
 
 This action will:
 
@@ -13684,343 +13684,388 @@ This action will:
 
 • Change Previous Term payments back to Current Term
 
-Do you want to continue?`
+Do you want to continue?`,
 
-);
+        async function () {
 
-if (!proceed) return;
+            // ========================================
+            // FIND LATEST ARCHIVE BATCH
+            // ========================================
 
+            const {
 
-// ========================================
-// FIND LATEST ARCHIVE BATCH
-// ========================================
+                data: lastBatch,
 
-const {
+                error: lastBatchError
 
-data: lastBatch,
+            } = await supabaseClient
 
-error: lastBatchError
+                .from("finance_archive")
 
-} = await supabaseClient
+                .select("archive_batch_id")
 
-.from("finance_archive")
+                .order(
+                    "archived_at",
+                    { ascending: false }
+                )
 
-.select("archive_batch_id")
+                .limit(1)
 
-.order("archived_at", { ascending: false })
+                .single();
 
-.limit(1)
 
-.single();
+            if (lastBatchError) {
 
-if (lastBatchError) {
+                alert(
+                    "No archive found."
+                );
 
-alert("No archive found.");
+                return;
 
-return;
+            }
 
-}
 
-const batchId = lastBatch.archive_batch_id;
+            const batchId =
+                lastBatch.archive_batch_id;
 
 
-// ========================================
-// LOAD ARCHIVE RECORDS
-// ========================================
+            // ========================================
+            // LOAD ARCHIVE RECORDS
+            // ========================================
 
-const {
+            const {
 
-data: archiveRows,
+                data: archiveRows,
 
-error: archiveError
+                error: archiveError
 
-} = await supabaseClient
+            } = await supabaseClient
 
-.from("finance_archive")
+                .from("finance_archive")
 
-.select("*")
+                .select("*")
 
-.eq("archive_batch_id", batchId);
+                .eq(
+                    "archive_batch_id",
+                    batchId
+                );
 
-if (archiveError) {
 
-alert(archiveError.message);
+            if (archiveError) {
 
-return;
+                alert(
+                    archiveError.message
+                );
 
-}
+                return;
 
+            }
 
-// ========================================
-// REBUILD student_payments
-// ========================================
 
-const paymentRows = archiveRows.map(row => ({
+            // ========================================
+            // REBUILD student_payments
+            // ========================================
 
-school_code: row.school_code,
+            const paymentRows =
+                archiveRows.map(row => ({
 
-student_id: row.student_id,
+                    school_code:
+                        row.school_code,
 
-student_name: row.student_name,
+                    student_id:
+                        row.student_id,
 
-reg_no: row.reg_no,
+                    student_name:
+                        row.student_name,
 
-department: row.department,
+                    reg_no:
+                        row.reg_no,
 
-class: row.class,
+                    department:
+                        row.department,
 
-amount_paid: row.amount_paid
+                    class:
+                        row.class,
 
-}));
+                    amount_paid:
+                        row.amount_paid
 
-const {
+                }));
 
-error: insertError
 
-} = await supabaseClient
+            const {
 
-.from("student_payments")
+                error: insertError
 
-.insert(paymentRows);
+            } = await supabaseClient
 
+                .from("student_payments")
 
-// IMPORTANT
-// CHECK IMMEDIATELY
+                .insert(paymentRows);
 
-if (insertError) {
 
-alert(insertError.message);
+            // IMPORTANT
+            // CHECK IMMEDIATELY
 
-return;
+            if (insertError) {
 
-}
+                alert(
+                    insertError.message
+                );
 
+                return;
 
-// ========================================
-// RESTORE TOTAL FEES PAID
-// ========================================
+            }
 
-const restoredStudents = {};
 
-archiveRows.forEach(row => {
+            // ========================================
+            // RESTORE TOTAL FEES PAID
+            // ========================================
 
-if (!restoredStudents[row.student_id]) {
+            const restoredStudents = {};
 
-restoredStudents[row.student_id] =
 
-Number(row.total_fees_paid || 0);
+            archiveRows.forEach(row => {
 
-}
+                if (
+                    !restoredStudents[
+                        row.student_id
+                    ]
+                ) {
 
-});
+                    restoredStudents[
+                        row.student_id
+                    ] =
 
-for (const studentId in restoredStudents) {
+                        Number(
+                            row.total_fees_paid || 0
+                        );
 
-const {
+                }
 
-error: updateError
+            });
 
-} = await supabaseClient
 
-.from("students")
+            for (
+                const studentId
+                in restoredStudents
+            ) {
 
-.update({
+                const {
 
-total_fees_paid:
+                    error: updateError
 
-restoredStudents[studentId]
+                } = await supabaseClient
 
-})
+                    .from("students")
 
-.eq("id", studentId);
+                    .update({
 
-if (updateError) {
+                        total_fees_paid:
+                            restoredStudents[
+                                studentId
+                            ]
 
-throw updateError;
+                    })
 
-}
+                    .eq(
+                        "id",
+                        studentId
+                    );
 
-}
 
+                if (updateError) {
 
-// ========================================
-// RESTORE PAYMENT HISTORY REMARKS
-// ========================================
+                    throw updateError;
 
-const {
+                }
 
-error: historyRestoreError
+            }
 
-} = await supabaseClient
 
-.from("payment_history")
+            // ========================================
+            // RESTORE PAYMENT HISTORY REMARKS
+            // ========================================
 
-.update({
+            const {
 
-remarks:
+                error: historyRestoreError
 
-"Current Term Payment"
+            } = await supabaseClient
 
-})
+                .from("payment_history")
 
-.eq(
+                .update({
 
-"school_code",
+                    remarks:
+                        "Current Term Payment"
 
-currentSchoolCode
+                })
 
-)
+                .eq(
+                    "school_code",
+                    currentSchoolCode
+                )
 
-.eq(
+                .eq(
+                    "remarks",
+                    "Previous Term Payment"
+                );
 
-"remarks",
 
-"Previous Term Payment"
+            if (historyRestoreError) {
 
-);
+                throw historyRestoreError;
 
-if (historyRestoreError) {
+            }
 
-throw historyRestoreError;
 
-}
+            // ========================================
+            // DELETE RESTORED ARCHIVE
+            // ========================================
 
+            const {
 
-// ========================================
-// DELETE RESTORED ARCHIVE
-// ========================================
+                error: archiveDeleteError
 
-const {
+            } = await supabaseClient
 
-error: archiveDeleteError
+                .from("finance_archive")
 
-} = await supabaseClient
+                .delete()
 
-.from("finance_archive")
+                .eq(
+                    "archive_batch_id",
+                    batchId
+                );
 
-.delete()
 
-.eq(
+            if (archiveDeleteError) {
 
-"archive_batch_id",
+                throw archiveDeleteError;
 
-batchId
+            }
 
-);
 
-if (archiveDeleteError) {
+            // ========================================
+            // REMOVE GENERATED OUTSTANDING FEES
+            // ========================================
 
-throw archiveDeleteError;
+            const {
 
-}
+                error: deleteOutstandingError
 
+            } = await supabaseClient
 
-// ========================================
-// REMOVE GENERATED OUTSTANDING FEES
-// ========================================
+                .from("student_outstanding_fees")
 
-const {
+                .delete()
 
-error: deleteOutstandingError
+                .eq(
+                    "school_code",
+                    currentSchoolCode
+                );
 
-} = await supabaseClient
 
-.from("student_outstanding_fees")
+            if (deleteOutstandingError) {
 
-.delete()
+                throw deleteOutstandingError;
 
-.eq(
+            }
 
-"school_code",
 
-currentSchoolCode
+            // ========================================
+            // VERIFY OUTSTANDING TABLE IS EMPTY
+            // ========================================
 
-);
+            const {
 
-if (deleteOutstandingError) {
+                data: remainingOutstanding,
 
-throw deleteOutstandingError;
+                error: remainingError
 
-}
+            } = await supabaseClient
 
+                .from("student_outstanding_fees")
 
-// ========================================
-// VERIFY OUTSTANDING TABLE IS EMPTY
-// ========================================
+                .select("*")
 
-const {
+                .eq(
+                    "school_code",
+                    currentSchoolCode
+                );
 
-data: remainingOutstanding,
 
-error: remainingError
+            console.log(
 
-} = await supabaseClient
+                "Outstanding Remaining After Restore:",
 
-.from("student_outstanding_fees")
+                remainingOutstanding
 
-.select("*")
+            );
 
-.eq(
 
-"school_code",
+            console.log(
 
-currentSchoolCode
+                "Remaining Error:",
 
-);
+                remainingError
 
-console.log(
+            );
 
-"Outstanding Remaining After Restore:",
 
-remainingOutstanding
+            // ========================================
+            // REMOVE PREVIOUS TERM OUTSTANDING
+            // ========================================
 
-);
+            const {
 
-console.log(
+                error:
+                    deletePreviousOutstandingError
 
-"Remaining Error:",
+            } = await supabaseClient
 
-remainingError
+                .from(
+                    "student_previous_outstanding_fees"
+                )
 
-);
+                .delete()
 
-// ========================================
-// REMOVE PREVIOUS TERM OUTSTANDING
-// ========================================
+                .eq(
+                    "school_code",
+                    currentSchoolCode
+                );
 
-const {
 
-error: deletePreviousOutstandingError
+            if (
+                deletePreviousOutstandingError
+            ) {
 
-} = await supabaseClient
+                throw deletePreviousOutstandingError;
 
-.from("student_previous_outstanding_fees")
+            }
 
-.delete()
 
-.eq(
+            // ========================================
+            // SUCCESS
+            // ========================================
 
-"school_code",
+            alert(
 
-currentSchoolCode
+                "Latest rollover restored successfully."
 
-);
+            );
 
-if (deletePreviousOutstandingError) {
+        },
 
-throw deletePreviousOutstandingError;
+        function () {
 
-}
+            // User cancelled.
+            // Do absolutely nothing.
 
-// ========================================
-// SUCCESS
-// ========================================
+        }
 
-alert(
-
-"Latest rollover restored successfully."
-
-);
+    );
 
 }
 
