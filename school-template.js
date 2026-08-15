@@ -12138,23 +12138,33 @@ function showSettings() {
 
 function logoutSchoolPortal() {
 
-  const confirmed =
-    confirm(
-      "Are you sure you want to logout?"
-    );
+  showTUPSConfirmation(
 
-  if (!confirmed) return;
+    "Are you sure you want to logout?",
 
-  // Clear session
-  sessionStorage.removeItem(
-    "school_code"
-  );
+    function () {
 
-  sessionStorage.clear();
+      // Clear session
+      sessionStorage.removeItem(
+        "school_code"
+      );
 
-  // Prevent browser returning here
-  window.location.replace(
-    "index.html"
+      sessionStorage.clear();
+
+      // Prevent browser returning here
+      window.location.replace(
+        "index.html"
+      );
+
+    },
+
+    function () {
+
+      // User cancelled logout.
+      // Do nothing.
+
+    }
+
   );
 
 }
