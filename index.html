@@ -14,10 +14,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 
   <!-- Custom CSS -->
+  <link rel="stylesheet" href="tups-notification.css">
   <link rel="stylesheet" href="style.css">
 
   <!-- PWA Manifest -->
     <meta name="theme-color" content="#000066">
+  
 </head>
 <body>
 
@@ -184,7 +186,7 @@ id="resultCard">
   
   <!-- Supabase (USE THIS EXACT LINK) -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-
+<script src="tups-notification.js"></script>
 <!-- Your app -->
 <script src="https://unpkg.com/@supabase/supabase-js@2" defer></script>
 <script src="app.js" defer></script>
@@ -205,5 +207,6 @@ if ('serviceWorker' in navigator) {
 <script>
   document.getElementById("year").textContent = new Date().getFullYear();
 </script>
+<div id="tupsNotification"></div>
 </body>
 </html>
