@@ -62,6 +62,23 @@
     </button>
 
   </div>
+  
+  <button
+    type="button"
+    onclick="
+        showTUPSConfirmation(
+            'Are you sure you want to continue?',
+            function () {
+                alert('Confirmation successful!');
+            },
+            function () {
+                alert('Action cancelled.');
+            }
+        );
+    "
+>
+    Test TUPS Confirmation
+</button>
 
 </div>
 

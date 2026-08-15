@@ -84,3 +84,89 @@
     #d88a00;
 
 }
+
+/* =================================
+   TUPS CONFIRMATION DIALOG
+================================= */
+
+#tupsConfirmOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000000;
+}
+
+#tupsConfirmBox {
+    width: min(400px, 90%);
+    background: white;
+    border-radius: 14px;
+    padding: 25px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: tupsConfirmPop 0.2s ease;
+}
+
+#tupsConfirmTitle {
+    margin: 0 0 12px;
+    color: #000066;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+#tupsConfirmMessage {
+    margin: 0 0 24px;
+    color: #333;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.tups-confirm-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.tups-confirm-buttons button {
+    min-width: 105px;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#tupsConfirmCancel {
+    background: #f1f1f1;
+    color: #333;
+}
+
+#tupsConfirmCancel:hover {
+    background: #e2e2e2;
+}
+
+#tupsConfirmOK {
+    background: #000066;
+    color: white;
+}
+
+#tupsConfirmOK:hover {
+    background: #00004d;
+}
+
+@keyframes tupsConfirmPop {
+
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+}

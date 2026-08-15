@@ -99,3 +99,121 @@ function(message){
     );
 
 };
+
+// =================================
+// TUPS CONFIRMATION SYSTEM
+// =================================
+
+function showTUPSConfirmation(
+    message,
+    onConfirm,
+    onCancel
+) {
+
+    let overlay =
+        document.getElementById(
+            "tupsConfirmOverlay"
+        );
+
+    if (!overlay) {
+
+        overlay =
+            document.createElement(
+                "div"
+            );
+
+        overlay.id =
+            "tupsConfirmOverlay";
+
+        overlay.innerHTML = `
+
+            <div id="tupsConfirmBox">
+
+                <h3 id="tupsConfirmTitle">
+                    TUPS Confirmation
+                </h3>
+
+                <div id="tupsConfirmMessage"></div>
+
+                <div class="tups-confirm-buttons">
+
+                    <button
+                        id="tupsConfirmCancel"
+                        type="button"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        id="tupsConfirmOK"
+                        type="button"
+                    >
+                        Confirm
+                    </button>
+
+                </div>
+
+            </div>
+
+        `;
+
+        document.body.appendChild(
+            overlay
+        );
+
+    }
+
+
+    document.getElementById(
+        "tupsConfirmMessage"
+    ).textContent =
+        message;
+
+
+    overlay.style.display =
+        "flex";
+
+
+    const cancelButton =
+        document.getElementById(
+            "tupsConfirmCancel"
+        );
+
+    const confirmButton =
+        document.getElementById(
+            "tupsConfirmOK"
+        );
+
+
+    // Remove previous handlers
+    cancelButton.onclick = null;
+    confirmButton.onclick = null;
+
+
+    cancelButton.onclick =
+        function () {
+
+            overlay.style.display =
+                "none";
+
+            if (typeof onCancel === "function") {
+                onCancel();
+            }
+
+        };
+
+
+    confirmButton.onclick =
+        function () {
+
+            overlay.style.display =
+                "none";
+
+            if (typeof onConfirm === "function") {
+                onConfirm();
+            }
+
+        };
+
+}
+
