@@ -1,8 +1,8 @@
 {
   "name": "Tups School System",
   "short_name": "TUPS",
-  "start_url": "/Tups-Technologies/index.html",
-  "scope": "/Tups-Technologies/",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#000066",
   "theme_color": "#000066",
