@@ -3415,79 +3415,94 @@ document.getElementById(
 
 async function removeSelectedOptionalItems(){
 
-const checked =
+    const checked =
 
-[...
+    [
 
-document.querySelectorAll(
+        ...
 
-".optionalItemCheck:checked"
+        document.querySelectorAll(
 
-)
+            ".optionalItemCheck:checked"
 
-].map(
+        )
 
-box=>box.value
+    ].map(
 
-);
+        box=>box.value
 
-if(
+    );
 
-checked.length===0
 
-){
+    if(
 
-alert(
+        checked.length===0
 
-"Select item(s) first."
+    ){
 
-);
+        alert(
 
-return;
+            "Select item(s) first."
 
-}
+        );
 
-const proceed = confirm(
+        return;
 
-`Remove ${checked.length} selected item(s)?`
+    }
 
-);
 
-if(!proceed)
+    showTUPSConfirmation(
 
-return;
+        `Remove ${checked.length} selected item(s)?`,
 
-const {
+        async function(){
 
-error
+            const {
 
-} = await supabaseClient
+                error
 
-.from(
+            } = await supabaseClient
 
-"set_optional_payments"
+                .from(
 
-)
+                    "set_optional_payments"
 
-.delete()
+                )
 
-.in(
+                .delete()
 
-"id",
+                .in(
 
-checked
+                    "id",
 
-);
+                    checked
 
-if(error){
+                );
 
-alert(error.message);
 
-return;
+            if(error){
 
-}
+                alert(
+                    error.message
+                );
 
-showOptionalPaymentsSetup();
+                return;
+
+            }
+
+
+            showOptionalPaymentsSetup();
+
+        },
+
+        function(){
+
+            // User cancelled.
+            // Do nothing.
+
+        }
+
+    );
 
 }
 
