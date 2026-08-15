@@ -3887,9 +3887,9 @@ await loadAllOptionalPayments();
 
 async function endTermOptionalPayments(){
 
-const confirmReset = confirm(
+    showTUPSConfirmation(
 
-`⚠ END OF TERM WARNING
+        `⚠ END OF TERM WARNING
 
 This will permanently delete ALL Optional Payment records for this term.
 
@@ -3901,47 +3901,57 @@ Before continuing, ensure that:
 
 This action CANNOT be undone.
 
-Do you want to continue?`
+Do you want to continue?`,
 
-);
+        async function(){
 
-if(!confirmReset){
+            const {
 
-return;
+                error
 
-}
+            } = await supabaseClient
 
-const {
+                .from("optional_payments")
 
-error
+                .delete()
 
-} = await supabaseClient
+                .eq(
+                    "school_code",
+                    currentSchoolCode
+                );
 
-.from("optional_payments")
 
-.delete()
+            if(error){
 
-.eq(
-"school_code",
-currentSchoolCode
-);
+                alert(
+                    error.message
+                );
 
-if(error){
+                return;
 
-alert(error.message);
+            }
 
-return;
 
-}
+            alert(
 
-alert(
+                "✅ End of Term completed successfully. All Optional Payment records have been cleared."
 
-"✅ End of Term completed successfully. All Optional Payment records have been cleared."
+            );
 
-);
 
-// Refresh dashboard
-await loadAllOptionalPayments();
+            // Refresh dashboard
+            await loadAllOptionalPayments();
+
+        },
+
+        function(){
+
+            // User cancelled.
+            // Do nothing.
+
+        }
+
+    );
 
 }
 
