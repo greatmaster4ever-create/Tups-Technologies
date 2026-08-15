@@ -11473,9 +11473,9 @@ function previousOutstandingNextPage(){
 
 async function clearCurrentTermPayments(){
 
-const proceed = confirm(
+    showTUPSConfirmation(
 
-`This action will:
+        `This action will:
 
 • Archive Current Payments
 
@@ -11489,228 +11489,258 @@ Payment History will be preserved.
 
 Current Term payments will be marked as Previous Term payments.
 
-Do you want to continue?`
+Do you want to continue?`,
 
-);
+        async function(){
 
-if(!proceed) return;
+            try{
 
-try{
+                // STEP 1
+                const archiveResult =
+                await archiveStudentPayments();
 
-// STEP 1
-const archiveResult =
-await archiveStudentPayments();
 
-// STEP 1B
-// MARK CURRENT TERM PAYMENTS AS PREVIOUS TERM
+                // STEP 1B
+                // MARK CURRENT TERM PAYMENTS AS PREVIOUS TERM
 
-const {
+                const {
 
-error: historyUpdateError
+                    error: historyUpdateError
 
-} = await supabaseClient
+                } = await supabaseClient
 
-.from("payment_history")
+                .from("payment_history")
 
-.update({
+                .update({
 
-remarks:
+                    remarks:
 
-"Previous Term Payment"
+                    "Previous Term Payment"
 
-})
+                })
 
-.eq(
+                .eq(
 
-"school_code",
+                    "school_code",
 
-currentSchoolCode
+                    currentSchoolCode
 
-)
+                )
 
-.eq(
+                .eq(
 
-"remarks",
+                    "remarks",
 
-"Current Term Payment"
+                    "Current Term Payment"
 
-);
+                );
 
-if(historyUpdateError){
 
-throw historyUpdateError;
+                if(historyUpdateError){
 
-}
+                    throw historyUpdateError;
 
-// ========================================
-// STEP 2B
-// COPY CURRENT OUTSTANDING
-// TO PREVIOUS TERM TABLE
-// ========================================
+                }
 
-// Make sure Outstanding data exists
-if(!outstandingFeesMasterData || outstandingFeesMasterData.length===0){
 
-    await loadOutstandingPayments();
+                // ========================================
+                // STEP 2B
+                // COPY CURRENT OUTSTANDING
+                // TO PREVIOUS TERM TABLE
+                // ========================================
 
-}
+                // Make sure Outstanding data exists
 
-if(!outstandingFeesMasterData || outstandingFeesMasterData.length===0){
+                if(
+                    !outstandingFeesMasterData ||
+                    outstandingFeesMasterData.length===0
+                ){
 
-    throw new Error(
-        "Unable to generate Outstanding snapshot."
-    );
+                    await loadOutstandingPayments();
 
-}
+                }
 
-// Remove previous snapshot
 
-const {
+                if(
+                    !outstandingFeesMasterData ||
+                    outstandingFeesMasterData.length===0
+                ){
 
-error: deletePreviousError
+                    throw new Error(
+                        "Unable to generate Outstanding snapshot."
+                    );
 
-} = await supabaseClient
+                }
 
-.from("student_previous_outstanding_fees")
 
-.delete()
+                // Remove previous snapshot
 
-.eq(
+                const {
 
-"school_code",
+                    error: deletePreviousError
 
-currentSchoolCode
+                } = await supabaseClient
 
-);
+                .from("student_previous_outstanding_fees")
 
-if(deletePreviousError){
+                .delete()
 
-throw deletePreviousError;
+                .eq(
 
-}
+                    "school_code",
 
-// Build snapshot directly from the Outstanding screen
+                    currentSchoolCode
 
-const previousRows =
+                );
 
-outstandingFeesMasterData
 
-.filter(row=>row.remaining_amount>0)
+                if(deletePreviousError){
 
-.map(row=>({
+                    throw deletePreviousError;
 
-school_code:
-row.school_code,
+                }
 
-student_id:
-row.student_id,
 
-reg_no:
-row.reg_no,
+                // Build snapshot directly from the Outstanding screen
 
-student_name:
-row.student_name,
+                const previousRows =
 
-department:
-row.department,
+                outstandingFeesMasterData
 
-class_name:
-row.class_name,
+                .filter(
+                    row=>row.remaining_amount>0
+                )
 
-session:
-row.session,
+                .map(row=>({
 
-term:
-row.term,
+                    school_code:
+                    row.school_code,
 
-original_amount:
-row.original_amount,
+                    student_id:
+                    row.student_id,
 
-remaining_amount:
-row.remaining_amount,
+                    reg_no:
+                    row.reg_no,
 
-status:
-row.status
+                    student_name:
+                    row.student_name,
 
-}));
+                    department:
+                    row.department,
 
-if(previousRows.length){
+                    class_name:
+                    row.class_name,
 
-const {
+                    session:
+                    row.session,
 
-error: previousInsertError
+                    term:
+                    row.term,
 
-} = await supabaseClient
+                    original_amount:
+                    row.original_amount,
 
-.from("student_previous_outstanding_fees")
+                    remaining_amount:
+                    row.remaining_amount,
 
-.insert(previousRows);
+                    status:
+                    row.status
 
-if(previousInsertError){
+                }));
 
-throw previousInsertError;
 
-}
+                if(previousRows.length){
 
-}
-// STEP 3
-const {
-error:updateError
-} =
-await supabaseClient
+                    const {
 
-.from("students")
+                        error: previousInsertError
 
-.update({
+                    } = await supabaseClient
 
-total_fees_paid:0
+                    .from(
+                        "student_previous_outstanding_fees"
+                    )
 
-})
+                    .insert(previousRows);
 
-.eq(
 
-"school_code",
+                    if(previousInsertError){
 
-currentSchoolCode
+                        throw previousInsertError;
 
-);
+                    }
 
-if(updateError)
-throw updateError;
+                }
 
-// STEP 4
-const {
-error:deleteError
-} =
-await supabaseClient
 
-.from("student_payments")
+                // STEP 3
 
-.delete()
+                const {
 
-.eq(
+                    error:updateError
 
-"school_code",
+                } =
+                await supabaseClient
 
-currentSchoolCode
+                .from("students")
 
-);
+                .update({
 
-if(deleteError)
-throw deleteError;
+                    total_fees_paid:0
 
+                })
 
-// ========================================
-// STEP 4B
-// GENERATE CURRENT TERM OUTSTANDING
-// ========================================
+                .eq(
 
-const outstanding =
-await generateOutstandingRecords();
+                    "school_code",
 
-alert(
+                    currentSchoolCode
 
-`Finance Rollover Completed Successfully
+                );
+
+
+                if(updateError)
+                    throw updateError;
+
+
+                // STEP 4
+
+                const {
+
+                    error:deleteError
+
+                } =
+                await supabaseClient
+
+                .from("student_payments")
+
+                .delete()
+
+                .eq(
+
+                    "school_code",
+
+                    currentSchoolCode
+
+                );
+
+
+                if(deleteError)
+                    throw deleteError;
+
+
+                // ========================================
+                // STEP 4B
+                // GENERATE CURRENT TERM OUTSTANDING
+                // ========================================
+
+                const outstanding =
+                await generateOutstandingRecords();
+
+
+                alert(
+
+                `Finance Rollover Completed Successfully
 
 Archived Records:
 ${archiveResult.count}
@@ -11722,36 +11752,50 @@ Student Payments Reset
 
 Payment History Preserved.`
 
-);
+                );
 
-// ========================================
-// REFRESH CURRENT TERM OUTSTANDING
-// ========================================
 
-await loadOutstandingPayments();
+                // ========================================
+                // REFRESH CURRENT TERM OUTSTANDING
+                // ========================================
 
-console.log(
+                await loadOutstandingPayments();
 
-"Finance rollover completed. Outstanding tables refreshed."
 
-);
+                console.log(
 
-}
-catch(err){
+                    "Finance rollover completed. Outstanding tables refreshed."
 
-alert(
+                );
 
-"Finance rollover failed.\n\n"
+            }
 
-+
+            catch(err){
 
-err.message
+                alert(
 
-);
+                    "Finance rollover failed.\n\n"
 
-console.error(err);
+                    +
 
-}
+                    err.message
+
+                );
+
+                console.error(err);
+
+            }
+
+        },
+
+        function(){
+
+            // User cancelled.
+            // No finance operation is performed.
+
+        }
+
+    );
 
 }
 
