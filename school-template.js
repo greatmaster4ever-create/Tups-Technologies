@@ -7838,29 +7838,39 @@ console.log(
 
         <td>
 
-  <div class="action-buttons">
+ <div class="action-buttons">
 
-    <button
-      onclick="
-  viewStudentInfo(
-    '${student.id}'
-  )
-"
-    >
-      Info
-    </button>
+  <button
+    onclick="
+      viewStudentInfo(
+        '${student.id}'
+      )
+    "
+  >
+    Info
+  </button>
 
-    <button
-      onclick="
-  openTermReport(
-    '${student.id}'
-  )
-"
-    >
-      Result
-    </button>
+  <button
+    onclick="
+      deleteStudent(
+        '${student.id}'
+      )
+    "
+  >
+    Delete
+  </button>
 
-  </div>
+  <button
+    onclick="
+      openTermReport(
+        '${student.id}'
+      )
+    "
+  >
+    Result
+  </button>
+
+</div>
 
 </td>
 
@@ -7878,6 +7888,72 @@ console.log(
   ).innerHTML =
     html;
 
+}
+
+
+async function deleteStudent(studentId) {
+
+  const confirmDelete = confirm(
+    "Are you sure you want to delete this student from Supabase?"
+  );
+
+  if (!confirmDelete) {
+    return;
+  }
+
+  const department =
+    document.getElementById(
+      "studentDepartment"
+    ).value;
+
+  if (!department) {
+    alert(
+      "Select department first."
+    );
+    return;
+  }
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("students")
+      .delete()
+      .eq(
+        "id",
+        studentId
+      )
+      .eq(
+        "school_code",
+        schoolCode
+      )
+      .eq(
+        "department",
+        department
+      );
+
+  if (error) {
+
+    console.error(
+      "DELETE STUDENT ERROR:",
+      error
+    );
+
+    alert(
+      "Unable to delete student: " +
+      error.message
+    );
+
+    return;
+  }
+
+  alert(
+    "Student deleted successfully."
+  );
+
+  await loadStudentsTable(
+    department
+  );
 }
 
 function filterStudentsTable() {
