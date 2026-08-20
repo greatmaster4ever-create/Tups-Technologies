@@ -6158,7 +6158,7 @@ function renderSchoolCalendar() {
 
 
     /*
-     * Days
+     * Calendar days
      */
 
     for (
@@ -6183,6 +6183,30 @@ function renderSchoolCalendar() {
             dayEvents.length > 0;
 
 
+        /*
+         * Get unique event colours.
+         *
+         * This allows a day containing
+         * several differently coloured events
+         * to display all their colours.
+         */
+
+        const eventColours =
+            [
+                ...new Set(
+                    dayEvents
+                        .map(
+                            event =>
+                                event.colour
+                        )
+                        .filter(
+                            colour =>
+                                colour
+                        )
+                )
+            ];
+
+
         const today =
             new Date();
 
@@ -6191,6 +6215,53 @@ function renderSchoolCalendar() {
             today.getFullYear() === year &&
             today.getMonth() === month &&
             today.getDate() === day;
+
+
+        /*
+         * Background for dates containing events.
+         */
+
+        const dayBackground =
+            hasEvents
+                ? "#f8fbff"
+                : "#fff";
+
+
+        /*
+         * Build colour indicators.
+         */
+
+        let colourIndicators =
+            "";
+
+
+        if (eventColours.length > 0) {
+
+            colourIndicators =
+                eventColours
+                    .map(
+                        colour => `
+
+                            <span
+                                title="Event"
+                                style="
+                                    width:9px;
+                                    height:9px;
+                                    border-radius:50%;
+                                    background:${escapeSchoolCalendarColour(
+                                        colour
+                                    )};
+                                    display:inline-block;
+                                    margin-right:3px;
+                                    border:1px solid rgba(0,0,0,0.12);
+                                "
+                            ></span>
+
+                        `
+                    )
+                    .join("");
+
+        }
 
 
         html += `
@@ -6206,12 +6277,7 @@ function renderSchoolCalendar() {
                     min-height:75px;
                     padding:8px;
                     text-align:left;
-                    background:
-                        ${
-                            hasEvents
-                                ? "#eef4ff"
-                                : "#fff"
-                        };
+                    background:${dayBackground};
                     border:none;
                     border-right:1px solid #eee;
                     border-bottom:1px solid #eee;
@@ -6239,18 +6305,18 @@ function renderSchoolCalendar() {
                         ${day}
                     </span>
 
+
                     ${
                         hasEvents
                             ? `
                                 <span
                                     style="
-                                        width:9px;
-                                        height:9px;
-                                        border-radius:50%;
-                                        background:#2563eb;
-                                        display:inline-block;
+                                        display:flex;
+                                        align-items:center;
                                     "
-                                ></span>
+                                >
+                                    ${colourIndicators}
+                                </span>
                               `
                             : ""
                     }
@@ -6265,8 +6331,8 @@ function renderSchoolCalendar() {
                                 style="
                                     margin-top:8px;
                                     font-size:11px;
-                                    color:#2563eb;
                                     font-weight:600;
+                                    color:#555;
                                 "
                             >
                                 ${dayEvents.length}
@@ -6642,6 +6708,36 @@ function escapeSchoolCalendarText(
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+
+}
+
+function escapeSchoolCalendarColour(
+    value
+) {
+
+    const colour =
+        String(value || "").trim();
+
+
+    /*
+     * Only allow standard hexadecimal colours.
+     *
+     * This prevents arbitrary CSS from being
+     * inserted into the calendar.
+     */
+
+    if (
+        /^#[0-9A-Fa-f]{6}$/.test(
+            colour
+        )
+    ) {
+
+        return colour;
+
+    }
+
+
+    return "#2563eb";
 
 }
 
