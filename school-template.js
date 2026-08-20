@@ -7328,6 +7328,826 @@ async function saveSchoolCalendarEvent() {
 
 }
 
+function editSchoolCalendarEvent(eventId) {
+
+    const state =
+        window.schoolCalendarState;
+
+    if (!state || !state.events) {
+        return;
+    }
+
+
+    const event =
+        state.events.find(
+            item =>
+                item.id === eventId
+        );
+
+
+    if (!event) {
+
+        alert(
+            "The selected event could not be found."
+        );
+
+        return;
+
+    }
+
+
+    const container =
+        document.getElementById(
+            "schoolCalendarSelectedDate"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const selectedDate =
+        new Date(
+            `${event.event_date}T00:00:00`
+        );
+
+
+    const formattedDate =
+        selectedDate.toLocaleDateString(
+            "en-NG",
+            {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
+
+
+    container.innerHTML = `
+
+        <div>
+
+            <div
+                style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    gap:10px;
+                    margin-bottom:18px;
+                "
+            >
+
+                <div>
+
+                    <h3
+                        style="
+                            margin:0 0 5px 0;
+                            color:#000066;
+                        "
+                    >
+                        ✏️ Edit Calendar Event
+                    </h3>
+
+                    <p
+                        style="
+                            margin:0;
+                            color:#666;
+                        "
+                    >
+                        ${formattedDate}
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="admin-btn"
+                    onclick="renderSchoolCalendarSelectedDate()"
+                >
+                    ✕ Cancel
+                </button>
+
+            </div>
+
+
+            <div
+                style="
+                    background:#fff;
+                    border:1px solid #ddd;
+                    border-radius:10px;
+                    padding:18px;
+                "
+            >
+
+                <!-- TITLE -->
+
+                <label
+                    for="schoolCalendarEditTitle"
+                    style="
+                        display:block;
+                        font-weight:600;
+                        margin-bottom:6px;
+                    "
+                >
+                    Event Title
+                </label>
+
+                <input
+                    type="text"
+                    id="schoolCalendarEditTitle"
+                    maxlength="150"
+                    value="${escapeSchoolCalendarText(event.title)}"
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        height:42px;
+                        border:1px solid #ccc;
+                        border-radius:8px;
+                        padding:0 10px;
+                        font-size:14px;
+                    "
+                />
+
+
+                <!-- DESCRIPTION -->
+
+                <label
+                    for="schoolCalendarEditDescription"
+                    style="
+                        display:block;
+                        font-weight:600;
+                        margin:16px 0 6px 0;
+                    "
+                >
+                    Description
+                </label>
+
+                <textarea
+                    id="schoolCalendarEditDescription"
+                    rows="4"
+                    maxlength="1000"
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        resize:vertical;
+                        border:1px solid #ccc;
+                        border-radius:8px;
+                        padding:10px;
+                        font-family:inherit;
+                        font-size:14px;
+                    "
+                >${escapeSchoolCalendarText(event.description || "")}</textarea>
+
+
+                <!-- TIMES -->
+
+                <div
+                    style="
+                        display:grid;
+                        grid-template-columns:
+                            repeat(
+                                auto-fit,
+                                minmax(180px, 1fr)
+                            );
+                        gap:15px;
+                        margin-top:16px;
+                    "
+                >
+
+                    <div>
+
+                        <label
+                            for="schoolCalendarEditStartTime"
+                            style="
+                                display:block;
+                                font-weight:600;
+                                margin-bottom:6px;
+                            "
+                        >
+                            Start Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="schoolCalendarEditStartTime"
+                            value="${event.start_time || ""}"
+                            style="
+                                width:100%;
+                                box-sizing:border-box;
+                                height:42px;
+                                border:1px solid #ccc;
+                                border-radius:8px;
+                                padding:0 10px;
+                            "
+                        />
+
+                    </div>
+
+
+                    <div>
+
+                        <label
+                            for="schoolCalendarEditEndTime"
+                            style="
+                                display:block;
+                                font-weight:600;
+                                margin-bottom:6px;
+                            "
+                        >
+                            End Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="schoolCalendarEditEndTime"
+                            value="${event.end_time || ""}"
+                            style="
+                                width:100%;
+                                box-sizing:border-box;
+                                height:42px;
+                                border:1px solid #ccc;
+                                border-radius:8px;
+                                padding:0 10px;
+                            "
+                        />
+
+                    </div>
+
+                </div>
+
+
+                <!-- CATEGORY -->
+
+                <label
+                    for="schoolCalendarEditCategory"
+                    style="
+                        display:block;
+                        font-weight:600;
+                        margin:16px 0 6px 0;
+                    "
+                >
+                    Category
+                </label>
+
+                <select
+                    id="schoolCalendarEditCategory"
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        height:42px;
+                        border:1px solid #ccc;
+                        border-radius:8px;
+                        padding:0 10px;
+                    "
+                >
+
+                    <option value="General">
+                        📌 General
+                    </option>
+
+                    <option value="Academic">
+                        📚 Academic
+                    </option>
+
+                    <option value="Examination">
+                        📝 Examination
+                    </option>
+
+                    <option value="Meeting">
+                        📣 Meeting
+                    </option>
+
+                    <option value="School Event">
+                        🎉 School Event
+                    </option>
+
+                    <option value="Holiday">
+                        🏖️ Holiday
+                    </option>
+
+                    <option value="Sports">
+                        ⚽ Sports
+                    </option>
+
+                </select>
+
+
+                <!-- COLOUR -->
+
+                <label
+                    for="schoolCalendarEditColour"
+                    style="
+                        display:block;
+                        font-weight:600;
+                        margin:16px 0 6px 0;
+                    "
+                >
+                    Calendar Colour
+                </label>
+
+                <select
+                    id="schoolCalendarEditColour"
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        height:42px;
+                        border:1px solid #ccc;
+                        border-radius:8px;
+                        padding:0 10px;
+                    "
+                >
+
+                    <option value="#2563eb">
+                        🔵 Blue
+                    </option>
+
+                    <option value="#16a34a">
+                        🟢 Green
+                    </option>
+
+                    <option value="#dc2626">
+                        🔴 Red
+                    </option>
+
+                    <option value="#ca8a04">
+                        🟡 Yellow
+                    </option>
+
+                    <option value="#9333ea">
+                        🟣 Purple
+                    </option>
+
+                    <option value="#ea580c">
+                        🟠 Orange
+                    </option>
+
+                </select>
+
+
+                <div
+                    id="schoolCalendarEditStatus"
+                    style="
+                        margin-top:14px;
+                        font-size:14px;
+                    "
+                ></div>
+
+
+                <div
+                    style="
+                        display:flex;
+                        gap:10px;
+                        flex-wrap:wrap;
+                        margin-top:18px;
+                    "
+                >
+
+                    <button
+                        type="button"
+                        class="admin-btn"
+                        onclick="
+                            updateSchoolCalendarEvent(
+                                '${event.id}'
+                            )
+                        "
+                    >
+                        💾 Save Changes
+                    </button>
+
+                    <button
+                        type="button"
+                        class="admin-btn"
+                        onclick="
+                            renderSchoolCalendarSelectedDate()
+                        "
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+
+    /*
+     * Set selected values after rendering.
+     */
+
+    const category =
+        document.getElementById(
+            "schoolCalendarEditCategory"
+        );
+
+    const colour =
+        document.getElementById(
+            "schoolCalendarEditColour"
+        );
+
+
+    if (category) {
+
+        category.value =
+            event.category ||
+            "General";
+
+    }
+
+
+    if (colour) {
+
+        colour.value =
+            event.colour ||
+            "#2563eb";
+
+    }
+
+}
+
+async function updateSchoolCalendarEvent(
+    eventId
+) {
+
+    const titleInput =
+        document.getElementById(
+            "schoolCalendarEditTitle"
+        );
+
+    const descriptionInput =
+        document.getElementById(
+            "schoolCalendarEditDescription"
+        );
+
+    const startTimeInput =
+        document.getElementById(
+            "schoolCalendarEditStartTime"
+        );
+
+    const endTimeInput =
+        document.getElementById(
+            "schoolCalendarEditEndTime"
+        );
+
+    const categoryInput =
+        document.getElementById(
+            "schoolCalendarEditCategory"
+        );
+
+    const colourInput =
+        document.getElementById(
+            "schoolCalendarEditColour"
+        );
+
+    const status =
+        document.getElementById(
+            "schoolCalendarEditStatus"
+        );
+
+
+    if (
+        !titleInput ||
+        !descriptionInput ||
+        !startTimeInput ||
+        !endTimeInput ||
+        !categoryInput ||
+        !colourInput
+    ) {
+
+        return;
+
+    }
+
+
+    const title =
+        titleInput.value.trim();
+
+    const description =
+        descriptionInput.value.trim();
+
+    const startTime =
+        startTimeInput.value;
+
+    const endTime =
+        endTimeInput.value;
+
+    const category =
+        categoryInput.value;
+
+    const colour =
+        colourInput.value;
+
+
+    if (!title) {
+
+        alert(
+            "Please enter an event title."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        startTime &&
+        endTime &&
+        endTime <= startTime
+    ) {
+
+        alert(
+            "The end time must be later than the start time."
+        );
+
+        return;
+
+    }
+
+
+    if (status) {
+
+        status.style.color =
+            "#555";
+
+        status.textContent =
+            "Saving changes...";
+
+    }
+
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_calendar_events"
+                )
+
+                .update(
+                    {
+                        title:
+                            title,
+
+                        description:
+                            description ||
+                            null,
+
+                        start_time:
+                            startTime ||
+                            null,
+
+                        end_time:
+                            endTime ||
+                            null,
+
+                        category:
+                            category,
+
+                        colour:
+                            colour,
+
+                        updated_at:
+                            new Date().toISOString()
+                    }
+                )
+
+                .eq(
+                    "id",
+                    eventId
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                )
+
+                .select()
+                .single();
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        /*
+         * Update local Calendar state.
+         */
+
+        const state =
+            window.schoolCalendarState;
+
+
+        const index =
+            state.events.findIndex(
+                event =>
+                    event.id === eventId
+            );
+
+
+        if (index !== -1) {
+
+            state.events[index] =
+                data;
+
+        }
+
+
+        renderSchoolCalendar();
+
+        renderSchoolCalendarSelectedDate();
+
+
+        const calendarStatus =
+            document.getElementById(
+                "schoolCalendarStatus"
+            );
+
+
+        if (calendarStatus) {
+
+            calendarStatus.style.color =
+                "green";
+
+            calendarStatus.textContent =
+                "✓ Event updated successfully.";
+
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Update School Calendar Event Error:",
+            error
+        );
+
+
+        if (status) {
+
+            status.style.color =
+                "red";
+
+            status.textContent =
+                error.message ||
+                "Unable to update event.";
+
+        }
+
+    }
+
+}
+
+
+async function deleteSchoolCalendarEvent(
+    eventId
+) {
+
+    const state =
+        window.schoolCalendarState;
+
+
+    if (!state) {
+        return;
+    }
+
+
+    const event =
+        state.events.find(
+            item =>
+                item.id === eventId
+        );
+
+
+    if (!event) {
+
+        alert(
+            "The selected event could not be found."
+        );
+
+        return;
+
+    }
+
+
+    const confirmed =
+        confirm(
+            `Delete "${event.title}" from the school calendar?`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    const status =
+        document.getElementById(
+            "schoolCalendarStatus"
+        );
+
+
+    if (status) {
+
+        status.style.color =
+            "#555";
+
+        status.textContent =
+            "Deleting event...";
+
+    }
+
+
+    try {
+
+        const {
+            error
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_calendar_events"
+                )
+
+                .delete()
+
+                .eq(
+                    "id",
+                    eventId
+                )
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                );
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        /*
+         * Remove from local state.
+         */
+
+        state.events =
+            state.events.filter(
+                item =>
+                    item.id !== eventId
+            );
+
+
+        renderSchoolCalendar();
+
+        renderSchoolCalendarSelectedDate();
+
+
+        if (status) {
+
+            status.style.color =
+                "green";
+
+            status.textContent =
+                "✓ Event deleted successfully.";
+
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Delete School Calendar Event Error:",
+            error
+        );
+
+
+        if (status) {
+
+            status.style.color =
+                "red";
+
+            status.textContent =
+                error.message ||
+                "Unable to delete event.";
+
+        }
+
+    }
+
+}
 
 
 
