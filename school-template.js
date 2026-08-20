@@ -496,6 +496,19 @@ const adminDashboardHTML = `
             "
         >
             📣 Announcement
+       	   </button>
+		
+	        <!-- School Calendar -->
+
+        <button
+            type="button"
+            class="admin-btn payment-item"
+            onclick="
+                toggleAdvertsMenu();
+                showSchoolCalendar();
+            "
+        >
+            📅 School Calendar
         </button>
 
     </div>
@@ -5704,6 +5717,1618 @@ async function showAnnouncementEditor() {
     await loadAdminAnnouncement();
 
 }
+
+async function showSchoolCalendar() {
+
+    const adminContent =
+        document.getElementById("adminContent");
+
+    if (!adminContent) {
+        return;
+    }
+
+
+    adminContent.innerHTML = `
+
+        <div
+            class="school-calendar-admin"
+            style="
+                max-width:1000px;
+                margin:0 auto;
+            "
+        >
+
+            <!-- HEADER -->
+
+            <div
+                style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    gap:15px;
+                    flex-wrap:wrap;
+                    margin-bottom:20px;
+                "
+            >
+
+                <div>
+
+                    <h3
+                        style="
+                            margin:0 0 5px 0;
+                            color:#000066;
+                        "
+                    >
+                        📅 School Calendar
+                    </h3>
+
+                    <p
+                        style="
+                            margin:0;
+                            color:#666;
+                            font-size:14px;
+                        "
+                    >
+                        Manage school events and important dates.
+                    </p>
+
+                </div>
+
+
+                <div
+                    style="
+                        display:flex;
+                        gap:8px;
+                    "
+                >
+
+                    <button
+                        type="button"
+                        class="admin-btn"
+                        onclick="schoolCalendarPreviousMonth()"
+                    >
+                        ‹ Previous
+                    </button>
+
+                    <button
+                        type="button"
+                        class="admin-btn"
+                        onclick="schoolCalendarToday()"
+                    >
+                        Today
+                    </button>
+
+                    <button
+                        type="button"
+                        class="admin-btn"
+                        onclick="schoolCalendarNextMonth()"
+                    >
+                        Next ›
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- MONTH TITLE -->
+
+            <div
+                id="schoolCalendarMonthTitle"
+                style="
+                    text-align:center;
+                    font-size:22px;
+                    font-weight:700;
+                    color:#000066;
+                    margin-bottom:15px;
+                "
+            >
+            </div>
+
+
+            <!-- CALENDAR -->
+
+            <div
+                id="schoolCalendarGrid"
+                style="
+                    background:#fff;
+                    border:1px solid #ddd;
+                    border-radius:12px;
+                    overflow:hidden;
+                "
+            >
+            </div>
+
+
+            <!-- SELECTED DATE -->
+
+            <div
+                id="schoolCalendarSelectedDate"
+                style="
+                    margin-top:20px;
+                    background:#f8f9fa;
+                    border:1px solid #ddd;
+                    border-radius:12px;
+                    padding:20px;
+                "
+            >
+
+                <h3
+                    style="
+                        margin:0 0 5px 0;
+                        color:#000066;
+                    "
+                >
+                    Select a date
+                </h3>
+
+                <p
+                    style="
+                        margin:0;
+                        color:#666;
+                    "
+                >
+                    Click a date on the calendar to manage events.
+                </p>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div
+                id="schoolCalendarStatus"
+                style="
+                    margin-top:12px;
+                    font-size:14px;
+                "
+            >
+            </div>
+
+        </div>
+
+    `;
+
+
+    /*
+     * Calendar state
+     */
+
+    window.schoolCalendarState = {
+
+        currentDate:
+            new Date(),
+
+        selectedDate:
+            null,
+
+        events:
+            []
+
+    };
+
+
+    await loadSchoolCalendarEvents();
+
+    renderSchoolCalendar();
+
+}
+
+async function loadSchoolCalendarEvents() {
+
+    if (!window.schoolCalendarState) {
+        return;
+    }
+
+
+    const status =
+        document.getElementById(
+            "schoolCalendarStatus"
+        );
+
+
+    if (status) {
+
+        status.style.color = "#555";
+
+        status.textContent =
+            "Loading calendar...";
+
+    }
+
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_calendar_events"
+                )
+
+                .select("*")
+
+                .eq(
+                    "school_code",
+                    schoolCode
+                )
+
+                .order(
+                    "event_date",
+                    {
+                        ascending: true
+                    }
+                )
+
+                .order(
+                    "start_time",
+                    {
+                        ascending: true
+                    }
+                );
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        window.schoolCalendarState.events =
+            data || [];
+
+
+        if (status) {
+
+            status.textContent = "";
+
+        }
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Load School Calendar Error:",
+            error
+        );
+
+
+        if (status) {
+
+            status.style.color =
+                "red";
+
+            status.textContent =
+                error.message ||
+                "Unable to load school calendar.";
+
+        }
+
+    }
+
+}
+
+function renderSchoolCalendar() {
+
+    const grid =
+        document.getElementById(
+            "schoolCalendarGrid"
+        );
+
+    const title =
+        document.getElementById(
+            "schoolCalendarMonthTitle"
+        );
+
+
+    if (!grid || !title) {
+        return;
+    }
+
+
+    const state =
+        window.schoolCalendarState;
+
+
+    const year =
+        state.currentDate.getFullYear();
+
+    const month =
+        state.currentDate.getMonth();
+
+
+    const monthName =
+        state.currentDate.toLocaleString(
+            "default",
+            {
+                month: "long"
+            }
+        );
+
+
+    title.textContent =
+        `${monthName} ${year}`;
+
+
+    /*
+     * First day of the month
+     */
+
+    const firstDay =
+        new Date(
+            year,
+            month,
+            1
+        ).getDay();
+
+
+    /*
+     * Number of days in month
+     */
+
+    const daysInMonth =
+        new Date(
+            year,
+            month + 1,
+            0
+        ).getDate();
+
+
+    const weekdays = [
+        "Sun",
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat"
+    ];
+
+
+    let html = `
+
+        <div
+            style="
+                display:grid;
+                grid-template-columns:
+                    repeat(7, 1fr);
+                background:#f1f3f5;
+            "
+        >
+    `;
+
+
+    /*
+     * Weekday headings
+     */
+
+    weekdays.forEach(
+        day => {
+
+            html += `
+
+                <div
+                    style="
+                        padding:12px 5px;
+                        text-align:center;
+                        font-weight:700;
+                        color:#444;
+                        border-right:1px solid #ddd;
+                        border-bottom:1px solid #ddd;
+                    "
+                >
+                    ${day}
+                </div>
+
+            `;
+
+        }
+    );
+
+
+    /*
+     * Empty cells before first day
+     */
+
+    for (
+        let i = 0;
+        i < firstDay;
+        i++
+    ) {
+
+        html += `
+
+            <div
+                style="
+                    min-height:75px;
+                    background:#fafafa;
+                    border-right:1px solid #eee;
+                    border-bottom:1px solid #eee;
+                "
+            ></div>
+
+        `;
+
+    }
+
+
+    /*
+     * Days
+     */
+
+    for (
+        let day = 1;
+        day <= daysInMonth;
+        day++
+    ) {
+
+        const dateString =
+            `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+
+        const dayEvents =
+            state.events.filter(
+                event =>
+                    event.event_date ===
+                    dateString
+            );
+
+
+        const hasEvents =
+            dayEvents.length > 0;
+
+
+        const today =
+            new Date();
+
+
+        const isToday =
+            today.getFullYear() === year &&
+            today.getMonth() === month &&
+            today.getDate() === day;
+
+
+        html += `
+
+            <button
+                type="button"
+                onclick="
+                    selectSchoolCalendarDate(
+                        '${dateString}'
+                    )
+                "
+                style="
+                    min-height:75px;
+                    padding:8px;
+                    text-align:left;
+                    background:
+                        ${
+                            hasEvents
+                                ? "#eef4ff"
+                                : "#fff"
+                        };
+                    border:none;
+                    border-right:1px solid #eee;
+                    border-bottom:1px solid #eee;
+                    cursor:pointer;
+                    position:relative;
+                "
+            >
+
+                <div
+                    style="
+                        display:flex;
+                        justify-content:space-between;
+                        align-items:center;
+                        font-weight:700;
+                        color:
+                            ${
+                                isToday
+                                    ? "#000066"
+                                    : "#333"
+                            };
+                    "
+                >
+
+                    <span>
+                        ${day}
+                    </span>
+
+                    ${
+                        hasEvents
+                            ? `
+                                <span
+                                    style="
+                                        width:9px;
+                                        height:9px;
+                                        border-radius:50%;
+                                        background:#2563eb;
+                                        display:inline-block;
+                                    "
+                                ></span>
+                              `
+                            : ""
+                    }
+
+                </div>
+
+
+                ${
+                    hasEvents
+                        ? `
+                            <div
+                                style="
+                                    margin-top:8px;
+                                    font-size:11px;
+                                    color:#2563eb;
+                                    font-weight:600;
+                                "
+                            >
+                                ${dayEvents.length}
+                                event${dayEvents.length === 1 ? "" : "s"}
+                            </div>
+                          `
+                        : ""
+                }
+
+            </button>
+
+        `;
+
+    }
+
+
+    html += `</div>`;
+
+
+    grid.innerHTML =
+        html;
+
+}
+
+function schoolCalendarPreviousMonth() {
+
+    if (!window.schoolCalendarState) {
+        return;
+    }
+
+
+    window.schoolCalendarState.currentDate =
+        new Date(
+            window.schoolCalendarState.currentDate.getFullYear(),
+            window.schoolCalendarState.currentDate.getMonth() - 1,
+            1
+        );
+
+
+    renderSchoolCalendar();
+
+}
+
+function schoolCalendarNextMonth() {
+
+    if (!window.schoolCalendarState) {
+        return;
+    }
+
+
+    window.schoolCalendarState.currentDate =
+        new Date(
+            window.schoolCalendarState.currentDate.getFullYear(),
+            window.schoolCalendarState.currentDate.getMonth() + 1,
+            1
+        );
+
+
+    renderSchoolCalendar();
+
+}
+
+function schoolCalendarToday() {
+
+    if (!window.schoolCalendarState) {
+        return;
+    }
+
+
+    window.schoolCalendarState.currentDate =
+        new Date();
+
+
+    renderSchoolCalendar();
+
+}
+
+function selectSchoolCalendarDate(
+    dateString
+) {
+
+    if (!window.schoolCalendarState) {
+        return;
+    }
+
+
+    window.schoolCalendarState.selectedDate =
+        dateString;
+
+
+    renderSchoolCalendarSelectedDate();
+
+}
+
+function renderSchoolCalendarSelectedDate() {
+
+    const container =
+        document.getElementById(
+            "schoolCalendarSelectedDate"
+        );
+
+
+    if (!container) {
+        return;
+    }
+
+
+    const state =
+        window.schoolCalendarState;
+
+
+    const dateString =
+        state.selectedDate;
+
+
+    if (!dateString) {
+
+        container.innerHTML = `
+
+            <h3
+                style="
+                    margin:0 0 5px 0;
+                    color:#000066;
+                "
+            >
+                Select a date
+            </h3>
+
+            <p
+                style="
+                    margin:0;
+                    color:#666;
+                "
+            >
+                Click a date on the calendar
+                to manage events.
+            </p>
+
+        `;
+
+        return;
+
+    }
+
+
+    const selectedDate =
+        new Date(
+            `${dateString}T00:00:00`
+        );
+
+
+    const formattedDate =
+        selectedDate.toLocaleDateString(
+            "en-NG",
+            {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
+
+
+    const events =
+        state.events.filter(
+            event =>
+                event.event_date ===
+                dateString
+        );
+
+
+    let eventsHTML = "";
+
+
+    if (events.length === 0) {
+
+        eventsHTML = `
+
+            <div
+                style="
+                    padding:15px;
+                    background:#fff;
+                    border:1px solid #ddd;
+                    border-radius:8px;
+                    color:#666;
+                "
+            >
+                No events scheduled for this date.
+            </div>
+
+        `;
+
+    }
+    else {
+
+        eventsHTML =
+            events.map(
+                event => `
+
+                    <div
+                        style="
+                            background:#fff;
+                            border:1px solid #ddd;
+                            border-left:
+                                5px solid
+                                ${event.colour || "#2563eb"};
+                            border-radius:8px;
+                            padding:14px;
+                            margin-top:10px;
+                        "
+                    >
+
+                        <strong>
+                            ${escapeSchoolCalendarText(
+                                event.title
+                            )}
+                        </strong>
+
+                        ${
+                            event.description
+                                ? `
+                                    <p
+                                        style="
+                                            margin:7px 0;
+                                            color:#555;
+                                        "
+                                    >
+                                        ${escapeSchoolCalendarText(
+                                            event.description
+                                        )}
+                                    </p>
+                                  `
+                                : ""
+                        }
+
+                        ${
+                            event.start_time
+                                ? `
+                                    <div
+                                        style="
+                                            font-size:13px;
+                                            color:#666;
+                                        "
+                                    >
+                                        ${formatSchoolCalendarTime(
+                                            event.start_time
+                                        )}
+                                        ${
+                                            event.end_time
+                                                ? `
+                                                    –
+                                                    ${formatSchoolCalendarTime(
+                                                        event.end_time
+                                                    )}
+                                                  `
+                                                : ""
+                                        }
+                                    </div>
+                                  `
+                                : ""
+                        }
+
+                        <div
+                            style="
+                                margin-top:10px;
+                                display:flex;
+                                gap:8px;
+                                flex-wrap:wrap;
+                            "
+                        >
+
+                            <button
+                                type="button"
+                                class="admin-btn"
+                                onclick="
+                                    editSchoolCalendarEvent(
+                                        '${event.id}'
+                                    )
+                                "
+                            >
+                                ✏️ Edit
+                            </button>
+
+                            <button
+                                type="button"
+                                class="admin-btn"
+                                onclick="
+                                    deleteSchoolCalendarEvent(
+                                        '${event.id}'
+                                    )
+                                "
+                            >
+                                🗑 Delete
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                `
+            )
+            .join("");
+
+    }
+
+
+    container.innerHTML = `
+
+        <div
+            style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                gap:10px;
+                flex-wrap:wrap;
+            "
+        >
+
+            <div>
+
+                <h3
+                    style="
+                        margin:0 0 5px 0;
+                        color:#000066;
+                    "
+                >
+                    ${formattedDate}
+                </h3>
+
+                <p
+                    style="
+                        margin:0;
+                        color:#666;
+                    "
+                >
+                    ${events.length}
+                    event${events.length === 1 ? "" : "s"}
+                </p>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="admin-btn"
+                onclick="showSchoolCalendarEventForm()"
+            >
+                ➕ Add Event
+            </button>
+
+        </div>
+
+
+        <div
+            style="
+                margin-top:15px;
+            "
+        >
+            ${eventsHTML}
+        </div>
+
+    `;
+
+}
+
+function escapeSchoolCalendarText(
+    value
+) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+function formatSchoolCalendarTime(
+    time
+) {
+
+    if (!time) {
+        return "";
+    }
+
+
+    const parts =
+        time.split(":");
+
+
+    if (parts.length < 2) {
+        return time;
+    }
+
+
+    let hour =
+        parseInt(parts[0], 10);
+
+    const minute =
+        parts[1];
+
+
+    const suffix =
+        hour >= 12
+            ? "PM"
+            : "AM";
+
+
+    hour =
+        hour % 12 || 12;
+
+
+    return `${hour}:${minute} ${suffix}`;
+
+}
+
+function showSchoolCalendarEventForm() {
+
+    const container =
+        document.getElementById(
+            "schoolCalendarSelectedDate"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    const state =
+        window.schoolCalendarState;
+
+    if (!state || !state.selectedDate) {
+        alert("Please select a calendar date first.");
+        return;
+    }
+
+    const selectedDate =
+        new Date(
+            `${state.selectedDate}T00:00:00`
+        );
+
+    const formattedDate =
+        selectedDate.toLocaleDateString(
+            "en-NG",
+            {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            }
+        );
+
+    container.innerHTML = `
+
+        <div>
+
+            <div
+                style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    gap:10px;
+                    margin-bottom:18px;
+                "
+            >
+
+                <div>
+
+                    <h3
+                        style="
+                            margin:0 0 5px 0;
+                            color:#000066;
+                        "
+                    >
+                        ➕ Add Calendar Event
+                    </h3>
+
+                    <p
+                        style="
+                            margin:0;
+                            color:#666;
+                        "
+                    >
+                        ${formattedDate}
+                    </p>
+
+                </div>
+
+                <button
+                    type="button"
+                    class="admin-btn"
+                    onclick="renderSchoolCalendarSelectedDate()"
+                >
+                    ✕ Cancel
+                </button>
+
+            </div>
+
+
+            <div
+                style="
+                    background:#fff;
+                    border:1px solid #ddd;
+                    border-radius:10px;
+                    padding:18px;
+                "
+            >
+
+                <!-- TITLE -->
+
+                <label
+                    for="schoolCalendarEventTitle"
+                    style="
+                        display:block;
+                        font-weight:600;
+                        margin-bottom:6px;
+                    "
+                >
+                    Event Title
+                </label>
+
+                <input
+                    type="text"
+                    id="schoolCalendarEventTitle"
+                    placeholder="e.g. PTA Meeting"
+                    maxlength="150"
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        height:42px;
+                        border:1px solid #ccc;
+                        border-radius:8px;
+                        padding:0 10px;
+                        font-size:14px;
+                    "
+                />
+
+
+                <!-- DESCRIPTION -->
+
+                <label
+                    for="schoolCalendarEventDescription"
+                    style="
+                        display:block;
+                        font-weight:600;
+                        margin:16px 0 6px 0;
+                    "
+                >
+                    Description
+                </label>
+
+                <textarea
+                    id="schoolCalendarEventDescription"
+                    rows="4"
+                    maxlength="1000"
+                    placeholder="Add more information about this event..."
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        resize:vertical;
+                        border:1px solid #ccc;
+                        border-radius:8px;
+                        padding:10px;
+                        font-family:inherit;
+                        font-size:14px;
+                    "
+                ></textarea>
+
+
+                <!-- TIMES -->
+
+                <div
+                    style="
+                        display:grid;
+                        grid-template-columns:
+                            repeat(
+                                auto-fit,
+                                minmax(180px, 1fr)
+                            );
+                        gap:15px;
+                        margin-top:16px;
+                    "
+                >
+
+                    <div>
+
+                        <label
+                            for="schoolCalendarEventStartTime"
+                            style="
+                                display:block;
+                                font-weight:600;
+                                margin-bottom:6px;
+                            "
+                        >
+                            Start Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="schoolCalendarEventStartTime"
+                            style="
+                                width:100%;
+                                box-sizing:border-box;
+                                height:42px;
+                                border:1px solid #ccc;
+                                border-radius:8px;
+                                padding:0 10px;
+                            "
+                        />
+
+                    </div>
+
+
+                    <div>
+
+                        <label
+                            for="schoolCalendarEventEndTime"
+                            style="
+                                display:block;
+                                font-weight:600;
+                                margin-bottom:6px;
+                            "
+                        >
+                            End Time
+                        </label>
+
+                        <input
+                            type="time"
+                            id="schoolCalendarEventEndTime"
+                            style="
+                                width:100%;
+                                box-sizing:border-box;
+                                height:42px;
+                                border:1px solid #ccc;
+                                border-radius:8px;
+                                padding:0 10px;
+                            "
+                        />
+
+                    </div>
+
+                </div>
+
+
+                <!-- CATEGORY -->
+
+                <label
+                    for="schoolCalendarEventCategory"
+                    style="
+                        display:block;
+                        font-weight:600;
+                        margin:16px 0 6px 0;
+                    "
+                >
+                    Category
+                </label>
+
+                <select
+                    id="schoolCalendarEventCategory"
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        height:42px;
+                        border:1px solid #ccc;
+                        border-radius:8px;
+                        padding:0 10px;
+                        font-size:14px;
+                    "
+                >
+
+                    <option value="General">
+                        📌 General
+                    </option>
+
+                    <option value="Academic">
+                        📚 Academic
+                    </option>
+
+                    <option value="Examination">
+                        📝 Examination
+                    </option>
+
+                    <option value="Meeting">
+                        📣 Meeting
+                    </option>
+
+                    <option value="School Event">
+                        🎉 School Event
+                    </option>
+
+                    <option value="Holiday">
+                        🏖️ Holiday
+                    </option>
+
+                    <option value="Sports">
+                        ⚽ Sports
+                    </option>
+
+                </select>
+
+
+                <!-- COLOUR -->
+
+                <label
+                    for="schoolCalendarEventColour"
+                    style="
+                        display:block;
+                        font-weight:600;
+                        margin:16px 0 6px 0;
+                    "
+                >
+                    Calendar Colour
+                </label>
+
+                <select
+                    id="schoolCalendarEventColour"
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        height:42px;
+                        border:1px solid #ccc;
+                        border-radius:8px;
+                        padding:0 10px;
+                        font-size:14px;
+                    "
+                >
+
+                    <option value="#2563eb">
+                        🔵 Blue
+                    </option>
+
+                    <option value="#16a34a">
+                        🟢 Green
+                    </option>
+
+                    <option value="#dc2626">
+                        🔴 Red
+                    </option>
+
+                    <option value="#ca8a04">
+                        🟡 Yellow
+                    </option>
+
+                    <option value="#9333ea">
+                        🟣 Purple
+                    </option>
+
+                    <option value="#ea580c">
+                        🟠 Orange
+                    </option>
+
+                </select>
+
+
+                <!-- STATUS -->
+
+                <div
+                    id="schoolCalendarEventStatus"
+                    style="
+                        margin-top:14px;
+                        font-size:14px;
+                    "
+                ></div>
+
+
+                <!-- BUTTONS -->
+
+                <div
+                    style="
+                        display:flex;
+                        gap:10px;
+                        flex-wrap:wrap;
+                        margin-top:18px;
+                    "
+                >
+
+                    <button
+                        type="button"
+                        class="admin-btn"
+                        onclick="saveSchoolCalendarEvent()"
+                    >
+                        💾 Save Event
+                    </button>
+
+                    <button
+                        type="button"
+                        class="admin-btn"
+                        onclick="renderSchoolCalendarSelectedDate()"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+async function saveSchoolCalendarEvent() {
+
+    const titleInput =
+        document.getElementById(
+            "schoolCalendarEventTitle"
+        );
+
+    const descriptionInput =
+        document.getElementById(
+            "schoolCalendarEventDescription"
+        );
+
+    const startTimeInput =
+        document.getElementById(
+            "schoolCalendarEventStartTime"
+        );
+
+    const endTimeInput =
+        document.getElementById(
+            "schoolCalendarEventEndTime"
+        );
+
+    const categoryInput =
+        document.getElementById(
+            "schoolCalendarEventCategory"
+        );
+
+    const colourInput =
+        document.getElementById(
+            "schoolCalendarEventColour"
+        );
+
+    const status =
+        document.getElementById(
+            "schoolCalendarEventStatus"
+        );
+
+
+    if (
+        !titleInput ||
+        !descriptionInput ||
+        !startTimeInput ||
+        !endTimeInput ||
+        !categoryInput ||
+        !colourInput
+    ) {
+
+        return;
+
+    }
+
+
+    const state =
+        window.schoolCalendarState;
+
+
+    if (!state || !state.selectedDate) {
+
+        alert(
+            "Please select a calendar date."
+        );
+
+        return;
+
+    }
+
+
+    const title =
+        titleInput.value.trim();
+
+    const description =
+        descriptionInput.value.trim();
+
+    const startTime =
+        startTimeInput.value;
+
+    const endTime =
+        endTimeInput.value;
+
+    const category =
+        categoryInput.value;
+
+    const colour =
+        colourInput.value;
+
+
+    /*
+     * Validate title
+     */
+
+    if (!title) {
+
+        alert(
+            "Please enter an event title."
+        );
+
+        titleInput.focus();
+
+        return;
+
+    }
+
+
+    /*
+     * Validate times
+     */
+
+    if (
+        startTime &&
+        endTime &&
+        endTime <= startTime
+    ) {
+
+        alert(
+            "The end time must be later than the start time."
+        );
+
+        return;
+
+    }
+
+
+    if (status) {
+
+        status.style.color =
+            "#555";
+
+        status.textContent =
+            "Saving event...";
+
+    }
+
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+
+                .from(
+                    "school_calendar_events"
+                )
+
+                .insert(
+                    {
+                        school_code:
+                            schoolCode,
+
+                        event_date:
+                            state.selectedDate,
+
+                        title:
+                            title,
+
+                        description:
+                            description ||
+                            null,
+
+                        start_time:
+                            startTime ||
+                            null,
+
+                        end_time:
+                            endTime ||
+                            null,
+
+                        category:
+                            category,
+
+                        colour:
+                            colour,
+
+                        created_at:
+                            new Date().toISOString(),
+
+                        updated_at:
+                            new Date().toISOString()
+                    }
+                )
+
+                .select()
+                .single();
+
+
+        if (error) {
+
+            throw error;
+
+        }
+
+
+        /*
+         * Add the new event to local state.
+         */
+
+        state.events.push(data);
+
+
+        /*
+         * Re-render the calendar.
+         */
+
+        renderSchoolCalendar();
+
+
+        /*
+         * Show the selected date again.
+         */
+
+        renderSchoolCalendarSelectedDate();
+
+
+        /*
+         * Success message
+         */
+
+        const calendarStatus =
+            document.getElementById(
+                "schoolCalendarStatus"
+            );
+
+
+        if (calendarStatus) {
+
+            calendarStatus.style.color =
+                "green";
+
+            calendarStatus.textContent =
+                "✓ Event saved successfully.";
+
+        }
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Save School Calendar Event Error:",
+            error
+        );
+
+
+        if (status) {
+
+            status.style.color =
+                "red";
+
+            status.textContent =
+                error.message ||
+                "Unable to save event.";
+
+        }
+
+    }
+
+}
+
+
 
 
 /* =========================================================
