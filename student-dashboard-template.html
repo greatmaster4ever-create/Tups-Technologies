@@ -1457,6 +1457,220 @@ const studentDashboardSessionRegNo =
 const validStudentDashboardSession =
     studentDashboardSessionSchool === schoolCode &&
     studentDashboardSessionRegNo === regNo;
+	
+	/* =========================================================
+   STUDENT DASHBOARD CACHE
+   PHASE 1 — SAFE SESSION CACHE
+========================================================= */
+
+const STUDENT_DASHBOARD_CACHE_VERSION =
+    "v1";
+
+
+const STUDENT_DASHBOARD_CACHE_TIMES = {
+
+    school: 30 * 60 * 1000,   // 30 minutes
+
+    student: 5 * 60 * 1000    // 5 minutes
+
+};
+
+
+/* =========================================================
+   CACHE KEY
+========================================================= */
+
+function getStudentDashboardCacheKey(
+    type
+) {
+
+    return (
+        "tups_dashboard_" +
+        STUDENT_DASHBOARD_CACHE_VERSION +
+        "_" +
+        type +
+        "_" +
+        schoolCode +
+        "_" +
+        regNo
+    );
+
+}
+
+
+/* =========================================================
+   SAVE CACHE
+========================================================= */
+
+function saveStudentDashboardCache(
+    type,
+    data
+) {
+
+    try {
+
+        const cacheObject = {
+
+            savedAt:
+                Date.now(),
+
+            data:
+                data
+
+        };
+
+
+        sessionStorage.setItem(
+
+            getStudentDashboardCacheKey(
+                type
+            ),
+
+            JSON.stringify(
+                cacheObject
+            )
+
+        );
+
+    }
+    catch (error) {
+
+        console.warn(
+            "Dashboard cache save failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   READ CACHE
+========================================================= */
+
+function getStudentDashboardCache(
+    type
+) {
+
+    try {
+
+        const raw =
+            sessionStorage.getItem(
+
+                getStudentDashboardCacheKey(
+                    type
+                )
+
+            );
+
+
+        if (!raw) {
+
+            return null;
+
+        }
+
+
+        const cached =
+            JSON.parse(raw);
+
+
+        if (
+            !cached ||
+            !cached.savedAt
+        ) {
+
+            return null;
+
+        }
+
+
+        const cacheAge =
+            Date.now() -
+            cached.savedAt;
+
+
+        const maxAge =
+            STUDENT_DASHBOARD_CACHE_TIMES[
+                type
+            ];
+
+
+        /*
+         * Cache has expired.
+         */
+
+        if (
+            !maxAge ||
+            cacheAge > maxAge
+        ) {
+
+            sessionStorage.removeItem(
+
+                getStudentDashboardCacheKey(
+                    type
+                )
+
+            );
+
+            return null;
+
+        }
+
+
+        return cached.data;
+
+    }
+    catch (error) {
+
+        console.warn(
+            "Dashboard cache read failed:",
+            error
+        );
+
+
+        return null;
+
+    }
+
+}
+
+
+/* =========================================================
+   CLEAR DASHBOARD CACHE
+========================================================= */
+
+function clearStudentDashboardCache() {
+
+    try {
+
+        sessionStorage.removeItem(
+            getStudentDashboardCacheKey(
+                "school"
+            )
+        );
+
+
+        sessionStorage.removeItem(
+            getStudentDashboardCacheKey(
+                "student"
+            )
+        );
+
+    }
+    catch (error) {
+
+        console.warn(
+            "Dashboard cache clear failed:",
+            error
+        );
+
+    }
+
+}
+
+
 
 /* =========================================================
    PAGE START
@@ -1505,6 +1719,11 @@ console.log(
    LOAD STUDENT DASHBOARD
 ========================================================= */
 
+/* =========================================================
+   LOAD STUDENT DASHBOARD
+   WITH SAFE SESSION CACHING
+========================================================= */
+
 async function loadStudentDashboard() {
 
     try {
@@ -1513,39 +1732,82 @@ async function loadStudentDashboard() {
            LOAD SCHOOL INFORMATION
         ----------------------------------------- */
 
-        const {
-            data: schoolData,
-            error: schoolError
-        } = await supabaseClient
-
-            .from("schools")
-
-            .select(
-                "school_code, School_name, logo_url"
-            )
-
-            .eq(
-                "school_code",
-                schoolCode
-            )
-
-            .maybeSingle();
+        let schoolData =
+            getStudentDashboardCache(
+                "school"
+            );
 
 
-        if (schoolError) {
-
-            throw schoolError;
-
-        }
-
+        /*
+         * Only contact Supabase if the
+         * school cache is unavailable.
+         */
 
         if (!schoolData) {
 
-            showDashboardError(
-                "School information could not be found."
+            console.log(
+                "Dashboard: Loading school from Supabase..."
             );
 
-            return;
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+
+                    .from("schools")
+
+                    .select(
+                        "school_code, School_name, logo_url"
+                    )
+
+                    .eq(
+                        "school_code",
+                        schoolCode
+                    )
+
+                    .maybeSingle();
+
+
+            if (error) {
+
+                throw error;
+
+            }
+
+
+            if (!data) {
+
+                showDashboardError(
+                    "School information could not be found."
+                );
+
+                return;
+
+            }
+
+
+            schoolData =
+                data;
+
+
+            /*
+             * Store school information
+             * for future dashboard loads.
+             */
+
+            saveStudentDashboardCache(
+                "school",
+                schoolData
+            );
+
+        }
+        else {
+
+            console.log(
+                "Dashboard: School loaded from cache."
+            );
 
         }
 
@@ -1554,12 +1816,20 @@ async function loadStudentDashboard() {
            SCHOOL NAME
         ----------------------------------------- */
 
-        document.getElementById(
-            "dashboardTitle"
-        ).textContent =
-            `Welcome to ${
-                schoolData.School_name
-            } Students Dashboard`;
+        const dashboardTitle =
+            document.getElementById(
+                "dashboardTitle"
+            );
+
+
+        if (dashboardTitle) {
+
+            dashboardTitle.textContent =
+                `Welcome to ${
+                    schoolData.School_name
+                } Students Dashboard`;
+
+        }
 
 
         /* -----------------------------------------
@@ -1572,19 +1842,23 @@ async function loadStudentDashboard() {
             );
 
 
-        if (schoolData.logo_url) {
+        if (schoolLogo) {
 
-            schoolLogo.src =
-                schoolData.logo_url;
+            if (schoolData.logo_url) {
 
-            schoolLogo.style.display =
-                "block";
+                schoolLogo.src =
+                    schoolData.logo_url;
 
-        }
-        else {
+                schoolLogo.style.display =
+                    "block";
 
-            schoolLogo.style.display =
-                "none";
+            }
+            else {
+
+                schoolLogo.style.display =
+                    "none";
+
+            }
 
         }
 
@@ -1593,53 +1867,96 @@ async function loadStudentDashboard() {
            LOAD STUDENT
         ----------------------------------------- */
 
-        const {
-            data: studentData,
-            error: studentError
-        } = await supabaseClient
-
-            .from("students")
-
-            .select(`
-                id,
-                school_code,
-                student_name,
-                class,
-                reg_no,
-                address,
-                parent_contact1,
-                parent_contact2,
-                passport_url,
-                department
-            `)
-
-            .eq(
-                "school_code",
-                schoolCode
-            )
-
-            .eq(
-                "reg_no",
-                regNo
-            )
-
-            .maybeSingle();
+        let studentData =
+            getStudentDashboardCache(
+                "student"
+            );
 
 
-        if (studentError) {
-
-            throw studentError;
-
-        }
-
+        /*
+         * Only contact Supabase if the
+         * student cache is unavailable.
+         */
 
         if (!studentData) {
 
-            showDashboardError(
-                "Student record could not be found."
+            console.log(
+                "Dashboard: Loading student from Supabase..."
             );
 
-            return;
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+
+                    .from("students")
+
+                    .select(`
+                        id,
+                        school_code,
+                        student_name,
+                        class,
+                        reg_no,
+                        address,
+                        parent_contact1,
+                        parent_contact2,
+                        passport_url,
+                        department
+                    `)
+
+                    .eq(
+                        "school_code",
+                        schoolCode
+                    )
+
+                    .eq(
+                        "reg_no",
+                        regNo
+                    )
+
+                    .maybeSingle();
+
+
+            if (error) {
+
+                throw error;
+
+            }
+
+
+            if (!data) {
+
+                showDashboardError(
+                    "Student record could not be found."
+                );
+
+                return;
+
+            }
+
+
+            studentData =
+                data;
+
+
+            /*
+             * Store student information
+             * for future dashboard loads.
+             */
+
+            saveStudentDashboardCache(
+                "student",
+                studentData
+            );
+
+        }
+        else {
+
+            console.log(
+                "Dashboard: Student loaded from cache."
+            );
 
         }
 
@@ -1648,60 +1965,114 @@ async function loadStudentDashboard() {
            STUDENT NAME
         ----------------------------------------- */
 
-        document.getElementById(
-            "studentName"
-        ).textContent =
-            studentData.student_name || "—";
+        const studentName =
+            document.getElementById(
+                "studentName"
+            );
+
+
+        if (studentName) {
+
+            studentName.textContent =
+                studentData.student_name ||
+                "—";
+
+        }
 
 
         /* -----------------------------------------
            CLASS
         ----------------------------------------- */
 
-        document.getElementById(
-            "studentClass"
-        ).textContent =
-            studentData.class || "—";
+        const studentClass =
+            document.getElementById(
+                "studentClass"
+            );
+
+
+        if (studentClass) {
+
+            studentClass.textContent =
+                studentData.class ||
+                "—";
+
+        }
 
 
         /* -----------------------------------------
            REGISTRATION / ADMISSION NUMBER
         ----------------------------------------- */
 
-        document.getElementById(
-            "studentRegNo"
-        ).textContent =
-            studentData.reg_no || "—";
+        const studentRegNo =
+            document.getElementById(
+                "studentRegNo"
+            );
+
+
+        if (studentRegNo) {
+
+            studentRegNo.textContent =
+                studentData.reg_no ||
+                "—";
+
+        }
 
 
         /* -----------------------------------------
            ADDRESS
         ----------------------------------------- */
 
-        document.getElementById(
-            "studentAddress"
-        ).textContent =
-            studentData.address || "—";
+        const studentAddress =
+            document.getElementById(
+                "studentAddress"
+            );
+
+
+        if (studentAddress) {
+
+            studentAddress.textContent =
+                studentData.address ||
+                "—";
+
+        }
 
 
         /* -----------------------------------------
            PARENT CONTACT 1
         ----------------------------------------- */
 
-        document.getElementById(
-            "parentContact1"
-        ).textContent =
-            studentData.parent_contact1 || "—";
+        const parentContact1 =
+            document.getElementById(
+                "parentContact1"
+            );
+
+
+        if (parentContact1) {
+
+            parentContact1.textContent =
+                studentData.parent_contact1 ||
+                "—";
+
+        }
 
 
         /* -----------------------------------------
            PARENT CONTACT 2
         ----------------------------------------- */
 
-        document.getElementById(
-            "parentContact2"
-        ).textContent =
-            studentData.parent_contact2 || "—";
+        const parentContact2 =
+            document.getElementById(
+                "parentContact2"
+            );
+
+
+        if (parentContact2) {
+
+            parentContact2.textContent =
+                studentData.parent_contact2 ||
+                "—";
+
+        }
 
 
         /* -----------------------------------------
@@ -1714,39 +2085,52 @@ async function loadStudentDashboard() {
             );
 
 
-        if (studentData.passport_url) {
+        if (passport) {
 
-            passport.src =
-                studentData.passport_url;
+            if (studentData.passport_url) {
 
-            passport.style.display =
-                "block";
+                passport.src =
+                    studentData.passport_url;
 
-        }
-        else {
+                passport.style.display =
+                    "block";
 
-            passport.style.display =
-                "none";
+            }
+            else {
+
+                passport.style.display =
+                    "none";
+
+            }
 
         }
 
 
         /* -----------------------------------------
            STORE STUDENT DATA
-           FOR NEXT MODULES
+           FOR OTHER MODULES
         ----------------------------------------- */
 
-       window.currentStudent =
-    studentData;
+        window.currentStudent =
+            studentData;
 
-window.currentSchool =
-    schoolData;
 
-await loadSchoolFeesPaymentHistory();
+        window.currentSchool =
+            schoolData;
 
-await loadOptionalPaymentHistory();
 
-await loadCommunicationBook();
+        /*
+         * IMPORTANT:
+         * Existing working modules remain
+         * exactly where they are.
+         */
+
+        await loadSchoolFeesPaymentHistory();
+
+        await loadOptionalPaymentHistory();
+
+        await loadCommunicationBook();
+
 
         console.log(
             "Student Dashboard Loaded:",
@@ -1761,6 +2145,7 @@ await loadCommunicationBook();
             "Student Dashboard Error:",
             error
         );
+
 
         showDashboardError(
             error.message ||
