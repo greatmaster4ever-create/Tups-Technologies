@@ -1736,26 +1736,26 @@ document.addEventListener(
         );
 
 
-        await Promise.all([
+      await Promise.allSettled([
 
-            loadStudentAdvertisements(),
+    loadStudentAdvertisements(),
 
-            loadSchoolAnnouncement(),
+    loadSchoolAnnouncement(),
 
-            loadStudentSchoolCalendar(),
+    loadStudentSchoolCalendar(),
 
-            loadSchoolFeesPaymentHistory(),
+    loadSchoolFeesPaymentHistory(),
 
-            loadOptionalPaymentHistory(),
+    loadOptionalPaymentHistory(),
 
-            loadCommunicationBook()
+    loadCommunicationBook()
 
-        ]);
+]);
 
 
-        console.log(
-            "All dashboard modules loaded."
-        );
+       console.log(
+    "All independent dashboard modules finished loading."
+);
 
     }
 );
