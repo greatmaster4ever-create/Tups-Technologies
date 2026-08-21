@@ -1674,46 +1674,91 @@ function clearStudentDashboardCache() {
 
 /* =========================================================
    PAGE START
+   PHASE 2 — PARALLEL MODULE LOADING
 ========================================================= */
 
 document.addEventListener(
     "DOMContentLoaded",
     async function () {
-	
-	console.log(
-    "DASHBOARD SCHOOL CODE:",
-    schoolCode
-);
 
-console.log(
-    "DASHBOARD REG NO:",
-    regNo
-);
+        console.log(
+            "DASHBOARD SCHOOL CODE:",
+            schoolCode
+        );
 
-       if (
-    !schoolCode ||
-    !regNo ||
-    !validStudentDashboardSession
-) {
 
-    window.location.replace(
-        "index.html"
-    );
+        console.log(
+            "DASHBOARD REG NO:",
+            regNo
+        );
 
-    return;
-}
 
-      await loadStudentDashboard();
+        /* -----------------------------------------
+           SESSION VALIDATION
+        ----------------------------------------- */
 
-      await loadStudentAdvertisements();
+        if (
+            !schoolCode ||
+            !regNo ||
+            !validStudentDashboardSession
+        ) {
 
-      await loadSchoolAnnouncement();
+            window.location.replace(
+                "index.html"
+            );
 
-      await loadStudentSchoolCalendar();
+            return;
+
+        }
+
+
+        /* -----------------------------------------
+           LOAD CORE STUDENT DATA FIRST
+        ----------------------------------------- */
+
+        await loadStudentDashboard();
+
+
+        /*
+         * At this point:
+         *
+         * window.currentStudent
+         * window.currentSchool
+         *
+         * are available.
+         *
+         * The independent dashboard modules
+         * can now load concurrently.
+         */
+
+        console.log(
+            "Starting independent dashboard modules..."
+        );
+
+
+        await Promise.all([
+
+            loadStudentAdvertisements(),
+
+            loadSchoolAnnouncement(),
+
+            loadStudentSchoolCalendar(),
+
+            loadSchoolFeesPaymentHistory(),
+
+            loadOptionalPaymentHistory(),
+
+            loadCommunicationBook()
+
+        ]);
+
+
+        console.log(
+            "All dashboard modules loaded."
+        );
 
     }
 );
-
 
 /* =========================================================
    LOAD STUDENT DASHBOARD
@@ -2106,36 +2151,23 @@ async function loadStudentDashboard() {
         }
 
 
-        /* -----------------------------------------
-           STORE STUDENT DATA
-           FOR OTHER MODULES
-        ----------------------------------------- */
+       /* -----------------------------------------
+   STORE STUDENT DATA
+   FOR OTHER MODULES
+----------------------------------------- */
 
-        window.currentStudent =
-            studentData;
-
-
-        window.currentSchool =
-            schoolData;
+window.currentStudent =
+    studentData;
 
 
-        /*
-         * IMPORTANT:
-         * Existing working modules remain
-         * exactly where they are.
-         */
-
-        await loadSchoolFeesPaymentHistory();
-
-        await loadOptionalPaymentHistory();
-
-        await loadCommunicationBook();
+window.currentSchool =
+    schoolData;
 
 
-        console.log(
-            "Student Dashboard Loaded:",
-            studentData
-        );
+console.log(
+    "Core Student Dashboard Loaded:",
+    studentData
+);
 
 
     }
