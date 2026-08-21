@@ -1891,13 +1891,22 @@ async function loadStudentDashboard() {
 
             if (schoolData.logo_url) {
 
-                schoolLogo.src =
-                    schoolData.logo_url;
+    schoolLogo.loading =
+        "eager";
 
-                schoolLogo.style.display =
-                    "block";
+    schoolLogo.decoding =
+        "async";
 
-            }
+    schoolLogo.fetchPriority =
+        "high";
+
+    schoolLogo.src =
+        schoolData.logo_url;
+
+    schoolLogo.style.display =
+        "block";
+
+}
             else {
 
                 schoolLogo.style.display =
@@ -2134,13 +2143,19 @@ async function loadStudentDashboard() {
 
             if (studentData.passport_url) {
 
-                passport.src =
-                    studentData.passport_url;
+    passport.loading =
+        "lazy";
 
-                passport.style.display =
-                    "block";
+    passport.decoding =
+        "async";
 
-            }
+    passport.src =
+        studentData.passport_url;
+
+    passport.style.display =
+        "block";
+
+}
             else {
 
                 passport.style.display =
@@ -3910,18 +3925,29 @@ async function loadStudentAdvertisements() {
                 advert,
                 index
             ) => `
-                <img
-                    src="${advert.image_url}"
-                    alt="${
-                        advert.title ||
-                        "School Advertisement"
-                    }"
-                    class="slide ${
-                        index === 0
-                            ? "active"
-                            : ""
-                    }"
-                >
+               <img
+    src="${advert.image_url}"
+    alt="${
+        advert.title ||
+        "School Advertisement"
+    }"
+    class="slide ${
+        index === 0
+            ? "active"
+            : ""
+    }"
+    loading="${
+        index === 0
+            ? "eager"
+            : "auto"
+    }"
+    decoding="async"
+    fetchpriority="${
+        index === 0
+            ? "high"
+            : "auto"
+    }"
+>
             `
         )
         .join("");
