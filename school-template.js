@@ -11326,76 +11326,62 @@ function updateDeleteResultStudentList() {
   const department =
     document.getElementById(
       "deleteResultDepartment"
-    ).value;
+    )?.value || "ALL";
 
   const className =
     document.getElementById(
       "deleteResultClass"
-    ).value;
+    )?.value || "ALL";
 
   const students =
     window.deleteResultStudents || [];
 
-  let filtered =
-    students;
+  let filtered = students;
 
-  if (
-    department !== "ALL"
-  ) {
+  // Filter by department
+  if (department !== "ALL") {
 
     filtered =
       filtered.filter(
         student =>
-          student.department ===
-          department
+          student.department === department
       );
 
   }
 
-  if (
-    className !== "ALL"
-  ) {
+  // Filter by class
+  if (className !== "ALL") {
 
     filtered =
       filtered.filter(
         student =>
-          student.class ===
-          className
+          student.class === className
       );
 
   }
 
+  // Store currently displayed students
   window.deleteResultFilteredStudents =
     filtered;
 
+  // Render the filtered students
   renderDeleteResultStudentList(
     filtered
   );
-  
-  const department =
-  document.getElementById(
-    "deleteResultDepartment"
-  )?.value;
 
-const selectedClass =
-  document.getElementById(
-    "deleteResultClass"
-  )?.value;
+  /*
+   * If Department OR Class is ALL,
+   * automatically select every student
+   * currently displayed.
+   */
+  if (
+    department === "ALL" ||
+    className === "ALL"
+  ) {
 
+    selectAllDeleteResultStudents();
 
-/*
- * If either filter is ALL,
- * automatically select every
- * student currently displayed.
- */
-if (
-  department === "ALL" ||
-  selectedClass === "ALL"
-) {
-
-  selectAllDeleteResultStudents();
-
-}
+  }
 
 }
 
