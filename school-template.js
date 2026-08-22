@@ -11371,6 +11371,31 @@ function updateDeleteResultStudentList() {
   renderDeleteResultStudentList(
     filtered
   );
+  
+  const department =
+  document.getElementById(
+    "deleteResultDepartment"
+  )?.value;
+
+const selectedClass =
+  document.getElementById(
+    "deleteResultClass"
+  )?.value;
+
+
+/*
+ * If either filter is ALL,
+ * automatically select every
+ * student currently displayed.
+ */
+if (
+  department === "ALL" ||
+  selectedClass === "ALL"
+) {
+
+  selectAllDeleteResultStudents();
+
+}
 
 }
 
