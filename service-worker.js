@@ -52,7 +52,6 @@ self.addEventListener(
             }
 
           }
-
         )
 
     );
@@ -79,27 +78,27 @@ self.addEventListener(
 
             return Promise.all(
 
-              cacheNames
-                .map(
-                  cacheName => {
+              cacheNames.map(
+                cacheName => {
 
-                    if (
-                      cacheName !== CACHE_NAME
-                    ) {
+                  if (
+                    cacheName !== CACHE_NAME
+                  ) {
 
-                      return caches.delete(
-                        cacheName
-                      );
-
-                    }
+                    return caches.delete(
+                      cacheName
+                    );
 
                   }
-                )
+
+                  return null;
+
+                }
+              )
 
             );
 
           }
-
         )
 
     );
@@ -136,9 +135,9 @@ self.addEventListener(
     }
 
 
-    /*
-     * Only handle GET requests.
-     */
+    /* -----------------------------------------
+       ONLY HANDLE GET REQUESTS
+    ----------------------------------------- */
 
     if (
       event.request.method !== "GET"
@@ -148,6 +147,41 @@ self.addEventListener(
 
     }
 
+
+    /* -----------------------------------------
+       HTML AND JAVASCRIPT
+       
+       ALWAYS LOAD FROM NETWORK.
+       
+       This prevents old cached application
+       code from interfering with login,
+       authentication, dashboards and modules.
+    ----------------------------------------- */
+
+    if (
+      requestURL.pathname.endsWith(".html") ||
+      requestURL.pathname.endsWith(".js")
+    ) {
+
+      event.respondWith(
+
+        fetch(
+          event.request
+        )
+
+      );
+
+      return;
+
+    }
+
+
+    /* -----------------------------------------
+       OTHER SAME-ORIGIN ASSETS
+
+       CACHE FIRST
+       THEN NETWORK
+    ----------------------------------------- */
 
     event.respondWith(
 
@@ -165,13 +199,11 @@ self.addEventListener(
 
             }
 
-
             return fetch(
               event.request
             );
 
           }
-
         )
 
         .catch(
@@ -183,24 +215,11 @@ self.addEventListener(
               error
             );
 
-
-            /*
-             * Return a normal network error
-             * instead of throwing an unhandled
-             * service-worker promise rejection.
-             */
-
-            return new Response(
-              "",
-              {
-                status: 503,
-                statusText:
-                  "Service Unavailable"
-              }
+            return fetch(
+              event.request
             );
 
           }
-
         )
 
     );
