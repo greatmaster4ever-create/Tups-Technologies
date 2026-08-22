@@ -5297,92 +5297,76 @@ async function showMasterSheet() {
 
 async function showStudentsFees() {
 
-  const { data, error } =
-    await supabaseClient
-      .from(
-        "department_resources"
-      )
-      .select(
-        "department"
-      )
-      .eq(
-        "school_code",
-        schoolCode
-      )
-      .order(
-        "department"
-      );
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("department_resources")
+    .select("department")
+    .eq("school_code", schoolCode)
+    .order("department");
 
   if (error) {
 
-    alert(
-      error.message
-    );
-
+    alert(error.message);
     return;
 
   }
 
-  let options =
-    `<option value="">
+  let options = `
+    <option value="">
       Select Department
-    </option>`;
+    </option>
+  `;
 
   data.forEach(row => {
 
     options += `
-
-      <option
-        value="${row.department}"
-      >
-
+      <option value="${row.department}">
         ${row.department}
-
       </option>
-
     `;
 
   });
 
-  document.getElementById(
-    "adminContent"
-  ).innerHTML = `
+  document.getElementById("adminContent").innerHTML = `
 
     <h3>
       👨‍🎓 Students & Fees
     </h3>
 
-    <div
-  class="student-toolbar"
->
+    <div class="student-toolbar">
 
-  <select
-    id="studentDepartment"
-  >
-    ${options}
-  </select>
+      <select id="studentDepartment">
+        ${options}
+      </select>
 
-  <button
-    id="refreshStudentsBtn"
-    class="admin-btn"
-  >
-    Refresh
-  </button>
+      <button
+        id="refreshStudentsBtn"
+        class="admin-btn"
+      >
+        Refresh
+      </button>
 
-  <input
-    type="text"
-    id="studentSearch"
-    placeholder="Search Student..."
-  >
+      <button
+        id="deleteResultsBtn"
+        class="admin-btn"
+        type="button"
+      >
+        Delete Result
+      </button>
 
-</div>
+      <input
+        type="text"
+        id="studentSearch"
+        placeholder="Search Student..."
+      >
 
-<br>
+    </div>
 
-    <div
-      id="studentsTableContainer"
-    >
+    <br>
 
+    <div id="studentsTableContainer">
     </div>
 
   `;
@@ -5394,7 +5378,85 @@ async function showStudentsFees() {
 /* =========================================================
    ADVERTISEMENTS MODULE
    ========================================================= */
+async function showStudentsFees() {
 
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("department_resources")
+    .select("department")
+    .eq("school_code", schoolCode)
+    .order("department");
+
+  if (error) {
+
+    alert(error.message);
+    return;
+
+  }
+
+  let options = `
+    <option value="">
+      Select Department
+    </option>
+  `;
+
+  data.forEach(row => {
+
+    options += `
+      <option value="${row.department}">
+        ${row.department}
+      </option>
+    `;
+
+  });
+
+  document.getElementById("adminContent").innerHTML = `
+
+    <h3>
+      👨‍🎓 Students & Fees
+    </h3>
+
+    <div class="student-toolbar">
+
+      <select id="studentDepartment">
+        ${options}
+      </select>
+
+      <button
+        id="refreshStudentsBtn"
+        class="admin-btn"
+      >
+        Refresh
+      </button>
+
+      <button
+        id="deleteResultsBtn"
+        class="admin-btn"
+        type="button"
+      >
+        Delete Result
+      </button>
+
+      <input
+        type="text"
+        id="studentSearch"
+        placeholder="Search Student..."
+      >
+
+    </div>
+
+    <br>
+
+    <div id="studentsTableContainer">
+    </div>
+
+  `;
+
+  wireStudentsModule();
+
+}
 async function showAdverts() {
 
   const adminContent =
@@ -10257,32 +10319,913 @@ async function syncStudentsFromSheet() {
 
 }
 
+async function openDeleteResultsModal() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("students")
+    .select(`
+      id,
+      student_name,
+      class,
+      reg_no,
+      department,
+      result_url
+    `)
+    .eq(
+      "school_code",
+      schoolCode
+    )
+    .order(
+      "student_name"
+    );
+
+  if (error) {
+
+    alert(
+      "Unable to load students:\n\n" +
+      error.message
+    );
+
+    return;
+
+  }
+
+  if (!data || !data.length) {
+
+    alert(
+      "No students were found."
+    );
+
+    return;
+
+  }
+
+  window.deleteResultStudents =
+    data;
+
+  const departments =
+    [
+      ...new Set(
+        data
+          .map(
+            student =>
+              student.department
+          )
+          .filter(Boolean)
+      )
+    ]
+    .sort();
+
+  let departmentOptions = `
+    <option value="ALL">
+      ALL
+    </option>
+  `;
+
+  departments.forEach(
+    department => {
+
+      departmentOptions += `
+        <option value="${department}">
+          ${department}
+        </option>
+      `;
+
+    }
+  );
+
+  const modal =
+    document.createElement(
+      "div"
+    );
+
+  modal.id =
+    "deleteResultsModal";
+
+  modal.innerHTML = `
+
+    <div
+      class="delete-results-overlay"
+    >
+
+      <div
+        class="delete-results-modal"
+      >
+
+        <div
+          class="delete-results-header"
+        >
+
+          <h3>
+            Delete Result Links
+          </h3>
+
+          <button
+            type="button"
+            onclick="closeDeleteResultsModal()"
+          >
+            ×
+          </button>
+
+        </div>
+
+        <div
+          class="delete-results-filters"
+        >
+
+          <div>
+
+            <label>
+              Department
+            </label>
+
+            <select
+              id="deleteResultDepartment"
+              onchange="updateDeleteResultClasses()"
+            >
+
+              ${departmentOptions}
+
+            </select>
+
+          </div>
+
+          <div>
+
+            <label>
+              Class
+            </label>
+
+            <select
+              id="deleteResultClass"
+              onchange="updateDeleteResultStudentList()"
+            >
+
+              <option value="ALL">
+                ALL
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+        <div>
+
+          <label>
+            Search Student
+          </label>
+
+          <input
+            type="text"
+            id="deleteResultStudentSearch"
+            placeholder="Search name or registration number..."
+            oninput="filterDeleteResultStudents()"
+          >
+
+        </div>
+
+        <div
+          class="delete-results-selection-bar"
+        >
+
+          <button
+            type="button"
+            onclick="selectAllDeleteResultStudents()"
+          >
+            Select All
+          </button>
+
+          <button
+            type="button"
+            onclick="clearAllDeleteResultStudents()"
+          >
+            Clear All
+          </button>
+
+          <span
+            id="deleteResultSelectedCount"
+          >
+            0 selected
+          </span>
+
+        </div>
+
+        <div
+          id="deleteResultStudentList"
+          class="delete-result-student-list"
+        >
+        </div>
+
+        <div
+          class="delete-results-footer"
+        >
+
+          <button
+            type="button"
+            class="admin-btn"
+            onclick="closeDeleteResultsModal()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="admin-btn"
+            onclick="prepareDeleteResults()"
+          >
+            OK
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(
+    modal
+  );
+
+  updateDeleteResultClasses();
+
+}
+
+function updateDeleteResultClasses() {
+
+  const department =
+    document.getElementById(
+      "deleteResultDepartment"
+    ).value;
+
+  const students =
+    window.deleteResultStudents || [];
+
+  const filtered =
+    department === "ALL"
+      ? students
+      : students.filter(
+          student =>
+            student.department ===
+            department
+        );
+
+  const classes =
+    [
+      ...new Set(
+        filtered
+          .map(
+            student =>
+              student.class
+          )
+          .filter(Boolean)
+      )
+    ]
+    .sort();
+
+  const classSelect =
+    document.getElementById(
+      "deleteResultClass"
+    );
+
+  classSelect.innerHTML = `
+    <option value="ALL">
+      ALL
+    </option>
+  `;
+
+  classes.forEach(
+    className => {
+
+      classSelect.innerHTML += `
+        <option value="${className}">
+          ${className}
+        </option>
+      `;
+
+    }
+  );
+
+  updateDeleteResultStudentList();
+
+}
+
+function updateDeleteResultStudentList() {
+
+  const department =
+    document.getElementById(
+      "deleteResultDepartment"
+    ).value;
+
+  const className =
+    document.getElementById(
+      "deleteResultClass"
+    ).value;
+
+  const students =
+    window.deleteResultStudents || [];
+
+  let filtered =
+    students;
+
+  if (
+    department !== "ALL"
+  ) {
+
+    filtered =
+      filtered.filter(
+        student =>
+          student.department ===
+          department
+      );
+
+  }
+
+  if (
+    className !== "ALL"
+  ) {
+
+    filtered =
+      filtered.filter(
+        student =>
+          student.class ===
+          className
+      );
+
+  }
+
+  window.deleteResultFilteredStudents =
+    filtered;
+
+  renderDeleteResultStudentList(
+    filtered
+  );
+
+}
+
+function renderDeleteResultStudentList(
+  students
+) {
+
+  const container =
+    document.getElementById(
+      "deleteResultStudentList"
+    );
+
+  if (!students.length) {
+
+    container.innerHTML = `
+      <p>
+        No students found.
+      </p>
+    `;
+
+    updateDeleteResultSelectedCount();
+
+    return;
+
+  }
+
+  let html = "";
+
+  students.forEach(
+    student => {
+
+      const hasResult =
+        !!student.result_url;
+
+      html += `
+
+        <label
+          class="delete-result-student-row"
+          data-student-name="${(
+            student.student_name || ""
+          ).toLowerCase()}"
+          data-reg-no="${(
+            student.reg_no || ""
+          ).toLowerCase()}"
+        >
+
+          <input
+            type="checkbox"
+            class="delete-result-student-checkbox"
+            value="${student.id}"
+            data-has-result="${hasResult}"
+            onchange="updateDeleteResultSelectedCount()"
+          >
+
+          <span>
+
+            <strong>
+              ${student.student_name || ""}
+            </strong>
+
+            <small>
+              ${student.reg_no || ""}
+              —
+              ${student.class || ""}
+              —
+              ${student.department || ""}
+            </small>
+
+          </span>
+
+          <span>
+
+            ${
+              hasResult
+                ? "Result available"
+                : "No result link"
+            }
+
+          </span>
+
+        </label>
+
+      `;
+
+    }
+  );
+
+  container.innerHTML =
+    html;
+
+  updateDeleteResultSelectedCount();
+
+}
+
+function filterDeleteResultStudents() {
+
+  const search =
+    document
+      .getElementById(
+        "deleteResultStudentSearch"
+      )
+      .value
+      .toLowerCase()
+      .trim();
+
+  const rows =
+    document.querySelectorAll(
+      ".delete-result-student-row"
+    );
+
+  rows.forEach(
+    row => {
+
+      const name =
+        row.dataset.studentName || "";
+
+      const regNo =
+        row.dataset.regNo || "";
+
+      const matches =
+        name.includes(search) ||
+        regNo.includes(search);
+
+      row.style.display =
+        matches
+          ? "flex"
+          : "none";
+
+    }
+  );
+
+}
+
+function selectAllDeleteResultStudents() {
+
+  const checkboxes =
+    document.querySelectorAll(
+      ".delete-result-student-checkbox"
+    );
+
+  checkboxes.forEach(
+    checkbox => {
+
+      checkbox.checked = true;
+
+    }
+  );
+
+  updateDeleteResultSelectedCount();
+
+}
+
+function clearAllDeleteResultStudents() {
+
+  const checkboxes =
+    document.querySelectorAll(
+      ".delete-result-student-checkbox"
+    );
+
+  checkboxes.forEach(
+    checkbox => {
+
+      checkbox.checked = false;
+
+    }
+  );
+
+  updateDeleteResultSelectedCount();
+
+}
+
+function updateDeleteResultSelectedCount() {
+
+  const selected =
+    document.querySelectorAll(
+      ".delete-result-student-checkbox:checked"
+    );
+
+  const counter =
+    document.getElementById(
+      "deleteResultSelectedCount"
+    );
+
+  if (counter) {
+
+    counter.textContent =
+      `${selected.length} selected`;
+
+  }
+
+}
+
+function prepareDeleteResults() {
+
+  const selected =
+    [
+      ...document.querySelectorAll(
+        ".delete-result-student-checkbox:checked"
+      )
+    ];
+
+  if (!selected.length) {
+
+    alert(
+      "Please select at least one student."
+    );
+
+    return;
+
+  }
+
+  const selectedIds =
+    selected.map(
+      checkbox =>
+        checkbox.value
+    );
+
+  const students =
+    window.deleteResultStudents || [];
+
+  const selectedStudents =
+    students.filter(
+      student =>
+        selectedIds.includes(
+          String(student.id)
+        )
+    );
+
+  const withResults =
+    selectedStudents.filter(
+      student =>
+        !!student.result_url
+    );
+
+  if (!withResults.length) {
+
+    alert(
+      "None of the selected students currently have a result link."
+    );
+
+    return;
+
+  }
+
+  window.pendingDeleteResultStudents =
+    withResults;
+
+  showDeleteResultsConfirmation(
+    withResults
+  );
+
+}
+
+function showDeleteResultsConfirmation(
+  students
+) {
+
+  const existing =
+    document.getElementById(
+      "deleteResultsConfirmModal"
+    );
+
+  if (existing) {
+    existing.remove();
+  }
+
+  const modal =
+    document.createElement(
+      "div"
+    );
+
+  modal.id =
+    "deleteResultsConfirmModal";
+
+  modal.innerHTML = `
+
+    <div
+      class="delete-results-overlay"
+    >
+
+      <div
+        class="delete-results-confirm-modal"
+      >
+
+        <h3>
+          ⚠️ Confirm Delete
+        </h3>
+
+        <p>
+          You are about to remove result links for
+          <strong>
+            ${students.length}
+          </strong>
+          student${students.length === 1 ? "" : "s"}.
+        </p>
+
+        <p>
+          <strong>
+            Student records will NOT be deleted.
+          </strong>
+        </p>
+
+        <p>
+          Only the
+          <strong>
+            result_url
+          </strong>
+          will be cleared from Supabase.
+        </p>
+
+        <p>
+          Do you want to continue?
+        </p>
+
+        <div
+          class="delete-results-footer"
+        >
+
+          <button
+            type="button"
+            class="admin-btn"
+            onclick="closeDeleteResultsConfirmation()"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="admin-btn"
+            onclick="executeDeleteResults()"
+          >
+            Confirm Delete
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(
+    modal
+  );
+
+}
+
+async function executeDeleteResults() {
+
+  const students =
+    window.pendingDeleteResultStudents || [];
+
+  if (!students.length) {
+
+    alert(
+      "No students selected."
+    );
+
+    return;
+
+  }
+
+  const studentIds =
+    students.map(
+      student =>
+        student.id
+    );
+
+  const confirmButton =
+    document.querySelector(
+      "#deleteResultsConfirmModal button:last-child"
+    );
+
+  if (confirmButton) {
+
+    confirmButton.disabled =
+      true;
+
+    confirmButton.textContent =
+      "Deleting...";
+
+  }
+
+  const {
+    error
+  } = await supabaseClient
+    .from("students")
+    .update({
+      result_url: null
+    })
+    .eq(
+      "school_code",
+      schoolCode
+    )
+    .in(
+      "id",
+      studentIds
+    );
+
+  if (error) {
+
+    console.error(
+      "DELETE RESULT ERROR:",
+      error
+    );
+
+    alert(
+      "Unable to delete result links:\n\n" +
+      error.message
+    );
+
+    if (confirmButton) {
+
+      confirmButton.disabled =
+        false;
+
+      confirmButton.textContent =
+        "Confirm Delete";
+
+    }
+
+    return;
+
+  }
+
+  /*
+   * Remember the currently selected
+   * Students & Fees department before
+   * closing the popup.
+   */
+  const currentDepartment =
+    document.getElementById(
+      "studentDepartment"
+    )?.value;
+
+
+  /*
+   * Close confirmation and
+   * Delete Result popup.
+   */
+  closeDeleteResultsConfirmation();
+
+  closeDeleteResultsModal();
+
+
+  /*
+   * Clear temporary deletion data.
+   */
+  window.pendingDeleteResultStudents =
+    [];
+
+  window.deleteResultStudents =
+    [];
+
+  window.deleteResultFilteredStudents =
+    [];
+
+
+  /*
+   * Refresh the existing Students &
+   * Fees table automatically.
+   *
+   * This reloads the data directly
+   * from Supabase.
+   */
+  if (currentDepartment) {
+
+    await loadStudentsTable(
+      currentDepartment
+    );
+
+  } else {
+
+    document.getElementById(
+      "studentsTableContainer"
+    ).innerHTML = `
+      <p>
+        Result links successfully removed.
+      </p>
+    `;
+
+  }
+
+
+  /*
+   * Final confirmation message.
+   */
+  alert(
+    `Result link${
+      students.length === 1
+        ? ""
+        : "s"
+    } successfully removed for ${
+      students.length
+    } student${
+      students.length === 1
+        ? ""
+        : "s"
+    }.`
+  );
+
+}
+
+function closeDeleteResultsModal() {
+
+  const modal =
+    document.getElementById(
+      "deleteResultsModal"
+    );
+
+  if (modal) {
+
+    modal.remove();
+
+  }
+
+}
+
+function closeDeleteResultsConfirmation() {
+
+  const modal =
+    document.getElementById(
+      "deleteResultsConfirmModal"
+    );
+
+  if (modal) {
+
+    modal.remove();
+
+  }
+
+}
 
 async function loadStudentsTable(
   department
 ) {
 
   console.log(
-  "LOAD STUDENTS FUNCTION RUNNING"
-);
+    "LOAD STUDENTS FUNCTION RUNNING"
+  );
 
-console.log(
-  "Department Selected:",
-  department
-);
+  console.log(
+    "Department Selected:",
+    department
+  );
 
-const {
-  data,
-  error
-} =
-  await supabaseClient
+  const {
+    data,
+    error
+  } = await supabaseClient
     .from("students")
     .select(`
-id,
-student_name,
-class,
-reg_no
-`)
+      id,
+      student_name,
+      class,
+      reg_no,
+      department,
+      result_url
+    `)
     .eq(
       "school_code",
       schoolCode
@@ -10291,40 +11234,32 @@ reg_no
       "department",
       department
     );
-	console.log(
-  "FILTERED STUDENTS:",
-  data
-);
 
-console.log(
-  "RAW DATA:",
-  data
-);
+  console.log(
+    "FILTERED STUDENTS:",
+    data
+  );
 
-console.log(
-  "TOTAL STUDENTS:",
-  data?.length
-);
+  console.log(
+    "TOTAL STUDENTS:",
+    data?.length
+  );
 
-console.log(
-  "Students Returned:",
-  data
-);
+  console.log(
+    "Department:",
+    department
+  );
 
-console.log(
-  "Department:",
-  department
-);
+  console.log(
+    "School Code:",
+    schoolCode
+  );
 
-console.log(
-  "School Code:",
-  schoolCode
-);
+  console.log(
+    "Query Error:",
+    error
+  );
 
-console.log(
-  "Query Error:",
-  error
-);
   if (error) {
 
     alert(
@@ -10337,9 +11272,7 @@ console.log(
 
   let html = `
 
-    <table
-      class="students-table"
-    >
+    <table class="students-table">
 
       <tr>
 
@@ -10366,54 +11299,50 @@ console.log(
       <tr>
 
         <td>
-
-          ${student.student_name}
-
+          ${student.student_name || ""}
         </td>
 
         <td>
-
           ${student.class || ""}
-
         </td>
 
         <td>
 
- <div class="action-buttons">
+          <div class="action-buttons">
 
-  <button
-    onclick="
-      viewStudentInfo(
-        '${student.id}'
-      )
-    "
-  >
-    Info
-  </button>
+            <button
+              onclick="
+                viewStudentInfo(
+                  '${student.id}'
+                )
+              "
+            >
+              Info
+            </button>
 
-  <button
-    onclick="
-      deleteStudent(
-        '${student.id}'
-      )
-    "
-  >
-    Delete
-  </button>
+            <button
+              onclick="
+                deleteStudent(
+                  '${student.id}'
+                )
+              "
+            >
+              Delete
+            </button>
 
-  <button
-    onclick="
-      openTermReport(
-        '${student.id}'
-      )
-    "
-  >
-    Result
-  </button>
+            <button
+              onclick="
+                openTermReport(
+                  '${student.id}'
+                )
+              "
+            >
+              Result
+            </button>
 
-</div>
+          </div>
 
-</td>
+        </td>
 
       </tr>
 
@@ -10421,13 +11350,11 @@ console.log(
 
   });
 
-  html +=
-    "</table>";
+  html += "</table>";
 
   document.getElementById(
     "studentsTableContainer"
-  ).innerHTML =
-    html;
+  ).innerHTML = html;
 
 }
 
@@ -14735,18 +15662,16 @@ function wireStudentsModule() {
       "studentDepartment"
     );
 
-  departmentSelect
-    .addEventListener(
-      "change",
-      () => {
+  departmentSelect.addEventListener(
+    "change",
+    () => {
 
-       
-	loadStudentsTable(
+      loadStudentsTable(
         departmentSelect.value
       );
 
-      }
-    );
+    }
+  );
 
   document
     .getElementById(
@@ -14756,7 +15681,8 @@ function wireStudentsModule() {
       "click",
       syncStudentsFromSheet
     );
-	 document
+
+  document
     .getElementById(
       "studentSearch"
     )
@@ -14765,8 +15691,16 @@ function wireStudentsModule() {
       filterStudentsTable
     );
 
-}
+  document
+    .getElementById(
+      "deleteResultsBtn"
+    )
+    .addEventListener(
+      "click",
+      openDeleteResultsModal
+    );
 
+}
 
 function toggleDepartment(department) {
 
