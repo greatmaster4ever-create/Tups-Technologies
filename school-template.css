@@ -3749,193 +3749,344 @@ Teacher card above Admin card on small screens
     }
 
 }
+
 /* =========================================================
-   DELETE RESULT MODAL
+   TUPS — DELETE RESULT MODAL
+   Strongly scoped to prevent existing global CSS conflicts
    ========================================================= */
 
-.delete-results-overlay {
+#deleteResultsModal,
+#deleteResultsConfirmModal {
 
-  position: fixed;
+    position: fixed !important;
 
-  inset: 0;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
 
-  background: rgba(
-    0,
-    0,
-    0,
-    0.55
-  );
+    width: 100vw !important;
+    height: 100vh !important;
 
-  display: flex;
+    margin: 0 !important;
+    padding: 0 !important;
 
-  align-items: center;
-
-  justify-content: center;
-
-  z-index: 99999;
-
-  padding: 20px;
-
-  box-sizing: border-box;
+    z-index: 999999 !important;
 
 }
 
 
 /* =========================================================
-   MAIN DELETE RESULT MODAL
+   DARK BACKGROUND
    ========================================================= */
 
-.delete-results-modal {
+#deleteResultsModal .delete-results-overlay,
+#deleteResultsConfirmModal .delete-results-overlay {
 
-  width: 720px;
+    position: fixed !important;
 
-  max-width: 100%;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
 
-  max-height: 90vh;
+    width: 100vw !important;
+    height: 100vh !important;
 
-  overflow-y: auto;
+    background: rgba(0, 0, 0, 0.72) !important;
 
-  background: #ffffff;
+    display: flex !important;
 
-  border-radius: 10px;
+    align-items: center !important;
 
-  box-shadow:
-    0 15px 45px
-    rgba(
-      0,
-      0,
-      0,
-      0.25
-    );
+    justify-content: center !important;
 
-  padding: 22px;
+    padding: 20px !important;
 
-  box-sizing: border-box;
+    box-sizing: border-box !important;
+
+    overflow-y: auto !important;
 
 }
 
 
 /* =========================================================
-   MODAL HEADER
+   MAIN DELETE RESULT WINDOW
    ========================================================= */
 
-.delete-results-header {
+#deleteResultsModal .delete-results-modal {
 
-  display: flex;
+    position: relative !important;
 
-  align-items: center;
+    display: block !important;
 
-  justify-content: space-between;
+    width: min(760px, 94vw) !important;
 
-  margin-bottom: 20px;
+    max-width: 760px !important;
 
-  border-bottom: 1px solid #e5e5e5;
+    height: auto !important;
 
-  padding-bottom: 12px;
+    max-height: 90vh !important;
 
-}
+    margin: auto !important;
 
+    padding: 24px !important;
 
-.delete-results-header h3 {
+    box-sizing: border-box !important;
 
-  margin: 0;
+    background: #ffffff !important;
 
-  font-size: 20px;
+    color: #222222 !important;
 
-}
+    border-radius: 12px !important;
 
+    border: 1px solid #dddddd !important;
 
-.delete-results-header button {
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.35) !important;
 
-  border: none;
+    overflow-y: auto !important;
 
-  background: transparent;
-
-  font-size: 28px;
-
-  cursor: pointer;
-
-  line-height: 1;
-
-  padding: 2px 8px;
-
-}
-
-
-.delete-results-header button:hover {
-
-  background: #f1f1f1;
-
-  border-radius: 5px;
+    overflow-x: hidden !important;
 
 }
 
 
 /* =========================================================
-   FILTER AREA
+   HEADER
    ========================================================= */
 
-.delete-results-filters {
+#deleteResultsModal .delete-results-header {
 
-  display: grid;
+    width: 100% !important;
 
-  grid-template-columns:
-    1fr
-    1fr;
+    display: flex !important;
 
-  gap: 15px;
+    flex-direction: row !important;
 
-  margin-bottom: 15px;
+    align-items: center !important;
 
-}
+    justify-content: space-between !important;
 
+    gap: 15px !important;
 
-.delete-results-modal label {
+    margin: 0 0 20px 0 !important;
 
-  display: block;
+    padding: 0 0 15px 0 !important;
 
-  font-weight: 600;
+    border-bottom: 1px solid #e5e5e5 !important;
 
-  margin-bottom: 6px;
-
-}
-
-
-.delete-results-modal select,
-.delete-results-modal input[type="text"] {
-
-  width: 100%;
-
-  box-sizing: border-box;
-
-  padding: 10px 12px;
-
-  border: 1px solid #cfcfcf;
-
-  border-radius: 6px;
-
-  background: #ffffff;
-
-  font-size: 14px;
+    box-sizing: border-box !important;
 
 }
 
 
-.delete-results-modal select:focus,
-.delete-results-modal input[type="text"]:focus {
+#deleteResultsModal .delete-results-header h3 {
 
-  outline: none;
+    margin: 0 !important;
 
-  border-color: #007bff;
+    padding: 0 !important;
 
-  box-shadow:
-    0 0 0 2px
-    rgba(
-      0,
-      123,
-      255,
-      0.12
-    );
+    color: #222222 !important;
+
+    font-size: 21px !important;
+
+    font-weight: 700 !important;
+
+    line-height: 1.3 !important;
+
+}
+
+
+#deleteResultsModal .delete-results-header button {
+
+    width: 34px !important;
+
+    height: 34px !important;
+
+    min-width: 34px !important;
+
+    padding: 0 !important;
+
+    margin: 0 !important;
+
+    border: none !important;
+
+    border-radius: 50% !important;
+
+    background: #eeeeee !important;
+
+    color: #333333 !important;
+
+    font-size: 22px !important;
+
+    font-weight: 700 !important;
+
+    line-height: 34px !important;
+
+    text-align: center !important;
+
+    cursor: pointer !important;
+
+}
+
+
+#deleteResultsModal .delete-results-header button:hover {
+
+    background: #dddddd !important;
+
+}
+
+
+/* =========================================================
+   FILTER GRID
+   ========================================================= */
+
+#deleteResultsModal .delete-results-filters {
+
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr) !important;
+
+    gap: 16px !important;
+
+    margin: 0 0 16px 0 !important;
+
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+
+}
+
+
+/* =========================================================
+   ALL LABELS INSIDE DELETE RESULT MODAL
+   ========================================================= */
+
+#deleteResultsModal .delete-results-modal label,
+#deleteResultsModal .delete-results-filters label {
+
+    display: block !important;
+
+    width: 100% !important;
+
+    margin: 0 0 7px 0 !important;
+
+    padding: 0 !important;
+
+    color: #333333 !important;
+
+    font-size: 14px !important;
+
+    font-weight: 600 !important;
+
+    line-height: 1.4 !important;
+
+    box-sizing: border-box !important;
+
+}
+
+
+/* =========================================================
+   FILTER SELECTS
+   ========================================================= */
+
+#deleteResultsModal select {
+
+    display: block !important;
+
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    min-width: 0 !important;
+
+    height: 44px !important;
+
+    margin: 0 !important;
+
+    padding: 0 12px !important;
+
+    box-sizing: border-box !important;
+
+    border: 1px solid #cccccc !important;
+
+    border-radius: 7px !important;
+
+    background: #ffffff !important;
+
+    color: #222222 !important;
+
+    font-size: 14px !important;
+
+    font-family: inherit !important;
+
+    cursor: pointer !important;
+
+}
+
+
+/* =========================================================
+   SEARCH INPUT
+   ========================================================= */
+
+#deleteResultsModal #deleteResultStudentSearch {
+
+    display: block !important;
+
+    width: 100% !important;
+
+    max-width: 100% !important;
+
+    min-width: 0 !important;
+
+    height: 44px !important;
+
+    margin: 0 !important;
+
+    padding: 0 13px !important;
+
+    box-sizing: border-box !important;
+
+    border: 1px solid #cccccc !important;
+
+    border-radius: 7px !important;
+
+    background: #ffffff !important;
+
+    color: #222222 !important;
+
+    font-size: 14px !important;
+
+    font-family: inherit !important;
+
+}
+
+
+#deleteResultsModal #deleteResultStudentSearch::placeholder {
+
+    color: #888888 !important;
+
+}
+
+
+/* =========================================================
+   FOCUS
+   ========================================================= */
+
+#deleteResultsModal select:focus,
+#deleteResultsModal #deleteResultStudentSearch:focus {
+
+    outline: none !important;
+
+    border-color: #555555 !important;
+
+    box-shadow:
+        0 0 0 2px rgba(0, 0, 0, 0.08) !important;
 
 }
 
@@ -3944,157 +4095,318 @@ Teacher card above Admin card on small screens
    SELECTION BAR
    ========================================================= */
 
-.delete-results-selection-bar {
+#deleteResultsModal .delete-results-selection-bar {
 
-  display: flex;
+    width: 100% !important;
 
-  align-items: center;
+    display: flex !important;
 
-  gap: 10px;
+    align-items: center !important;
 
-  margin-top: 15px;
+    flex-wrap: wrap !important;
 
-  margin-bottom: 10px;
+    gap: 8px !important;
 
-  padding: 10px;
+    margin: 16px 0 10px 0 !important;
 
-  background: #f5f5f5;
+    padding: 10px !important;
 
-  border-radius: 6px;
+    box-sizing: border-box !important;
 
-}
+    background: #f5f5f5 !important;
 
+    border: 1px solid #e5e5e5 !important;
 
-.delete-results-selection-bar button {
-
-  border: 1px solid #ccc;
-
-  background: #ffffff;
-
-  padding: 7px 12px;
-
-  border-radius: 5px;
-
-  cursor: pointer;
-
-}
-
-
-.delete-results-selection-bar button:hover {
-
-  background: #eeeeee;
-
-}
-
-
-#deleteResultSelectedCount {
-
-  margin-left: auto;
-
-  font-weight: 600;
+    border-radius: 7px !important;
 
 }
 
 
 /* =========================================================
-   STUDENT LIST
+   SELECT ALL / CLEAR ALL
    ========================================================= */
 
-.delete-result-student-list {
+#deleteResultsModal .delete-results-selection-bar button {
 
-  border: 1px solid #dddddd;
+    width: auto !important;
 
-  border-radius: 6px;
+    min-width: 0 !important;
 
-  max-height: 360px;
+    height: 36px !important;
 
-  overflow-y: auto;
+    margin: 0 !important;
 
-  background: #ffffff;
+    padding: 0 14px !important;
 
-}
+    border: 1px solid #cccccc !important;
 
+    border-radius: 6px !important;
 
-.delete-result-student-row {
+    background: #ffffff !important;
 
-  display: flex;
+    color: #333333 !important;
 
-  align-items: center;
+    font-size: 13px !important;
 
-  gap: 12px;
+    font-weight: 600 !important;
 
-  padding: 11px 12px;
-
-  border-bottom: 1px solid #eeeeee;
-
-  cursor: pointer;
+    cursor: pointer !important;
 
 }
 
 
-.delete-result-student-row:last-child {
+#deleteResultsModal .delete-results-selection-bar button:hover {
 
-  border-bottom: none;
-
-}
-
-
-.delete-result-student-row:hover {
-
-  background: #f7f7f7;
+    background: #eeeeee !important;
 
 }
 
 
-.delete-result-student-row input[type="checkbox"] {
+/* =========================================================
+   SELECTED COUNT
+   ========================================================= */
 
-  width: 18px;
+#deleteResultsModal #deleteResultSelectedCount {
 
-  height: 18px;
+    margin-left: auto !important;
 
-  flex-shrink: 0;
+    padding: 0 !important;
 
-  cursor: pointer;
+    color: #555555 !important;
 
-}
+    font-size: 13px !important;
 
-
-.delete-result-student-row span:nth-child(2) {
-
-  display: flex;
-
-  flex-direction: column;
-
-  flex: 1;
+    font-weight: 600 !important;
 
 }
 
 
-.delete-result-student-row strong {
+/* =========================================================
+   STUDENT LIST CONTAINER
+   ========================================================= */
 
-  font-size: 14px;
+#deleteResultsModal .delete-result-student-list {
+
+    width: 100% !important;
+
+    height: auto !important;
+
+    max-height: 330px !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+
+    overflow-y: auto !important;
+
+    overflow-x: hidden !important;
+
+    border: 1px solid #dddddd !important;
+
+    border-radius: 8px !important;
+
+    background: #ffffff !important;
 
 }
 
 
-.delete-result-student-row small {
+/* =========================================================
+   STUDENT ROW
+   ========================================================= */
 
-  margin-top: 3px;
+#deleteResultsModal .delete-result-student-row {
 
-  color: #666666;
+    width: 100% !important;
 
-  font-size: 12px;
+    min-height: 62px !important;
+
+    display: flex !important;
+
+    flex-direction: row !important;
+
+    align-items: center !important;
+
+    gap: 12px !important;
+
+    margin: 0 !important;
+
+    padding: 10px 12px !important;
+
+    box-sizing: border-box !important;
+
+    border: none !important;
+
+    border-bottom: 1px solid #eeeeee !important;
+
+    background: #ffffff !important;
+
+    color: #222222 !important;
+
+    cursor: pointer !important;
 
 }
 
 
-.delete-result-student-row span:last-child {
+#deleteResultsModal .delete-result-student-row:last-child {
 
-  font-size: 12px;
+    border-bottom: none !important;
 
-  color: #666666;
+}
 
-  white-space: nowrap;
+
+#deleteResultsModal .delete-result-student-row:hover {
+
+    background: #f8f8f8 !important;
+
+}
+
+
+/* =========================================================
+   CHECKBOX
+   ========================================================= */
+
+#deleteResultsModal
+.delete-result-student-row
+input[type="checkbox"] {
+
+    display: block !important;
+
+    width: 18px !important;
+
+    height: 18px !important;
+
+    min-width: 18px !important;
+
+    max-width: 18px !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    flex: 0 0 18px !important;
+
+    cursor: pointer !important;
+
+}
+
+
+/* =========================================================
+   STUDENT INFORMATION AREA
+   ========================================================= */
+
+#deleteResultsModal
+.delete-result-student-row
+span:nth-child(2) {
+
+    min-width: 0 !important;
+
+    flex: 1 1 auto !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    gap: 3px !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+}
+
+
+#deleteResultsModal
+.delete-result-student-row
+strong {
+
+    display: block !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    color: #222222 !important;
+
+    font-size: 14px !important;
+
+    font-weight: 600 !important;
+
+    line-height: 1.3 !important;
+
+}
+
+
+#deleteResultsModal
+.delete-result-student-row
+small {
+
+    display: block !important;
+
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    color: #777777 !important;
+
+    font-size: 12px !important;
+
+    line-height: 1.3 !important;
+
+}
+
+
+/* =========================================================
+   RESULT STATUS
+   ========================================================= */
+
+#deleteResultsModal
+.delete-result-student-row
+span:last-child {
+
+    flex: 0 0 auto !important;
+
+    margin: 0 !important;
+
+    padding: 5px 8px !important;
+
+    color: #666666 !important;
+
+    background: #f2f2f2 !important;
+
+    border-radius: 5px !important;
+
+    font-size: 11px !important;
+
+    white-space: nowrap !important;
+
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+#deleteResultsModal .delete-results-footer {
+
+    width: 100% !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+
+    justify-content: flex-end !important;
+
+    gap: 10px !important;
+
+    margin: 18px 0 0 0 !important;
+
+    padding: 15px 0 0 0 !important;
+
+    border-top: 1px solid #e5e5e5 !important;
+
+    box-sizing: border-box !important;
 
 }
 
@@ -4103,144 +4415,240 @@ Teacher card above Admin card on small screens
    FOOTER BUTTONS
    ========================================================= */
 
-.delete-results-footer {
+#deleteResultsModal .delete-results-footer button {
 
-  display: flex;
+    width: auto !important;
 
-  justify-content: flex-end;
+    min-width: 90px !important;
 
-  gap: 10px;
+    height: 40px !important;
 
-  margin-top: 20px;
+    margin: 0 !important;
 
-  padding-top: 15px;
+    padding: 0 18px !important;
 
-  border-top: 1px solid #e5e5e5;
+    border: none !important;
+
+    border-radius: 6px !important;
+
+    background: #3f3f99 !important;
+
+    color: #ffffff !important;
+
+    font-size: 14px !important;
+
+    font-weight: 600 !important;
+
+    cursor: pointer !important;
 
 }
 
 
-.delete-results-footer button {
+#deleteResultsModal
+.delete-results-footer
+button:first-child {
 
-  min-width: 100px;
+    background: #eeeeee !important;
 
-  cursor: pointer;
+    color: #333333 !important;
+
+}
+
+
+#deleteResultsModal
+.delete-results-footer
+button:hover {
+
+    opacity: 0.88 !important;
 
 }
 
 
 /* =========================================================
-   CONFIRMATION MODAL
+   CONFIRMATION WINDOW
    ========================================================= */
 
+#deleteResultsConfirmModal
 .delete-results-confirm-modal {
 
-  width: 460px;
+    position: relative !important;
 
-  max-width: 100%;
+    width: min(470px, 94vw) !important;
 
-  background: #ffffff;
+    max-width: 470px !important;
 
-  border-radius: 10px;
+    height: auto !important;
 
-  box-shadow:
-    0 15px 45px
-    rgba(
-      0,
-      0,
-      0,
-      0.3
-    );
+    margin: auto !important;
 
-  padding: 25px;
+    padding: 25px !important;
 
-  box-sizing: border-box;
+    box-sizing: border-box !important;
+
+    background: #ffffff !important;
+
+    color: #222222 !important;
+
+    border-radius: 12px !important;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.35) !important;
 
 }
 
 
+/* =========================================================
+   CONFIRMATION TEXT
+   ========================================================= */
+
+#deleteResultsConfirmModal
 .delete-results-confirm-modal h3 {
 
-  margin-top: 0;
+    margin: 0 0 18px 0 !important;
 
-  margin-bottom: 18px;
+    padding: 0 !important;
+
+    color: #222222 !important;
+
+    font-size: 20px !important;
 
 }
 
 
+#deleteResultsConfirmModal
 .delete-results-confirm-modal p {
 
-  line-height: 1.6;
+    margin: 10px 0 !important;
 
-  margin: 10px 0;
+    padding: 0 !important;
 
-}
+    color: #444444 !important;
 
+    font-size: 14px !important;
 
-.delete-results-confirm-modal strong {
-
-  font-weight: 700;
-
-}
-
-
-/* =========================================================
-   DISABLED CONFIRM BUTTON
-   ========================================================= */
-
-.delete-results-footer button:disabled {
-
-  opacity: 0.6;
-
-  cursor: not-allowed;
+    line-height: 1.6 !important;
 
 }
 
 
 /* =========================================================
-   DELETE RESULT BUTTON
+   CONFIRMATION FOOTER
    ========================================================= */
 
-#deleteResultsBtn {
+#deleteResultsConfirmModal
+.delete-results-footer {
 
-  cursor: pointer;
+    width: 100% !important;
+
+    display: flex !important;
+
+    justify-content: flex-end !important;
+
+    gap: 10px !important;
+
+    margin-top: 20px !important;
+
+    padding-top: 15px !important;
+
+    border-top: 1px solid #e5e5e5 !important;
 
 }
 
 
-#deleteResultsBtn:hover {
+#deleteResultsConfirmModal
+.delete-results-footer button {
 
-  opacity: 0.9;
+    width: auto !important;
+
+    min-width: 110px !important;
+
+    height: 40px !important;
+
+    margin: 0 !important;
+
+    padding: 0 16px !important;
+
+    border: none !important;
+
+    border-radius: 6px !important;
+
+    background: #3f3f99 !important;
+
+    color: #ffffff !important;
+
+    font-size: 14px !important;
+
+    font-weight: 600 !important;
+
+    cursor: pointer !important;
+
+}
+
+
+#deleteResultsConfirmModal
+.delete-results-footer button:first-child {
+
+    background: #eeeeee !important;
+
+    color: #333333 !important;
 
 }
 
 
 /* =========================================================
-   STUDENTS & FEES TOOLBAR
+   MOBILE / SMALL SCREEN
    ========================================================= */
 
-.student-toolbar {
+@media (max-width: 650px) {
 
-  display: flex;
+    #deleteResultsModal
+    .delete-results-modal {
 
-  align-items: center;
+        width: 94vw !important;
 
-  gap: 10px;
+        max-width: 94vw !important;
 
-  flex-wrap: wrap;
+        max-height: 92vh !important;
 
-}
+        padding: 18px !important;
 
-
-.student-toolbar input {
-
-  min-width: 220px;
-
-}
+    }
 
 
-.student-toolbar select {
+    #deleteResultsModal
+    .delete-results-filters {
 
-  min-width: 180px;
+        grid-template-columns: 1fr !important;
+
+        gap: 12px !important;
+
+    }
+
+
+    #deleteResultsModal
+    .delete-result-student-row
+    span:last-child {
+
+        display: none !important;
+
+    }
+
+
+    #deleteResultsModal
+    .delete-results-selection-bar {
+
+        align-items: stretch !important;
+
+    }
+
+
+    #deleteResultsModal
+    #deleteResultSelectedCount {
+
+        width: 100% !important;
+
+        margin-left: 0 !important;
+
+    }
 
 }
