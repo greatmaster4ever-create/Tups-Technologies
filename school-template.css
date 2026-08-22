@@ -3749,3 +3749,498 @@ Teacher card above Admin card on small screens
     }
 
 }
+/* =========================================================
+   DELETE RESULT MODAL
+   ========================================================= */
+
+.delete-results-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(
+    0,
+    0,
+    0,
+    0.55
+  );
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  z-index: 99999;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+
+}
+
+
+/* =========================================================
+   MAIN DELETE RESULT MODAL
+   ========================================================= */
+
+.delete-results-modal {
+
+  width: 720px;
+
+  max-width: 100%;
+
+  max-height: 90vh;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  border-radius: 10px;
+
+  box-shadow:
+    0 15px 45px
+    rgba(
+      0,
+      0,
+      0,
+      0.25
+    );
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+}
+
+
+/* =========================================================
+   MODAL HEADER
+   ========================================================= */
+
+.delete-results-header {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  margin-bottom: 20px;
+
+  border-bottom: 1px solid #e5e5e5;
+
+  padding-bottom: 12px;
+
+}
+
+
+.delete-results-header h3 {
+
+  margin: 0;
+
+  font-size: 20px;
+
+}
+
+
+.delete-results-header button {
+
+  border: none;
+
+  background: transparent;
+
+  font-size: 28px;
+
+  cursor: pointer;
+
+  line-height: 1;
+
+  padding: 2px 8px;
+
+}
+
+
+.delete-results-header button:hover {
+
+  background: #f1f1f1;
+
+  border-radius: 5px;
+
+}
+
+
+/* =========================================================
+   FILTER AREA
+   ========================================================= */
+
+.delete-results-filters {
+
+  display: grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap: 15px;
+
+  margin-bottom: 15px;
+
+}
+
+
+.delete-results-modal label {
+
+  display: block;
+
+  font-weight: 600;
+
+  margin-bottom: 6px;
+
+}
+
+
+.delete-results-modal select,
+.delete-results-modal input[type="text"] {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 10px 12px;
+
+  border: 1px solid #cfcfcf;
+
+  border-radius: 6px;
+
+  background: #ffffff;
+
+  font-size: 14px;
+
+}
+
+
+.delete-results-modal select:focus,
+.delete-results-modal input[type="text"]:focus {
+
+  outline: none;
+
+  border-color: #007bff;
+
+  box-shadow:
+    0 0 0 2px
+    rgba(
+      0,
+      123,
+      255,
+      0.12
+    );
+
+}
+
+
+/* =========================================================
+   SELECTION BAR
+   ========================================================= */
+
+.delete-results-selection-bar {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 15px;
+
+  margin-bottom: 10px;
+
+  padding: 10px;
+
+  background: #f5f5f5;
+
+  border-radius: 6px;
+
+}
+
+
+.delete-results-selection-bar button {
+
+  border: 1px solid #ccc;
+
+  background: #ffffff;
+
+  padding: 7px 12px;
+
+  border-radius: 5px;
+
+  cursor: pointer;
+
+}
+
+
+.delete-results-selection-bar button:hover {
+
+  background: #eeeeee;
+
+}
+
+
+#deleteResultSelectedCount {
+
+  margin-left: auto;
+
+  font-weight: 600;
+
+}
+
+
+/* =========================================================
+   STUDENT LIST
+   ========================================================= */
+
+.delete-result-student-list {
+
+  border: 1px solid #dddddd;
+
+  border-radius: 6px;
+
+  max-height: 360px;
+
+  overflow-y: auto;
+
+  background: #ffffff;
+
+}
+
+
+.delete-result-student-row {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 11px 12px;
+
+  border-bottom: 1px solid #eeeeee;
+
+  cursor: pointer;
+
+}
+
+
+.delete-result-student-row:last-child {
+
+  border-bottom: none;
+
+}
+
+
+.delete-result-student-row:hover {
+
+  background: #f7f7f7;
+
+}
+
+
+.delete-result-student-row input[type="checkbox"] {
+
+  width: 18px;
+
+  height: 18px;
+
+  flex-shrink: 0;
+
+  cursor: pointer;
+
+}
+
+
+.delete-result-student-row span:nth-child(2) {
+
+  display: flex;
+
+  flex-direction: column;
+
+  flex: 1;
+
+}
+
+
+.delete-result-student-row strong {
+
+  font-size: 14px;
+
+}
+
+
+.delete-result-student-row small {
+
+  margin-top: 3px;
+
+  color: #666666;
+
+  font-size: 12px;
+
+}
+
+
+.delete-result-student-row span:last-child {
+
+  font-size: 12px;
+
+  color: #666666;
+
+  white-space: nowrap;
+
+}
+
+
+/* =========================================================
+   FOOTER BUTTONS
+   ========================================================= */
+
+.delete-results-footer {
+
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  margin-top: 20px;
+
+  padding-top: 15px;
+
+  border-top: 1px solid #e5e5e5;
+
+}
+
+
+.delete-results-footer button {
+
+  min-width: 100px;
+
+  cursor: pointer;
+
+}
+
+
+/* =========================================================
+   CONFIRMATION MODAL
+   ========================================================= */
+
+.delete-results-confirm-modal {
+
+  width: 460px;
+
+  max-width: 100%;
+
+  background: #ffffff;
+
+  border-radius: 10px;
+
+  box-shadow:
+    0 15px 45px
+    rgba(
+      0,
+      0,
+      0,
+      0.3
+    );
+
+  padding: 25px;
+
+  box-sizing: border-box;
+
+}
+
+
+.delete-results-confirm-modal h3 {
+
+  margin-top: 0;
+
+  margin-bottom: 18px;
+
+}
+
+
+.delete-results-confirm-modal p {
+
+  line-height: 1.6;
+
+  margin: 10px 0;
+
+}
+
+
+.delete-results-confirm-modal strong {
+
+  font-weight: 700;
+
+}
+
+
+/* =========================================================
+   DISABLED CONFIRM BUTTON
+   ========================================================= */
+
+.delete-results-footer button:disabled {
+
+  opacity: 0.6;
+
+  cursor: not-allowed;
+
+}
+
+
+/* =========================================================
+   DELETE RESULT BUTTON
+   ========================================================= */
+
+#deleteResultsBtn {
+
+  cursor: pointer;
+
+}
+
+
+#deleteResultsBtn:hover {
+
+  opacity: 0.9;
+
+}
+
+
+/* =========================================================
+   STUDENTS & FEES TOOLBAR
+   ========================================================= */
+
+.student-toolbar {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  flex-wrap: wrap;
+
+}
+
+
+.student-toolbar input {
+
+  min-width: 220px;
+
+}
+
+
+.student-toolbar select {
+
+  min-width: 180px;
+
+}
