@@ -10363,38 +10363,27 @@ async function openDeleteResultsModal() {
 
   }
 
-  /*
-   * Store students temporarily for
-   * the Delete Result module.
-   */
+
   window.deleteResultStudents = data;
 
 
-  /*
-   * Get unique departments.
-   */
   const departments = [
     ...new Set(
       data
         .map(
-          student =>
-            student.department
+          student => student.department
         )
         .filter(Boolean)
     )
   ].sort();
 
 
-  /*
-   * Department options.
-   *
-   * ALL is always first.
-   */
   let departmentOptions = `
     <option value="ALL">
       ALL
     </option>
   `;
+
 
   departments.forEach(
     department => {
@@ -10410,198 +10399,849 @@ async function openDeleteResultsModal() {
 
 
   /*
-   * Create modal.
+   * Remove an old dialog if one somehow exists.
    */
+  const oldModal =
+    document.getElementById(
+      "deleteResultsModal"
+    );
+
+  if (oldModal) {
+
+    oldModal.remove();
+
+  }
+
+
+  /*
+   * Create native HTML dialog.
+   *
+   * This is important because showModal()
+   * places the dialog in the browser's
+   * TOP LAYER above the school footer.
+   */
+
   const modal =
-    document.createElement("div");
+    document.createElement("dialog");
 
   modal.id =
     "deleteResultsModal";
 
 
   /*
-   * Complete modal HTML.
+   * Completely self-contained CSS.
    */
+
   modal.innerHTML = `
 
-    <div class="dr-overlay">
+<style>
 
-      <div class="dr-window">
+#deleteResultsModal {
 
-        <!-- HEADER -->
+    width: 760px;
 
-        <div class="dr-header">
+    max-width: calc(100vw - 40px);
 
-          <div>
+    max-height: calc(100vh - 40px);
 
-            <h2>
-              Delete Result Links
+    padding: 0;
+
+    margin: auto;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background: #ffffff;
+
+    color: #222222;
+
+    box-shadow:
+        0 25px 80px rgba(0,0,0,0.45);
+
+    overflow: hidden;
+
+}
+
+
+/* Remove browser default dialog spacing */
+
+#deleteResultsModal::backdrop {
+
+    background:
+        rgba(0,0,0,0.78);
+
+}
+
+
+/* =====================================================
+   WINDOW
+   ===================================================== */
+
+#deleteResultsModal .dr-window {
+
+    width: 100%;
+
+    max-height: calc(100vh - 40px);
+
+    display: flex;
+
+    flex-direction: column;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+}
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+#deleteResultsModal .dr-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 20px 22px;
+
+    background: #3f3f99;
+
+    color: #ffffff;
+
+    box-sizing: border-box;
+
+}
+
+
+#deleteResultsModal .dr-title {
+
+    margin: 0;
+
+    padding: 0;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    line-height: 1.3;
+
+}
+
+
+#deleteResultsModal .dr-subtitle {
+
+    margin: 4px 0 0 0;
+
+    padding: 0;
+
+    font-size: 12px;
+
+    color: rgba(255,255,255,0.82);
+
+}
+
+
+#deleteResultsModal .dr-close {
+
+    width: 36px;
+
+    height: 36px;
+
+    padding: 0;
+
+    margin: 0;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.15);
+
+    color: #ffffff;
+
+    font-size: 25px;
+
+    line-height: 36px;
+
+    text-align: center;
+
+    cursor: pointer;
+
+}
+
+
+#deleteResultsModal .dr-close:hover {
+
+    background: rgba(255,255,255,0.28);
+
+}
+
+
+/* =====================================================
+   CONTENT
+   ===================================================== */
+
+#deleteResultsModal .dr-content {
+
+    padding: 22px;
+
+    box-sizing: border-box;
+
+    overflow-y: auto;
+
+}
+
+
+/* =====================================================
+   FILTER GRID
+   ===================================================== */
+
+#deleteResultsModal .dr-filter-grid {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 16px;
+
+    margin-bottom: 16px;
+
+}
+
+
+#deleteResultsModal .dr-field {
+
+    width: 100%;
+
+    margin: 0;
+
+    padding: 0;
+
+}
+
+
+#deleteResultsModal .dr-field label {
+
+    display: block;
+
+    margin: 0 0 7px 0;
+
+    padding: 0;
+
+    color: #333333;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+}
+
+
+/* =====================================================
+   INPUTS
+   ===================================================== */
+
+#deleteResultsModal select,
+#deleteResultsModal input[type="text"] {
+
+    display: block;
+
+    width: 100%;
+
+    height: 44px;
+
+    box-sizing: border-box;
+
+    margin: 0;
+
+    padding: 0 12px;
+
+    border: 1px solid #d0d0d0;
+
+    border-radius: 7px;
+
+    background: #ffffff;
+
+    color: #222222;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    outline: none;
+
+}
+
+
+#deleteResultsModal select:focus,
+#deleteResultsModal input[type="text"]:focus {
+
+    border-color: #3f3f99;
+
+    box-shadow:
+        0 0 0 2px rgba(63,63,153,0.12);
+
+}
+
+
+/* =====================================================
+   SEARCH
+   ===================================================== */
+
+#deleteResultsModal .dr-search {
+
+    margin-bottom: 16px;
+
+}
+
+
+/* =====================================================
+   SELECTION BAR
+   ===================================================== */
+
+#deleteResultsModal .dr-selection-bar {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 9px;
+
+    margin-bottom: 10px;
+
+    background: #f5f5f7;
+
+    border: 1px solid #e3e3e3;
+
+    border-radius: 7px;
+
+}
+
+
+#deleteResultsModal .dr-selection-buttons {
+
+    display: flex;
+
+    gap: 7px;
+
+}
+
+
+#deleteResultsModal .dr-selection-buttons button {
+
+    height: 34px;
+
+    padding: 0 13px;
+
+    border: 1px solid #d0d0d0;
+
+    border-radius: 6px;
+
+    background: #ffffff;
+
+    color: #333333;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+}
+
+
+#deleteResultsModal .dr-selection-buttons button:hover {
+
+    background: #eeeeee;
+
+}
+
+
+#deleteResultsModal #deleteResultSelectedCount {
+
+    margin: 0;
+
+    color: #555555;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+
+/* =====================================================
+   STUDENT LIST
+   ===================================================== */
+
+#deleteResultsModal .dr-student-list {
+
+    width: 100%;
+
+    max-height: 330px;
+
+    overflow-y: auto;
+
+    overflow-x: hidden;
+
+    box-sizing: border-box;
+
+    border: 1px solid #dddddd;
+
+    border-radius: 8px;
+
+    background: #ffffff;
+
+}
+
+
+/* =====================================================
+   STUDENT ROW
+   ===================================================== */
+
+#deleteResultsModal .delete-result-student-row {
+
+    display: flex;
+
+    align-items: center;
+
+    width: 100%;
+
+    min-height: 62px;
+
+    box-sizing: border-box;
+
+    margin: 0;
+
+    padding: 10px 13px;
+
+    gap: 12px;
+
+    border: none;
+
+    border-bottom: 1px solid #eeeeee;
+
+    background: #ffffff;
+
+    cursor: pointer;
+
+}
+
+
+#deleteResultsModal
+.delete-result-student-row:last-child {
+
+    border-bottom: none;
+
+}
+
+
+#deleteResultsModal
+.delete-result-student-row:hover {
+
+    background: #f8f8fa;
+
+}
+
+
+/* =====================================================
+   CHECKBOX
+   ===================================================== */
+
+#deleteResultsModal
+.delete-result-student-row
+input[type="checkbox"] {
+
+    flex: 0 0 18px;
+
+    width: 18px;
+
+    height: 18px;
+
+    margin: 0;
+
+    cursor: pointer;
+
+}
+
+
+/* =====================================================
+   STUDENT DETAILS
+   ===================================================== */
+
+#deleteResultsModal
+.delete-result-student-row
+span:nth-child(2) {
+
+    flex: 1;
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 3px;
+
+}
+
+
+#deleteResultsModal
+.delete-result-student-row
+strong {
+
+    display: block;
+
+    margin: 0;
+
+    padding: 0;
+
+    color: #222222;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+}
+
+
+#deleteResultsModal
+.delete-result-student-row
+small {
+
+    display: block;
+
+    margin: 0;
+
+    padding: 0;
+
+    color: #777777;
+
+    font-size: 11px;
+
+}
+
+
+/* =====================================================
+   RESULT STATUS
+   ===================================================== */
+
+#deleteResultsModal
+.delete-result-student-row
+span:last-child {
+
+    flex: 0 0 auto;
+
+    padding: 5px 8px;
+
+    border-radius: 5px;
+
+    background: #f1f1f1;
+
+    color: #666666;
+
+    font-size: 10px;
+
+    white-space: nowrap;
+
+}
+
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+
+#deleteResultsModal .dr-footer {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 9px;
+
+    padding: 16px 22px;
+
+    border-top: 1px solid #e5e5e5;
+
+    background: #fafafa;
+
+}
+
+
+#deleteResultsModal .dr-footer button {
+
+    min-width: 90px;
+
+    height: 40px;
+
+    padding: 0 17px;
+
+    border: none;
+
+    border-radius: 6px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+}
+
+
+#deleteResultsModal .dr-cancel {
+
+    background: #e9e9e9;
+
+    color: #333333;
+
+}
+
+
+#deleteResultsModal .dr-ok {
+
+    background: #3f3f99;
+
+    color: #ffffff;
+
+}
+
+
+#deleteResultsModal .dr-footer button:hover {
+
+    opacity: 0.88;
+
+}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (max-width: 650px) {
+
+    #deleteResultsModal {
+
+        width: calc(100vw - 20px);
+
+        max-width: calc(100vw - 20px);
+
+        max-height: calc(100vh - 20px);
+
+    }
+
+
+    #deleteResultsModal .dr-filter-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+
+    #deleteResultsModal .dr-content {
+
+        padding: 16px;
+
+    }
+
+
+    #deleteResultsModal .dr-header {
+
+        padding: 16px;
+
+    }
+
+
+    #deleteResultsModal .dr-footer {
+
+        padding: 13px 16px;
+
+    }
+
+
+    #deleteResultsModal
+    .delete-result-student-row
+    span:last-child {
+
+        display: none;
+
+    }
+
+}
+
+</style>
+
+
+<div class="dr-window">
+
+    <div class="dr-header">
+
+        <div>
+
+            <h2 class="dr-title">
+                Delete Result Links
             </h2>
 
-            <p>
-              Remove result links without deleting
-              student records.
+            <p class="dr-subtitle">
+                Remove result links without deleting
+                student records.
             </p>
 
-          </div>
+        </div>
 
-          <button
+
+        <button
             type="button"
             class="dr-close"
             onclick="closeDeleteResultsModal()"
-            title="Close"
-          >
+        >
             ×
-          </button>
+        </button>
 
-        </div>
+    </div>
 
 
-        <!-- FILTERS -->
+    <div class="dr-content">
 
         <div class="dr-filter-grid">
 
+            <div class="dr-field">
 
-          <!-- DEPARTMENT -->
+                <label
+                    for="deleteResultDepartment"
+                >
+                    Department
+                </label>
 
-          <div class="dr-field">
+                <select
+                    id="deleteResultDepartment"
+                    onchange="updateDeleteResultClasses()"
+                >
 
-            <label
-              for="deleteResultDepartment"
-            >
-              Department
-            </label>
+                    ${departmentOptions}
 
-            <select
-              id="deleteResultDepartment"
-              onchange="updateDeleteResultClasses()"
-            >
+                </select>
 
-              ${departmentOptions}
-
-            </select>
-
-          </div>
+            </div>
 
 
-          <!-- CLASS -->
+            <div class="dr-field">
 
-          <div class="dr-field">
+                <label
+                    for="deleteResultClass"
+                >
+                    Class
+                </label>
 
-            <label
-              for="deleteResultClass"
-            >
-              Class
-            </label>
+                <select
+                    id="deleteResultClass"
+                    onchange="updateDeleteResultStudentList()"
+                >
 
-            <select
-              id="deleteResultClass"
-              onchange="updateDeleteResultStudentList()"
-            >
+                    <option value="ALL">
+                        ALL
+                    </option>
 
-              <option value="ALL">
-                ALL
-              </option>
+                </select>
 
-            </select>
-
-          </div>
-
+            </div>
 
         </div>
 
 
-        <!-- SEARCH -->
+        <div class="dr-field dr-search">
 
-        <div class="dr-field dr-search-field">
+            <label
+                for="deleteResultStudentSearch"
+            >
+                Student Search
+            </label>
 
-          <label
-            for="deleteResultStudentSearch"
-          >
-            Student Search
-          </label>
-
-          <input
-            type="text"
-            id="deleteResultStudentSearch"
-            placeholder="Search by student name or registration number..."
-            oninput="filterDeleteResultStudents()"
-          >
+            <input
+                type="text"
+                id="deleteResultStudentSearch"
+                placeholder="Search name or registration number..."
+                oninput="filterDeleteResultStudents()"
+            >
 
         </div>
 
-
-        <!-- SELECTION BAR -->
 
         <div class="dr-selection-bar">
 
-          <div class="dr-selection-buttons">
+            <div class="dr-selection-buttons">
 
-            <button
-              type="button"
-              onclick="selectAllDeleteResultStudents()"
+                <button
+                    type="button"
+                    onclick="selectAllDeleteResultStudents()"
+                >
+                    Select All
+                </button>
+
+                <button
+                    type="button"
+                    onclick="clearAllDeleteResultStudents()"
+                >
+                    Clear All
+                </button>
+
+            </div>
+
+
+            <span
+                id="deleteResultSelectedCount"
             >
-              Select All
-            </button>
-
-            <button
-              type="button"
-              onclick="clearAllDeleteResultStudents()"
-            >
-              Clear All
-            </button>
-
-          </div>
-
-          <span
-            id="deleteResultSelectedCount"
-          >
-            0 selected
-          </span>
+                0 selected
+            </span>
 
         </div>
 
 
-        <!-- STUDENT LIST -->
-
         <div
-          id="deleteResultStudentList"
-          class="dr-student-list"
+            id="deleteResultStudentList"
+            class="dr-student-list"
         >
         </div>
 
+    </div>
 
-        <!-- FOOTER -->
 
-        <div class="dr-footer">
+    <div class="dr-footer">
 
-          <button
+        <button
             type="button"
             class="dr-cancel"
             onclick="closeDeleteResultsModal()"
-          >
+        >
             Cancel
-          </button>
+        </button>
 
-          <button
+        <button
             type="button"
             class="dr-ok"
             onclick="prepareDeleteResults()"
-          >
+        >
             OK
-          </button>
-
-        </div>
-
-      </div>
+        </button>
 
     </div>
+
+</div>
 
   `;
 
 
   /*
-   * Add modal to page.
+   * Put the dialog directly on BODY.
    */
   document.body.appendChild(
     modal
@@ -10609,7 +11249,14 @@ async function openDeleteResultsModal() {
 
 
   /*
-   * Populate classes and students.
+   * Open in the browser TOP LAYER.
+   */
+  modal.showModal();
+
+
+  /*
+   * Populate the class filter
+   * and student list.
    */
   updateDeleteResultClasses();
 
@@ -11241,16 +11888,20 @@ async function executeDeleteResults() {
 
 function closeDeleteResultsModal() {
 
-  const modal =
-    document.getElementById(
-      "deleteResultsModal"
-    );
+    const modal =
+        document.getElementById(
+            "deleteResultsModal"
+        );
 
-  if (modal) {
+    if (!modal) {
+        return;
+    }
+
+    if (modal.open) {
+        modal.close();
+    }
 
     modal.remove();
-
-  }
 
 }
 
