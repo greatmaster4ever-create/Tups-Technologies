@@ -10363,22 +10363,33 @@ async function openDeleteResultsModal() {
 
   }
 
-  window.deleteResultStudents =
-    data;
+  /*
+   * Store students temporarily for
+   * the Delete Result module.
+   */
+  window.deleteResultStudents = data;
 
-  const departments =
-    [
-      ...new Set(
-        data
-          .map(
-            student =>
-              student.department
-          )
-          .filter(Boolean)
-      )
-    ]
-    .sort();
 
+  /*
+   * Get unique departments.
+   */
+  const departments = [
+    ...new Set(
+      data
+        .map(
+          student =>
+            student.department
+        )
+        .filter(Boolean)
+    )
+  ].sort();
+
+
+  /*
+   * Department options.
+   *
+   * ALL is always first.
+   */
   let departmentOptions = `
     <option value="ALL">
       ALL
@@ -10397,48 +10408,67 @@ async function openDeleteResultsModal() {
     }
   );
 
+
+  /*
+   * Create modal.
+   */
   const modal =
-    document.createElement(
-      "div"
-    );
+    document.createElement("div");
 
   modal.id =
     "deleteResultsModal";
 
+
+  /*
+   * Complete modal HTML.
+   */
   modal.innerHTML = `
 
-    <div
-      class="delete-results-overlay"
-    >
+    <div class="dr-overlay">
 
-      <div
-        class="delete-results-modal"
-      >
+      <div class="dr-window">
 
-        <div
-          class="delete-results-header"
-        >
+        <!-- HEADER -->
 
-          <h3>
-            Delete Result Links
-          </h3>
+        <div class="dr-header">
+
+          <div>
+
+            <h2>
+              Delete Result Links
+            </h2>
+
+            <p>
+              Remove result links without deleting
+              student records.
+            </p>
+
+          </div>
 
           <button
             type="button"
+            class="dr-close"
             onclick="closeDeleteResultsModal()"
+            title="Close"
           >
             ×
           </button>
 
         </div>
 
-        <div
-          class="delete-results-filters"
-        >
 
-          <div>
+        <!-- FILTERS -->
 
-            <label>
+        <div class="dr-filter-grid">
+
+
+          <!-- DEPARTMENT -->
+
+          <div class="dr-field">
+
+            <label
+              for="deleteResultDepartment"
+            >
               Department
             </label>
 
@@ -10453,9 +10483,14 @@ async function openDeleteResultsModal() {
 
           </div>
 
-          <div>
 
-            <label>
+          <!-- CLASS -->
+
+          <div class="dr-field">
+
+            <label
+              for="deleteResultClass"
+            >
               Class
             </label>
 
@@ -10472,40 +10507,51 @@ async function openDeleteResultsModal() {
 
           </div>
 
+
         </div>
 
-        <div>
 
-          <label>
-            Search Student
+        <!-- SEARCH -->
+
+        <div class="dr-field dr-search-field">
+
+          <label
+            for="deleteResultStudentSearch"
+          >
+            Student Search
           </label>
 
           <input
             type="text"
             id="deleteResultStudentSearch"
-            placeholder="Search name or registration number..."
+            placeholder="Search by student name or registration number..."
             oninput="filterDeleteResultStudents()"
           >
 
         </div>
 
-        <div
-          class="delete-results-selection-bar"
-        >
 
-          <button
-            type="button"
-            onclick="selectAllDeleteResultStudents()"
-          >
-            Select All
-          </button>
+        <!-- SELECTION BAR -->
 
-          <button
-            type="button"
-            onclick="clearAllDeleteResultStudents()"
-          >
-            Clear All
-          </button>
+        <div class="dr-selection-bar">
+
+          <div class="dr-selection-buttons">
+
+            <button
+              type="button"
+              onclick="selectAllDeleteResultStudents()"
+            >
+              Select All
+            </button>
+
+            <button
+              type="button"
+              onclick="clearAllDeleteResultStudents()"
+            >
+              Clear All
+            </button>
+
+          </div>
 
           <span
             id="deleteResultSelectedCount"
@@ -10515,19 +10561,23 @@ async function openDeleteResultsModal() {
 
         </div>
 
+
+        <!-- STUDENT LIST -->
+
         <div
           id="deleteResultStudentList"
-          class="delete-result-student-list"
+          class="dr-student-list"
         >
         </div>
 
-        <div
-          class="delete-results-footer"
-        >
+
+        <!-- FOOTER -->
+
+        <div class="dr-footer">
 
           <button
             type="button"
-            class="admin-btn"
+            class="dr-cancel"
             onclick="closeDeleteResultsModal()"
           >
             Cancel
@@ -10535,7 +10585,7 @@ async function openDeleteResultsModal() {
 
           <button
             type="button"
-            class="admin-btn"
+            class="dr-ok"
             onclick="prepareDeleteResults()"
           >
             OK
@@ -10549,10 +10599,18 @@ async function openDeleteResultsModal() {
 
   `;
 
+
+  /*
+   * Add modal to page.
+   */
   document.body.appendChild(
     modal
   );
 
+
+  /*
+   * Populate classes and students.
+   */
   updateDeleteResultClasses();
 
 }
@@ -10678,12 +10736,23 @@ function renderDeleteResultStudentList(
       "deleteResultStudentList"
     );
 
+  if (!container) {
+    return;
+  }
+
   if (!students.length) {
 
     container.innerHTML = `
-      <p>
+      <div
+        style="
+          padding:30px;
+          text-align:center;
+          color:#777;
+          font-size:13px;
+        "
+      >
         No students found.
-      </p>
+      </div>
     `;
 
     updateDeleteResultSelectedCount();
@@ -10723,15 +10792,15 @@ function renderDeleteResultStudentList(
           <span>
 
             <strong>
-              ${student.student_name || ""}
+              ${student.student_name || "Unnamed Student"}
             </strong>
 
             <small>
-              ${student.reg_no || ""}
-              —
-              ${student.class || ""}
-              —
-              ${student.department || ""}
+              ${student.reg_no || "No Reg. No."}
+              &nbsp; • &nbsp;
+              ${student.class || "No Class"}
+              &nbsp; • &nbsp;
+              ${student.department || "No Department"}
             </small>
 
           </span>

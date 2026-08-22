@@ -3749,82 +3749,55 @@ Teacher card above Admin card on small screens
     }
 
 }
-
 /* =========================================================
-   TUPS — DELETE RESULT MODAL
-   Strongly scoped to prevent existing global CSS conflicts
+   TUPS DELETE RESULT
    ========================================================= */
 
-#deleteResultsModal,
-#deleteResultsConfirmModal {
-
+#deleteResultsModal {
     position: fixed !important;
-
-    top: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-
+    inset: 0 !important;
     width: 100vw !important;
     height: 100vh !important;
-
     margin: 0 !important;
     padding: 0 !important;
-
     z-index: 999999 !important;
-
 }
 
 
 /* =========================================================
-   DARK BACKGROUND
+   OVERLAY
    ========================================================= */
 
-#deleteResultsModal .delete-results-overlay,
-#deleteResultsConfirmModal .delete-results-overlay {
-
+#deleteResultsModal .dr-overlay {
     position: fixed !important;
-
-    top: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
+    inset: 0 !important;
 
     width: 100vw !important;
     height: 100vh !important;
 
-    background: rgba(0, 0, 0, 0.72) !important;
-
     display: flex !important;
-
     align-items: center !important;
-
     justify-content: center !important;
 
     padding: 20px !important;
 
     box-sizing: border-box !important;
 
-    overflow-y: auto !important;
+    background: rgba(0, 0, 0, 0.72) !important;
 
+    overflow-y: auto !important;
 }
 
 
 /* =========================================================
-   MAIN DELETE RESULT WINDOW
+   MAIN WINDOW
    ========================================================= */
 
-#deleteResultsModal .delete-results-modal {
-
+#deleteResultsModal .dr-window {
     position: relative !important;
 
-    display: block !important;
-
-    width: min(760px, 94vw) !important;
-
-    max-width: 760px !important;
-
-    height: auto !important;
+    width: 720px !important;
+    max-width: 94vw !important;
 
     max-height: 90vh !important;
 
@@ -3840,15 +3813,10 @@ Teacher card above Admin card on small screens
 
     border-radius: 12px !important;
 
-    border: 1px solid #dddddd !important;
-
     box-shadow:
         0 20px 60px rgba(0, 0, 0, 0.35) !important;
 
     overflow-y: auto !important;
-
-    overflow-x: hidden !important;
-
 }
 
 
@@ -3856,34 +3824,25 @@ Teacher card above Admin card on small screens
    HEADER
    ========================================================= */
 
-#deleteResultsModal .delete-results-header {
-
-    width: 100% !important;
-
+#deleteResultsModal .dr-header {
     display: flex !important;
 
-    flex-direction: row !important;
-
-    align-items: center !important;
+    align-items: flex-start !important;
 
     justify-content: space-between !important;
 
-    gap: 15px !important;
+    gap: 20px !important;
 
     margin: 0 0 20px 0 !important;
 
-    padding: 0 0 15px 0 !important;
+    padding: 0 0 16px 0 !important;
 
     border-bottom: 1px solid #e5e5e5 !important;
-
-    box-sizing: border-box !important;
-
 }
 
 
-#deleteResultsModal .delete-results-header h3 {
-
-    margin: 0 !important;
+#deleteResultsModal .dr-header h2 {
+    margin: 0 0 5px 0 !important;
 
     padding: 0 !important;
 
@@ -3891,26 +3850,41 @@ Teacher card above Admin card on small screens
 
     font-size: 21px !important;
 
-    font-weight: 700 !important;
-
     line-height: 1.3 !important;
 
+    font-weight: 700 !important;
 }
 
 
-#deleteResultsModal .delete-results-header button {
+#deleteResultsModal .dr-header p {
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    color: #777777 !important;
+
+    font-size: 13px !important;
+
+    line-height: 1.4 !important;
+}
+
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+#deleteResultsModal .dr-close {
+    flex: 0 0 auto !important;
 
     width: 34px !important;
-
     height: 34px !important;
 
     min-width: 34px !important;
 
+    margin: 0 !important;
     padding: 0 !important;
 
-    margin: 0 !important;
-
-    border: none !important;
+    border: 0 !important;
 
     border-radius: 50% !important;
 
@@ -3918,23 +3892,18 @@ Teacher card above Admin card on small screens
 
     color: #333333 !important;
 
-    font-size: 22px !important;
-
-    font-weight: 700 !important;
+    font-size: 23px !important;
 
     line-height: 34px !important;
 
     text-align: center !important;
 
     cursor: pointer !important;
-
 }
 
 
-#deleteResultsModal .delete-results-header button:hover {
-
+#deleteResultsModal .dr-close:hover {
     background: #dddddd !important;
-
 }
 
 
@@ -3942,34 +3911,38 @@ Teacher card above Admin card on small screens
    FILTER GRID
    ========================================================= */
 
-#deleteResultsModal .delete-results-filters {
-
-    width: 100% !important;
-
+#deleteResultsModal .dr-filter-grid {
     display: grid !important;
 
     grid-template-columns:
-        minmax(0, 1fr)
-        minmax(0, 1fr) !important;
+        1fr 1fr !important;
 
     gap: 16px !important;
+
+    width: 100% !important;
 
     margin: 0 0 16px 0 !important;
 
     padding: 0 !important;
-
-    box-sizing: border-box !important;
-
 }
 
 
 /* =========================================================
-   ALL LABELS INSIDE DELETE RESULT MODAL
+   FIELD
    ========================================================= */
 
-#deleteResultsModal .delete-results-modal label,
-#deleteResultsModal .delete-results-filters label {
+#deleteResultsModal .dr-field {
+    width: 100% !important;
 
+    margin: 0 !important;
+
+    padding: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+#deleteResultsModal .dr-field label {
     display: block !important;
 
     width: 100% !important;
@@ -3980,32 +3953,26 @@ Teacher card above Admin card on small screens
 
     color: #333333 !important;
 
-    font-size: 14px !important;
+    font-size: 13px !important;
 
     font-weight: 600 !important;
 
     line-height: 1.4 !important;
-
-    box-sizing: border-box !important;
-
 }
 
 
 /* =========================================================
-   FILTER SELECTS
+   SELECTS
    ========================================================= */
 
-#deleteResultsModal select {
-
+#deleteResultsModal .dr-field select {
     display: block !important;
 
     width: 100% !important;
 
-    max-width: 100% !important;
+    height: 42px !important;
 
-    min-width: 0 !important;
-
-    height: 44px !important;
+    min-height: 42px !important;
 
     margin: 0 !important;
 
@@ -4015,128 +3982,43 @@ Teacher card above Admin card on small screens
 
     border: 1px solid #cccccc !important;
 
-    border-radius: 7px !important;
+    border-radius: 6px !important;
 
     background: #ffffff !important;
 
     color: #222222 !important;
 
-    font-size: 14px !important;
-
     font-family: inherit !important;
 
-    cursor: pointer !important;
+    font-size: 14px !important;
 
+    cursor: pointer !important;
 }
 
 
 /* =========================================================
-   SEARCH INPUT
+   SEARCH
    ========================================================= */
 
-#deleteResultsModal #deleteResultStudentSearch {
+#deleteResultsModal .dr-search-field {
+    margin-bottom: 16px !important;
+}
 
+
+#deleteResultsModal .dr-search-field input {
     display: block !important;
 
     width: 100% !important;
 
-    max-width: 100% !important;
+    height: 42px !important;
 
-    min-width: 0 !important;
-
-    height: 44px !important;
+    min-height: 42px !important;
 
     margin: 0 !important;
 
-    padding: 0 13px !important;
+    padding: 0 12px !important;
 
     box-sizing: border-box !important;
-
-    border: 1px solid #cccccc !important;
-
-    border-radius: 7px !important;
-
-    background: #ffffff !important;
-
-    color: #222222 !important;
-
-    font-size: 14px !important;
-
-    font-family: inherit !important;
-
-}
-
-
-#deleteResultsModal #deleteResultStudentSearch::placeholder {
-
-    color: #888888 !important;
-
-}
-
-
-/* =========================================================
-   FOCUS
-   ========================================================= */
-
-#deleteResultsModal select:focus,
-#deleteResultsModal #deleteResultStudentSearch:focus {
-
-    outline: none !important;
-
-    border-color: #555555 !important;
-
-    box-shadow:
-        0 0 0 2px rgba(0, 0, 0, 0.08) !important;
-
-}
-
-
-/* =========================================================
-   SELECTION BAR
-   ========================================================= */
-
-#deleteResultsModal .delete-results-selection-bar {
-
-    width: 100% !important;
-
-    display: flex !important;
-
-    align-items: center !important;
-
-    flex-wrap: wrap !important;
-
-    gap: 8px !important;
-
-    margin: 16px 0 10px 0 !important;
-
-    padding: 10px !important;
-
-    box-sizing: border-box !important;
-
-    background: #f5f5f5 !important;
-
-    border: 1px solid #e5e5e5 !important;
-
-    border-radius: 7px !important;
-
-}
-
-
-/* =========================================================
-   SELECT ALL / CLEAR ALL
-   ========================================================= */
-
-#deleteResultsModal .delete-results-selection-bar button {
-
-    width: auto !important;
-
-    min-width: 0 !important;
-
-    height: 36px !important;
-
-    margin: 0 !important;
-
-    padding: 0 14px !important;
 
     border: 1px solid #cccccc !important;
 
@@ -4144,52 +4026,121 @@ Teacher card above Admin card on small screens
 
     background: #ffffff !important;
 
-    color: #333333 !important;
+    color: #222222 !important;
 
-    font-size: 13px !important;
+    font-family: inherit !important;
 
-    font-weight: 600 !important;
-
-    cursor: pointer !important;
-
+    font-size: 14px !important;
 }
 
 
-#deleteResultsModal .delete-results-selection-bar button:hover {
+#deleteResultsModal .dr-search-field input::placeholder {
+    color: #999999 !important;
+}
 
-    background: #eeeeee !important;
 
+#deleteResultsModal .dr-search-field input:focus,
+#deleteResultsModal .dr-field select:focus {
+    outline: none !important;
+
+    border-color: #555555 !important;
+
+    box-shadow:
+        0 0 0 2px rgba(0, 0, 0, 0.06) !important;
 }
 
 
 /* =========================================================
-   SELECTED COUNT
+   SELECTION BAR
    ========================================================= */
 
-#deleteResultsModal #deleteResultSelectedCount {
+#deleteResultsModal .dr-selection-bar {
+    display: flex !important;
 
-    margin-left: auto !important;
+    align-items: center !important;
+
+    justify-content: space-between !important;
+
+    gap: 10px !important;
+
+    width: 100% !important;
+
+    margin: 0 0 10px 0 !important;
+
+    padding: 9px !important;
+
+    box-sizing: border-box !important;
+
+    background: #f5f5f5 !important;
+
+    border: 1px solid #e4e4e4 !important;
+
+    border-radius: 6px !important;
+}
+
+
+#deleteResultsModal .dr-selection-buttons {
+    display: flex !important;
+
+    align-items: center !important;
+
+    gap: 7px !important;
+}
+
+
+#deleteResultsModal .dr-selection-buttons button {
+    width: auto !important;
+
+    height: 34px !important;
+
+    min-width: 85px !important;
+
+    margin: 0 !important;
+
+    padding: 0 12px !important;
+
+    border: 1px solid #cccccc !important;
+
+    border-radius: 5px !important;
+
+    background: #ffffff !important;
+
+    color: #333333 !important;
+
+    font-family: inherit !important;
+
+    font-size: 12px !important;
+
+    font-weight: 600 !important;
+
+    cursor: pointer !important;
+}
+
+
+#deleteResultsModal .dr-selection-buttons button:hover {
+    background: #eeeeee !important;
+}
+
+
+#deleteResultsModal #deleteResultSelectedCount {
+    margin: 0 !important;
 
     padding: 0 !important;
 
     color: #555555 !important;
 
-    font-size: 13px !important;
+    font-size: 12px !important;
 
     font-weight: 600 !important;
-
 }
 
 
 /* =========================================================
-   STUDENT LIST CONTAINER
+   STUDENT LIST
    ========================================================= */
 
-#deleteResultsModal .delete-result-student-list {
-
+#deleteResultsModal .dr-student-list {
     width: 100% !important;
-
-    height: auto !important;
 
     max-height: 330px !important;
 
@@ -4203,12 +4154,11 @@ Teacher card above Admin card on small screens
 
     overflow-x: hidden !important;
 
-    border: 1px solid #dddddd !important;
-
-    border-radius: 8px !important;
-
     background: #ffffff !important;
 
+    border: 1px solid #dddddd !important;
+
+    border-radius: 7px !important;
 }
 
 
@@ -4217,26 +4167,23 @@ Teacher card above Admin card on small screens
    ========================================================= */
 
 #deleteResultsModal .delete-result-student-row {
-
-    width: 100% !important;
-
-    min-height: 62px !important;
-
     display: flex !important;
-
-    flex-direction: row !important;
 
     align-items: center !important;
 
-    gap: 12px !important;
+    width: 100% !important;
+
+    min-height: 60px !important;
 
     margin: 0 !important;
 
-    padding: 10px 12px !important;
+    padding: 9px 12px !important;
 
     box-sizing: border-box !important;
 
-    border: none !important;
+    gap: 11px !important;
+
+    border: 0 !important;
 
     border-bottom: 1px solid #eeeeee !important;
 
@@ -4245,21 +4192,18 @@ Teacher card above Admin card on small screens
     color: #222222 !important;
 
     cursor: pointer !important;
-
 }
 
 
-#deleteResultsModal .delete-result-student-row:last-child {
-
-    border-bottom: none !important;
-
+#deleteResultsModal
+.delete-result-student-row:last-child {
+    border-bottom: 0 !important;
 }
 
 
-#deleteResultsModal .delete-result-student-row:hover {
-
+#deleteResultsModal
+.delete-result-student-row:hover {
     background: #f8f8f8 !important;
-
 }
 
 
@@ -4270,8 +4214,7 @@ Teacher card above Admin card on small screens
 #deleteResultsModal
 .delete-result-student-row
 input[type="checkbox"] {
-
-    display: block !important;
+    flex: 0 0 18px !important;
 
     width: 18px !important;
 
@@ -4279,30 +4222,26 @@ input[type="checkbox"] {
 
     min-width: 18px !important;
 
-    max-width: 18px !important;
+    min-height: 18px !important;
 
     margin: 0 !important;
 
     padding: 0 !important;
 
-    flex: 0 0 18px !important;
-
     cursor: pointer !important;
-
 }
 
 
 /* =========================================================
-   STUDENT INFORMATION AREA
+   STUDENT DETAILS
    ========================================================= */
 
 #deleteResultsModal
 .delete-result-student-row
 span:nth-child(2) {
+    flex: 1 1 auto !important;
 
     min-width: 0 !important;
-
-    flex: 1 1 auto !important;
 
     display: flex !important;
 
@@ -4313,14 +4252,12 @@ span:nth-child(2) {
     margin: 0 !important;
 
     padding: 0 !important;
-
 }
 
 
 #deleteResultsModal
 .delete-result-student-row
 strong {
-
     display: block !important;
 
     margin: 0 !important;
@@ -4329,19 +4266,17 @@ strong {
 
     color: #222222 !important;
 
-    font-size: 14px !important;
-
-    font-weight: 600 !important;
+    font-size: 13px !important;
 
     line-height: 1.3 !important;
 
+    font-weight: 600 !important;
 }
 
 
 #deleteResultsModal
 .delete-result-student-row
 small {
-
     display: block !important;
 
     margin: 0 !important;
@@ -4350,10 +4285,9 @@ small {
 
     color: #777777 !important;
 
-    font-size: 12px !important;
+    font-size: 11px !important;
 
     line-height: 1.3 !important;
-
 }
 
 
@@ -4364,23 +4298,21 @@ small {
 #deleteResultsModal
 .delete-result-student-row
 span:last-child {
-
     flex: 0 0 auto !important;
 
     margin: 0 !important;
 
-    padding: 5px 8px !important;
+    padding: 4px 7px !important;
+
+    border-radius: 4px !important;
+
+    background: #f1f1f1 !important;
 
     color: #666666 !important;
 
-    background: #f2f2f2 !important;
-
-    border-radius: 5px !important;
-
-    font-size: 11px !important;
+    font-size: 10px !important;
 
     white-space: nowrap !important;
-
 }
 
 
@@ -4388,222 +4320,78 @@ span:last-child {
    FOOTER
    ========================================================= */
 
-#deleteResultsModal .delete-results-footer {
-
-    width: 100% !important;
-
+#deleteResultsModal .dr-footer {
     display: flex !important;
 
     align-items: center !important;
 
     justify-content: flex-end !important;
 
-    gap: 10px !important;
-
-    margin: 18px 0 0 0 !important;
-
-    padding: 15px 0 0 0 !important;
-
-    border-top: 1px solid #e5e5e5 !important;
-
-    box-sizing: border-box !important;
-
-}
-
-
-/* =========================================================
-   FOOTER BUTTONS
-   ========================================================= */
-
-#deleteResultsModal .delete-results-footer button {
-
-    width: auto !important;
-
-    min-width: 90px !important;
-
-    height: 40px !important;
-
-    margin: 0 !important;
-
-    padding: 0 18px !important;
-
-    border: none !important;
-
-    border-radius: 6px !important;
-
-    background: #3f3f99 !important;
-
-    color: #ffffff !important;
-
-    font-size: 14px !important;
-
-    font-weight: 600 !important;
-
-    cursor: pointer !important;
-
-}
-
-
-#deleteResultsModal
-.delete-results-footer
-button:first-child {
-
-    background: #eeeeee !important;
-
-    color: #333333 !important;
-
-}
-
-
-#deleteResultsModal
-.delete-results-footer
-button:hover {
-
-    opacity: 0.88 !important;
-
-}
-
-
-/* =========================================================
-   CONFIRMATION WINDOW
-   ========================================================= */
-
-#deleteResultsConfirmModal
-.delete-results-confirm-modal {
-
-    position: relative !important;
-
-    width: min(470px, 94vw) !important;
-
-    max-width: 470px !important;
-
-    height: auto !important;
-
-    margin: auto !important;
-
-    padding: 25px !important;
-
-    box-sizing: border-box !important;
-
-    background: #ffffff !important;
-
-    color: #222222 !important;
-
-    border-radius: 12px !important;
-
-    box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.35) !important;
-
-}
-
-
-/* =========================================================
-   CONFIRMATION TEXT
-   ========================================================= */
-
-#deleteResultsConfirmModal
-.delete-results-confirm-modal h3 {
-
-    margin: 0 0 18px 0 !important;
-
-    padding: 0 !important;
-
-    color: #222222 !important;
-
-    font-size: 20px !important;
-
-}
-
-
-#deleteResultsConfirmModal
-.delete-results-confirm-modal p {
-
-    margin: 10px 0 !important;
-
-    padding: 0 !important;
-
-    color: #444444 !important;
-
-    font-size: 14px !important;
-
-    line-height: 1.6 !important;
-
-}
-
-
-/* =========================================================
-   CONFIRMATION FOOTER
-   ========================================================= */
-
-#deleteResultsConfirmModal
-.delete-results-footer {
+    gap: 9px !important;
 
     width: 100% !important;
 
-    display: flex !important;
+    margin: 17px 0 0 0 !important;
 
-    justify-content: flex-end !important;
+    padding: 15px 0 0 0 !important;
 
-    gap: 10px !important;
-
-    margin-top: 20px !important;
-
-    padding-top: 15px !important;
+    box-sizing: border-box !important;
 
     border-top: 1px solid #e5e5e5 !important;
-
 }
 
 
-#deleteResultsConfirmModal
-.delete-results-footer button {
-
+#deleteResultsModal .dr-footer button {
     width: auto !important;
 
-    min-width: 110px !important;
+    min-width: 88px !important;
 
-    height: 40px !important;
+    height: 38px !important;
 
     margin: 0 !important;
 
     padding: 0 16px !important;
 
-    border: none !important;
+    border: 0 !important;
 
     border-radius: 6px !important;
 
-    background: #3f3f99 !important;
+    font-family: inherit !important;
 
-    color: #ffffff !important;
-
-    font-size: 14px !important;
+    font-size: 13px !important;
 
     font-weight: 600 !important;
 
     cursor: pointer !important;
-
 }
 
 
-#deleteResultsConfirmModal
-.delete-results-footer button:first-child {
-
+#deleteResultsModal .dr-cancel {
     background: #eeeeee !important;
 
     color: #333333 !important;
+}
 
+
+#deleteResultsModal .dr-ok {
+    background: #3f3f99 !important;
+
+    color: #ffffff !important;
+}
+
+
+#deleteResultsModal .dr-footer button:hover {
+    opacity: 0.88 !important;
 }
 
 
 /* =========================================================
-   MOBILE / SMALL SCREEN
+   SMALL SCREENS
    ========================================================= */
 
 @media (max-width: 650px) {
 
-    #deleteResultsModal
-    .delete-results-modal {
-
+    #deleteResultsModal .dr-window {
         width: 94vw !important;
 
         max-width: 94vw !important;
@@ -4611,44 +4399,31 @@ button:hover {
         max-height: 92vh !important;
 
         padding: 18px !important;
-
     }
 
 
-    #deleteResultsModal
-    .delete-results-filters {
-
+    #deleteResultsModal .dr-filter-grid {
         grid-template-columns: 1fr !important;
-
-        gap: 12px !important;
-
     }
 
 
     #deleteResultsModal
     .delete-result-student-row
     span:last-child {
-
         display: none !important;
-
     }
 
 
-    #deleteResultsModal
-    .delete-results-selection-bar {
+    #deleteResultsModal .dr-selection-bar {
+        align-items: flex-start !important;
 
-        align-items: stretch !important;
-
+        flex-direction: column !important;
     }
 
 
     #deleteResultsModal
     #deleteResultSelectedCount {
-
-        width: 100% !important;
-
         margin-left: 0 !important;
-
     }
 
 }
