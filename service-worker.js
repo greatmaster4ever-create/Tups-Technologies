@@ -1,4 +1,4 @@
-const CACHE_NAME = "tups-school-v2.0";
+const CACHE_NAME = "tups-school-v2.1";
 
 const urlsToCache = [
   "/",
@@ -13,47 +13,197 @@ const urlsToCache = [
   "/school-template.js"
 ];
 
-self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(urlsToCache);
-    })
-  );
-});
 
-self.addEventListener("fetch", event => {
+/* =========================================================
+   INSTALL
+========================================================= */
 
-  const requestURL =
-    new URL(event.request.url);
+self.addEventListener(
+  "install",
+  event => {
 
-  // ==========================================
-  // ONLY HANDLE TUPS TECHNOLOGIES REQUESTS
-  // ==========================================
+    event.waitUntil(
 
-  if (
-    requestURL.origin !== self.location.origin
-  ) {
+      caches
+        .open(CACHE_NAME)
 
-    return;
+        .then(
+          async cache => {
+
+            for (
+              const url of urlsToCache
+            ) {
+
+              try {
+
+                await cache.add(url);
+
+              }
+              catch (error) {
+
+                console.warn(
+                  "Service Worker could not cache:",
+                  url,
+                  error
+                );
+
+              }
+
+            }
+
+          }
+
+        )
+
+    );
 
   }
+);
 
 
-  event.respondWith(
+/* =========================================================
+   ACTIVATE
+========================================================= */
 
-    caches.match(
-      event.request
-    )
+self.addEventListener(
+  "activate",
+  event => {
 
-    .then(response => {
+    event.waitUntil(
 
-      return (
-        response ||
-        fetch(event.request)
+      caches
+        .keys()
+
+        .then(
+          cacheNames => {
+
+            return Promise.all(
+
+              cacheNames
+                .map(
+                  cacheName => {
+
+                    if (
+                      cacheName !== CACHE_NAME
+                    ) {
+
+                      return caches.delete(
+                        cacheName
+                      );
+
+                    }
+
+                  }
+                )
+
+            );
+
+          }
+
+        )
+
+    );
+
+  }
+);
+
+
+/* =========================================================
+   FETCH
+========================================================= */
+
+self.addEventListener(
+  "fetch",
+  event => {
+
+    const requestURL =
+      new URL(
+        event.request.url
       );
 
-    })
 
-  );
+    /* -----------------------------------------
+       ONLY HANDLE SAME-ORIGIN REQUESTS
+    ----------------------------------------- */
 
-});
+    if (
+      requestURL.origin !==
+      self.location.origin
+    ) {
+
+      return;
+
+    }
+
+
+    /*
+     * Only handle GET requests.
+     */
+
+    if (
+      event.request.method !== "GET"
+    ) {
+
+      return;
+
+    }
+
+
+    event.respondWith(
+
+      caches
+        .match(
+          event.request
+        )
+
+        .then(
+          response => {
+
+            if (response) {
+
+              return response;
+
+            }
+
+
+            return fetch(
+              event.request
+            );
+
+          }
+
+        )
+
+        .catch(
+          error => {
+
+            console.warn(
+              "Service Worker fetch failed:",
+              event.request.url,
+              error
+            );
+
+
+            /*
+             * Return a normal network error
+             * instead of throwing an unhandled
+             * service-worker promise rejection.
+             */
+
+            return new Response(
+              "",
+              {
+                status: 503,
+                statusText:
+                  "Service Unavailable"
+              }
+            );
+
+          }
+
+        )
+
+    );
+
+  }
+);
