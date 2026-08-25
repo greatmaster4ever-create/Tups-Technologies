@@ -215,7 +215,7 @@ function resetTimer() {
 
       logoutAdmin();
 
-    }, 60000);
+    }, 300000);
 
 }
 
