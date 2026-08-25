@@ -1106,6 +1106,7 @@ console.log("STEP 6");
 // ==========================
 
 let sheetUrl = "";
+let result = null;
 
 try {
 
@@ -1148,16 +1149,38 @@ console.log(
   text
 );
 
-const result =
+result =
   JSON.parse(text);
 
-  if (!result.success) {
+result =
+  JSON.parse(text);
 
-    throw new Error(
-      result.error
-    );
+console.log(
+  "PARSED APPS SCRIPT RESULT:",
+  result
+);
 
-  }
+if (!result.success) {
+
+  throw new Error(
+    result.error ||
+    "Apps Script failed"
+  );
+
+}
+
+if (
+  !Array.isArray(
+    result.subjects
+  ) ||
+  result.subjects.length === 0
+) {
+
+  throw new Error(
+    "Apps Script did not return the created subjects."
+  );
+
+}
 
   sheetUrl =
     result.sheetUrl;
