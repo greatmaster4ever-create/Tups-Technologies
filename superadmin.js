@@ -1200,43 +1200,59 @@ document.getElementById(
 
       }
 
-      const { error } =
-        await supabaseClient
-          .from("subjects")
-          .insert([{
+      // =====================================================
+// SAVE ALL CREATED SUBJECTS TO SUPABASE
+// =====================================================
 
-            school_code:
-              schoolCode,
+const subjectsToSave =
+  (result.subjects || [])
+    .map(
+      item => ({
 
-            cadre:
-              cadre,
+        school_code:
+          schoolCode,
 
-            department:
-              department,
+        cadre:
+          cadre,
 
-            subject:
-              subject,
+        department:
+          department,
 
-            subject_password:
-              subjectPassword,
+        subject:
+          item.subject,
 
-            admin_password:
-              adminPassword,
+        subject_password:
+          item.subject === subject
+            ? subjectPassword
+            : "Subject",
 
-            sheet_url:
-              sheetUrl
+        admin_password:
+          adminPassword,
 
-          }]);
+        sheet_url:
+          item.sheetUrl
 
-      if (error) {
+      })
+    );
 
-        alert(
-          error.message
-        );
 
-        return;
+const { error } =
+  await supabaseClient
+    .from("subjects")
+    .insert(
+      subjectsToSave
+    );
 
-      }
+
+if (error) {
+
+  alert(
+    error.message
+  );
+
+  return;
+
+}
 
       alert(
         "Subject Added Successfully"
