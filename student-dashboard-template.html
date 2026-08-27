@@ -11,6 +11,7 @@
 
 <title>Student Dashboard</title>
 <link rel="stylesheet" href="tups-notification.css">
+<link rel="stylesheet" href="attendance.css">
 <style>
 
 /* =========================================================
@@ -1132,7 +1133,35 @@ body {
 
             </div>
 
+<!-- =============================================
+     STUDENT ATTENDANCE
+================================================= -->
 
+<div class="student-attendance-section">
+
+    <div class="student-attendance-title">
+        ATTENDANCE
+    </div>
+
+    <!-- ATTENDANCE COUNT -->
+
+    <div
+        id="studentAttendanceCount"
+        class="student-attendance-count"
+    >
+        Loading attendance...
+    </div>
+
+    <!-- ATTENDANCE CALENDAR -->
+
+    <div
+        id="studentAttendanceCalendar"
+        class="student-attendance-calendar"
+    >
+        Loading calendar...
+    </div>
+
+</div>
         </section>
 
 
@@ -4929,6 +4958,6 @@ async function loadOptionalPaymentHistory() {
 
 </script>
 <div id="tupsNotification"></div>
-
+<script src="attendance.js"></script>
 </body>
 </html>

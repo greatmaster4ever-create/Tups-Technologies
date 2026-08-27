@@ -148,17 +148,69 @@
 
          </div>
 		 
-		  <!-- COMMUNICATION BOOK ROW -->
-		
-		<button
-    type="button"
-    id="teacherCommunicationBtn" 
-	class="communication-btn"
-	onclick="openTeacherCommunicationBook()"
+		 <!-- COMMUNICATION BOOK ROW -->
+
+<button
+  type="button"
+  id="teacherCommunicationBtn"
+  class="communication-btn"
+  onclick="openTeacherCommunicationBook()"
 >
-    📖 Communication Book
+  📖 Communication Book
 </button>
 
+<!-- ATTENDANCE LOG BOOK -->
+
+<button
+  type="button"
+  id="teacherAttendanceBtn"
+  class="attendance-btn"
+  onclick="toggleTeacherAttendanceMenu()"
+>
+  Attendance Log Book
+</button>
+
+<!-- ATTENDANCE OPTIONS — HIDDEN INITIALLY -->
+
+<div
+  id="teacherAttendanceMenu"
+  class="teacher-attendance-menu"
+  style="display:none;"
+>
+
+  <button
+  type="button"
+  class="attendance-menu-btn morning-btn"
+  onclick="
+    hideTeacherAttendanceMenu();
+    openAttendanceMarker('morning');
+  "
+>
+  Morning
+</button>
+
+<button
+  type="button"
+  class="attendance-menu-btn afternoon-btn"
+  onclick="
+    hideTeacherAttendanceMenu();
+    openAttendanceMarker('afternoon');
+  "
+>
+  Afternoon
+</button>
+
+<button
+  type="button"
+  class="attendance-menu-btn view-attendance-btn"
+  onclick="
+    hideTeacherAttendanceMenu();
+    openStudentAttendanceViewer();
+  "
+>
+  View Students Attendance
+</button>
+</div>
         </form>
 
        </div>
