@@ -2917,289 +2917,331 @@ async function markSelectedAttendance() {
 ========================================================= */
 
 async function sendAttendanceWhatsAppNotification(
-  student,
-  session,
-  attendanceTimestamp
+student,
+session,
+attendanceTimestamp
 ) {
 
-  let sentCount =
-    0;
+let sentCount =
+0;
 
-  let failedCount =
-    0;
+let failedCount =
+0;
 
+try {
+
+```
+/* =====================================================
+   SCHOOL INFORMATION
+===================================================== */
+
+const schoolInfo =
+  window.attendanceSchoolInfo || {};
+
+
+const schoolName =
+  schoolInfo.School_name ||
+  "School";
+
+
+/* =====================================================
+   FORMAT STORED ATTENDANCE TIME
+
+   Uses the exact timestamp that was stored in
+   student_attendance.
+===================================================== */
+
+const attendanceDateTime =
+  new Date(
+    attendanceTimestamp
+  );
+
+
+const formattedDate =
+  attendanceDateTime.toLocaleDateString(
+    "en-NG",
+    {
+      day: "2-digit",
+      month: "long",
+      year: "numeric"
+    }
+  );
+
+
+const formattedTime =
+  attendanceDateTime.toLocaleTimeString(
+    "en-NG",
+    {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true
+    }
+  );
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+const message =
+  `${student.student_name || "Student"} has arrived ${schoolName} Premises.\n\n` +
+  `Date: ${formattedDate}\n` +
+  `Time: ${formattedTime}`;
+
+
+/* =====================================================
+   COLLECT RECIPIENTS
+
+   Parent 1
+   Parent 2
+   School phone
+
+   Duplicate numbers are removed.
+===================================================== */
+
+const rawRecipients = [
+
+  student.parent_contact1,
+
+  student.parent_contact2,
+
+  schoolInfo.phone
+
+];
+
+
+const recipients = [];
+
+
+rawRecipients.forEach(
+  number => {
+
+    const normalized =
+      normalizeAttendanceWhatsAppNumber(
+        number
+      );
+
+
+    if (
+      normalized &&
+      !recipients.includes(
+        normalized
+      )
+    ) {
+
+      recipients.push(
+        normalized
+      );
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   NO WHATSAPP NUMBERS
+===================================================== */
+
+if (!recipients.length) {
+
+  console.warn(
+    "No WhatsApp recipients available for:",
+    student.student_name
+  );
+
+  return {
+
+    sent: false,
+
+    failed: false,
+
+    sentCount: 0,
+
+    failedCount: 0
+
+  };
+
+}
+
+
+/* =====================================================
+   SEND TO EACH RECIPIENT
+===================================================== */
+
+for (
+  const recipient of recipients
+) {
 
   try {
 
-    /* =====================================================
-       SCHOOL INFORMATION
-    ===================================================== */
-
-    const schoolInfo =
-      window.attendanceSchoolInfo || {};
-
-
-    const schoolName =
-      schoolInfo.School_name ||
-      "School";
-
-
-    /* =====================================================
-       FORMAT STORED ATTENDANCE TIME
-
-       Uses the exact timestamp that was stored in
-       student_attendance.
-    ===================================================== */
-
-    const attendanceDateTime =
-      new Date(
-        attendanceTimestamp
-      );
-
-
-    const formattedDate =
-      attendanceDateTime.toLocaleDateString(
-        "en-NG",
-        {
-          day: "2-digit",
-          month: "long",
-          year: "numeric"
-        }
-      );
-
-
-    const formattedTime =
-      attendanceDateTime.toLocaleTimeString(
-        "en-NG",
-        {
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true
-        }
-      );
-
-
-    /* =====================================================
-       MESSAGE
-    ===================================================== */
-
-    const message =
-      `${student.student_name || "Student"} has arrived ${schoolName} Premises.\n\n` +
-      `Date: ${formattedDate}\n` +
-      `Time: ${formattedTime}`;
-
-
-    /* =====================================================
-       COLLECT RECIPIENTS
-
-       Parent 1
-       Parent 2
-       School phone
-
-       Duplicate numbers are removed.
-    ===================================================== */
-
-    const rawRecipients = [
-
-      student.parent_contact1,
-
-      student.parent_contact2,
-
-      schoolInfo.phone
-
-    ];
-
-
-    const recipients = [];
-
-
-    rawRecipients.forEach(
-      number => {
-
-        const normalized =
-          normalizeAttendanceWhatsAppNumber(
-            number
-          );
-
-
-        if (
-          normalized &&
-          !recipients.includes(
-            normalized
-          )
-        ) {
-
-          recipients.push(
-            normalized
-          );
-
-        }
-
-      }
-    );
-
-
-    /* =====================================================
-       NO WHATSAPP NUMBERS
-    ===================================================== */
-
-    if (!recipients.length) {
-
-      console.warn(
-        "No WhatsApp recipients available for:",
-        student.student_name
-      );
-
-      return {
-        sent: false,
-        failed: 0,
-        sentCount: 0
-      };
-
-    }
-
-
-    /* =====================================================
-       SEND TO EACH RECIPIENT
-    ===================================================== */
-
-    for (
-      const recipient of recipients
+    if (
+      typeof supabaseClient === "undefined" ||
+      !supabaseClient ||
+      !supabaseClient.functions
     ) {
 
-      try {
+      console.error(
+        "Supabase Functions client unavailable."
+      );
 
-        if (
-          typeof supabaseClient === "undefined" ||
-          !supabaseClient ||
-          !supabaseClient.functions
-        ) {
+      failedCount++;
 
-          console.error(
-            "Supabase Functions client unavailable."
-          );
-
-          failedCount++;
-
-          continue;
-
-        }
-
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient.functions.invoke(
-            "send-attendance-whatsapp",
-            {
-              body: {
-                recipient:
-                  recipient,
-
-                message:
-                  message
-              }
-            }
-          );
-
-
-        if (error) {
-
-          console.error(
-            "WhatsApp notification error for",
-            recipient,
-            error,
-            data
-          );
-
-          failedCount++;
-
-          continue;
-
-        }
-
-
-        if (
-          data &&
-          data.success === true
-        ) {
-
-          sentCount++;
-
-          console.log(
-            "Attendance WhatsApp sent successfully:",
-            recipient
-          );
-
-        } else {
-
-          console.error(
-            "WhatsApp function returned an unsuccessful result:",
-            recipient,
-            data
-          );
-
-          failedCount++;
-
-        }
-
-
-      } catch (recipientError) {
-
-        console.error(
-          "WhatsApp recipient error:",
-          recipient,
-          recipientError
-        );
-
-        failedCount++;
-
-      }
+      continue;
 
     }
 
 
-    return {
+    /* =================================================
+       SUPABASE FUNCTION CALL
 
-      sent:
-        sentCount > 0,
+       Explicitly use the current Supabase key for
+       authorization. This matches the successful
+       manual Edge Function test.
+    ================================================= */
 
-      failed:
-        failedCount > 0,
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.functions.invoke(
+        "send-attendance-whatsapp",
+        {
 
-      sentCount:
-        sentCount,
+          body: {
 
-      failedCount:
-        failedCount
+            recipient:
+              recipient,
 
-    };
+            message:
+              message
+
+          },
+
+          headers: {
+
+            "Authorization":
+              "Bearer " + supabaseKey
+
+          }
+
+        }
+      );
 
 
-  } catch (error) {
+    /* =================================================
+       FUNCTION ERROR
+    ================================================= */
+
+    if (error) {
+
+      console.error(
+        "WhatsApp notification error for",
+        recipient,
+        error,
+        data
+      );
+
+      failedCount++;
+
+      continue;
+
+    }
+
+
+    /* =================================================
+       SUCCESS
+    ================================================= */
+
+    if (
+      data &&
+      data.success === true
+    ) {
+
+      sentCount++;
+
+      console.log(
+        "Attendance WhatsApp sent successfully:",
+        recipient
+      );
+
+    } else {
+
+      console.error(
+        "WhatsApp function returned an unsuccessful result:",
+        recipient,
+        data
+      );
+
+      failedCount++;
+
+    }
+
+
+  } catch (
+    recipientError
+  ) {
 
     console.error(
-      "Attendance WhatsApp notification failed:",
-      error
+      "WhatsApp recipient error:",
+      recipient,
+      recipientError
     );
 
-
-    return {
-
-      sent: false,
-
-      failed: true,
-
-      sentCount: 0,
-
-      failedCount: 1
-
-    };
+    failedCount++;
 
   }
 
 }
+
+
+/* =====================================================
+   RETURN RESULT
+===================================================== */
+
+return {
+
+  sent:
+    sentCount > 0,
+
+  failed:
+    failedCount > 0,
+
+  sentCount:
+    sentCount,
+
+  failedCount:
+    failedCount
+
+};
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Attendance WhatsApp notification failed:",
+  error
+);
+
+
+return {
+
+  sent: false,
+
+  failed: true,
+
+  sentCount: 0,
+
+  failedCount: 1
+
+};
+```
+
+}
+
+}
+
 
 
 /* =========================================================
