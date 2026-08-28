@@ -28,6 +28,7 @@ function toggleTeacherAttendanceMenu() {
     menu.style.display = "none";
 
   }
+
 }
 
 
@@ -40,6 +41,7 @@ function hideTeacherAttendanceMenu() {
   if (!menu) return;
 
   menu.style.display = "none";
+
 }
 
 
@@ -52,6 +54,7 @@ function openAttendanceMarker(session) {
   hideTeacherAttendanceMenu();
 
   createAttendanceModal(session);
+
 }
 
 
@@ -62,11 +65,16 @@ function openAttendanceMarker(session) {
 function createAttendanceModal(session) {
 
   const existing =
-    document.getElementById("attendanceModalOverlay");
+    document.getElementById(
+      "attendanceModalOverlay"
+    );
 
   if (existing) {
+
     existing.remove();
+
   }
+
 
   const overlay =
     document.createElement("div");
@@ -178,7 +186,24 @@ function createAttendanceModal(session) {
   document.body.appendChild(overlay);
 
 
-  /* CLOSE */
+  /* =======================================================
+     STORE CURRENT SESSION
+  ======================================================= */
+
+  window.currentAttendanceSession =
+    session;
+
+
+  /* =======================================================
+     RESET CURRENT SELECTION
+  ======================================================= */
+
+  window.attendanceSelectedStudents = [];
+
+
+  /* =======================================================
+     CLOSE
+  ======================================================= */
 
   document
     .getElementById("attendanceCloseBtn")
@@ -188,7 +213,9 @@ function createAttendanceModal(session) {
     );
 
 
-  /* BULK */
+  /* =======================================================
+     BULK
+  ======================================================= */
 
   document
     .getElementById("attendanceBulkBtn")
@@ -197,7 +224,10 @@ function createAttendanceModal(session) {
       toggleAttendanceBulkMode
     );
 
-  /* MARK ATTENDANCE */
+
+  /* =======================================================
+     MARK ATTENDANCE
+  ======================================================= */
 
   document
     .getElementById("attendanceMarkBtn")
@@ -206,7 +236,10 @@ function createAttendanceModal(session) {
       markSelectedAttendance
     );
 
-  /* SEARCH */
+
+  /* =======================================================
+     SEARCH
+  ======================================================= */
 
   document
     .getElementById("attendanceStudentSearch")
@@ -221,10 +254,15 @@ function createAttendanceModal(session) {
       }
     );
 
-  /* FILTERS */
+
+  /* =======================================================
+     DEPARTMENT FILTER
+  ======================================================= */
 
   document
-    .getElementById("attendanceDepartmentFilter")
+    .getElementById(
+      "attendanceDepartmentFilter"
+    )
     .addEventListener(
       "change",
       function () {
@@ -232,15 +270,21 @@ function createAttendanceModal(session) {
         searchAttendanceStudents(
           document.getElementById(
             "attendanceStudentSearch"
-          ).value
+          )?.value || ""
         );
 
       }
     );
 
 
+  /* =======================================================
+     CLASS FILTER
+  ======================================================= */
+
   document
-    .getElementById("attendanceClassFilter")
+    .getElementById(
+      "attendanceClassFilter"
+    )
     .addEventListener(
       "change",
       function () {
@@ -248,442 +292,36 @@ function createAttendanceModal(session) {
         searchAttendanceStudents(
           document.getElementById(
             "attendanceStudentSearch"
-          ).value
+          )?.value || ""
         );
 
       }
     );
 
-  /* STORE CURRENT SESSION */
 
-  window.currentAttendanceSession =
-    session;
+  /* =======================================================
+     LOAD STUDENTS
+  ======================================================= */
+
   loadAttendanceStudents();
 
 }
 
 
 /* =========================================================
-   CLOSE MODAL
-========================================================= */
-
-function closeAttendanceModal() {
-
-  const modal =
-    document.getElementById(
-      "attendanceModalOverlay"
-    );
-
-  if (modal) {
-    modal.remove();
-  }
-
-}
-
-
-/* =========================================================
-   BULK MODE
-========================================================= */
-
-function toggleAttendanceBulkMode() {
-
-  const filters =
-    document.getElementById(
-      "attendanceFilters"
-    );
-
-  if (!filters) return;
-
-  if (
-    filters.style.display === "none" ||
-    filters.style.display === ""
-  ) {
-
-    filters.style.display = "grid";
-
-  } else {
-
-    filters.style.display = "none";
-
-  }
-
-}
-
-/* =========================================================
-   ATTENDANCE STUDENT SEARCH
-========================================================= */
-
-let attendanceSearchTimer = null;
-
-
-/* =========================================================
-   SEARCH STUDENTS
-========================================================= */
-
-function searchAttendanceStudents(searchText) {
-
-  clearTimeout(attendanceSearchTimer);
-
-  attendanceSearchTimer = setTimeout(
-    async function () {
-
-      const results =
-        document.getElementById(
-          "attendanceResults"
-        );
-
-      if (!results) return;
-
-
-      const search =
-        String(searchText || "").trim();
-
-
-      /* -----------------------------------------
-         Nothing entered
-      ----------------------------------------- */
-
-      if (!search) {
-
-        results.innerHTML = `
-          <div class="attendance-empty">
-            Search for a student by name or Reg No.
-          </div>
-        `;
-
-        return;
-      }
-
-
-      /* -----------------------------------------
-         Loading
-      ----------------------------------------- */
-
-      results.innerHTML = `
-        <div class="attendance-loading">
-          Searching...
-        </div>
-      `;
-
-
-      try {
-
-        /*
-         * Search both student name and
-         * registration number.
-         */
-
-        const {
-          data,
-          error
-        } =
-          await supabase
-            .from("students")
-            .select(`
-              id,
-              school_code,
-              department,
-              student_name,
-              class,
-              reg_no,
-              parent_contact1,
-              parent_contact2
-            `)
-            .or(
-              `student_name.ilike.%${search}%,reg_no.ilike.%${search}%`
-            )
-            .order(
-              "student_name",
-              {
-                ascending: true
-              }
-            )
-            .limit(50);
-
-
-        if (error) {
-
-          console.error(
-            "Attendance student search error:",
-            error
-          );
-
-          results.innerHTML = `
-            <div class="attendance-error">
-              Unable to search students.
-            </div>
-          `;
-
-          return;
-        }
-
-
-        const students =
-          data || [];
-
-
-        /* -----------------------------------------
-           No results
-        ----------------------------------------- */
-
-        if (!students.length) {
-
-          results.innerHTML = `
-            <div class="attendance-empty">
-              No students found.
-            </div>
-          `;
-
-          return;
-        }
-
-
-        /* -----------------------------------------
-           Render students
-        ----------------------------------------- */
-
-        renderAttendanceStudents(
-          students
-        );
-
-      } catch (error) {
-
-        console.error(
-          "Attendance search failed:",
-          error
-        );
-
-        results.innerHTML = `
-          <div class="attendance-error">
-            An error occurred while searching.
-          </div>
-        `;
-      }
-
-    },
-    250
-  );
-}
-
-
-/* =========================================================
-   RENDER STUDENT RESULTS
-========================================================= */
-
-function renderAttendanceStudents(
-  students
-) {
-
-  const results =
-    document.getElementById(
-      "attendanceResults"
-    );
-
-  if (!results) return;
-
-
-  results.innerHTML = "";
-
-
-  students.forEach(
-    function (student) {
-
-      const row =
-        document.createElement("div");
-
-
-      row.className =
-        "attendance-student-row";
-
-
-      row.innerHTML = `
-
-        <label class="attendance-check">
-
-          <input
-            type="checkbox"
-            class="attendance-student-checkbox"
-            data-student-id="${student.id}"
-          >
-
-        </label>
-
-
-        <div class="attendance-student-name">
-          ${escapeAttendanceText(
-            student.student_name
-          )}
-        </div>
-
-
-        <div class="attendance-student-class">
-          ${escapeAttendanceText(
-            student.class
-          )}
-        </div>
-
-
-        <div class="attendance-student-reg">
-          ${escapeAttendanceText(
-            student.reg_no
-          )}
-        </div>
-
-      `;
-
-
-      const checkbox =
-        row.querySelector(
-          ".attendance-student-checkbox"
-        );
-
-
-      checkbox.addEventListener(
-        "change",
-        function () {
-
-          handleAttendanceStudentSelection(
-            student,
-            this.checked
-          );
-
-        }
-      );
-
-
-      results.appendChild(row);
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   HANDLE STUDENT SELECTION
-========================================================= */
-
-function handleAttendanceStudentSelection(
-  student,
-  checked
-) {
-
-  if (
-    !window.attendanceSelectedStudents
-  ) {
-
-    window.attendanceSelectedStudents = [];
-
-  }
-
-
-  const selected =
-    window.attendanceSelectedStudents;
-
-
-  const existingIndex =
-    selected.findIndex(
-      function (item) {
-
-        return String(item.id) ===
-          String(student.id);
-
-      }
-    );
-
-
-  if (checked) {
-
-    if (existingIndex === -1) {
-
-      selected.push(student);
-
-    }
-
-  } else {
-
-    if (existingIndex !== -1) {
-
-      selected.splice(
-        existingIndex,
-        1
-      );
-
-    }
-
-  }
-
-
-  console.log(
-    "Selected attendance students:",
-    selected
-  );
-}
-
-
-/* =========================================================
-   ESCAPE TEXT
-========================================================= */
-
-function escapeAttendanceText(
-  value
-) {
-
-  if (
-    value === null ||
-    value === undefined
-  ) {
-
-    return "";
-
-  }
-
-
-  return String(value)
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
-}
-
-
-
-/* =========================================================
-   VIEW STUDENT ATTENDANCE
-========================================================= */
-
-function openStudentAttendanceViewer() {
-
-  hideTeacherAttendanceMenu();
-
-  // Viewer will be built in the next stage.
-  console.log(
-    "Student attendance viewer selected."
-  );
-
-}
-
-/* =========================================================
    ATTENDANCE STUDENT DATA
 ========================================================= */
 
 window.attendanceStudents = [];
+
+window.attendanceSelectedStudents = [];
+
+
+/* =========================================================
+   SEARCH TIMER
+========================================================= */
+
+let attendanceSearchTimer = null;
 
 
 /* =========================================================
@@ -694,20 +332,69 @@ async function loadAttendanceStudents() {
 
   try {
 
-    const { data, error } = await supabase
-      .from("students")
-      .select(`
-        id,
-        school_code,
-        department,
-        student_name,
-        class,
-        reg_no
-      `)
-      .order("student_name", {
-        ascending: true
-      });
+    /* -------------------------------------------------------
+       VERIFY SUPABASE CLIENT
+    ------------------------------------------------------- */
 
+    if (
+      typeof supabaseClient === "undefined" ||
+      !supabaseClient ||
+      typeof supabaseClient.from !== "function"
+    ) {
+
+      console.error(
+        "Attendance: supabaseClient is not available."
+      );
+
+      const results =
+        document.getElementById(
+          "attendanceResults"
+        );
+
+      if (results) {
+
+        results.innerHTML = `
+          <div class="attendance-error">
+            Attendance database connection is unavailable.
+          </div>
+        `;
+
+      }
+
+      return;
+
+    }
+
+
+    /* -------------------------------------------------------
+       LOAD STUDENTS
+    ------------------------------------------------------- */
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("students")
+        .select(`
+          id,
+          school_code,
+          department,
+          student_name,
+          class,
+          reg_no
+        `)
+        .order(
+          "student_name",
+          {
+            ascending: true
+          }
+        );
+
+
+    /* -------------------------------------------------------
+       DATABASE ERROR
+    ------------------------------------------------------- */
 
     if (error) {
 
@@ -716,16 +403,51 @@ async function loadAttendanceStudents() {
         error
       );
 
+      const results =
+        document.getElementById(
+          "attendanceResults"
+        );
+
+      if (results) {
+
+        results.innerHTML = `
+          <div class="attendance-error">
+            Unable to load students.
+          </div>
+        `;
+
+      }
+
       return;
 
     }
 
 
+    /* -------------------------------------------------------
+       STORE STUDENTS
+    ------------------------------------------------------- */
+
     window.attendanceStudents =
       data || [];
 
 
+    /* -------------------------------------------------------
+       POPULATE FILTERS
+    ------------------------------------------------------- */
+
     populateAttendanceFilters();
+
+
+    /* -------------------------------------------------------
+       INITIAL DISPLAY
+    ------------------------------------------------------- */
+
+    searchAttendanceStudents(
+      document.getElementById(
+        "attendanceStudentSearch"
+      )?.value || ""
+    );
+
 
   } catch (error) {
 
@@ -733,6 +455,22 @@ async function loadAttendanceStudents() {
       "Attendance student loading failed:",
       error
     );
+
+
+    const results =
+      document.getElementById(
+        "attendanceResults"
+      );
+
+    if (results) {
+
+      results.innerHTML = `
+        <div class="attendance-error">
+          Unable to load attendance students.
+        </div>
+      `;
+
+    }
 
   }
 
@@ -756,88 +494,156 @@ function populateAttendanceFilters() {
     );
 
 
-  if (!departmentFilter || !classFilter) {
+  if (
+    !departmentFilter ||
+    !classFilter
+  ) {
+
     return;
+
   }
 
+
+  /* -------------------------------------------------------
+     DEPARTMENTS
+  ------------------------------------------------------- */
 
   const departments =
     [
       ...new Set(
-        window.attendanceStudents
-          .map(student => student.department)
+        (window.attendanceStudents || [])
+          .map(
+            student =>
+              student.department
+          )
           .filter(Boolean)
       )
     ]
-    .sort();
+    .sort(
+      (a, b) =>
+        String(a).localeCompare(
+          String(b)
+        )
+    );
 
+
+  departmentFilter.innerHTML = `
+    <option value="ALL">
+      ALL Departments
+    </option>
+  `;
+
+
+  departments.forEach(
+    department => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        department;
+
+      option.textContent =
+        department;
+
+      departmentFilter.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  /* -------------------------------------------------------
+     CLASSES
+  ------------------------------------------------------- */
 
   const classes =
     [
       ...new Set(
-        window.attendanceStudents
-          .map(student => student.class)
+        (window.attendanceStudents || [])
+          .map(
+            student =>
+              student.class
+          )
           .filter(Boolean)
       )
     ]
-    .sort();
-
-
-  departmentFilter.innerHTML =
-    `<option value="ALL">
-      ALL Departments
-    </option>`;
-
-
-  departments.forEach(department => {
-
-    const option =
-      document.createElement("option");
-
-    option.value =
-      department;
-
-    option.textContent =
-      department;
-
-    departmentFilter.appendChild(
-      option
+    .sort(
+      (a, b) =>
+        String(a).localeCompare(
+          String(b)
+        )
     );
 
-  });
 
-
-  classFilter.innerHTML =
-    `<option value="ALL">
+  classFilter.innerHTML = `
+    <option value="ALL">
       ALL Classes
-    </option>`;
+    </option>
+  `;
 
 
-  classes.forEach(className => {
+  classes.forEach(
+    className => {
 
-    const option =
-      document.createElement("option");
+      const option =
+        document.createElement(
+          "option"
+        );
 
-    option.value =
-      className;
+      option.value =
+        className;
 
-    option.textContent =
-      className;
+      option.textContent =
+        className;
 
-    classFilter.appendChild(
-      option
-    );
+      classFilter.appendChild(
+        option
+      );
 
-  });
+    }
+  );
 
 }
 
 
 /* =========================================================
    SEARCH ATTENDANCE STUDENTS
+   ONE SEARCH ENGINE ONLY
 ========================================================= */
 
 function searchAttendanceStudents(
+  searchValue = ""
+) {
+
+  clearTimeout(
+    attendanceSearchTimer
+  );
+
+
+  attendanceSearchTimer =
+    setTimeout(
+      function () {
+
+        performAttendanceStudentSearch(
+          searchValue
+        );
+
+      },
+      150
+    );
+
+}
+
+
+/* =========================================================
+   PERFORM ATTENDANCE STUDENT SEARCH
+========================================================= */
+
+function performAttendanceStudentSearch(
   searchValue = ""
 ) {
 
@@ -850,11 +656,19 @@ function searchAttendanceStudents(
   if (!results) return;
 
 
+  /* -------------------------------------------------------
+     SEARCH VALUE
+  ------------------------------------------------------- */
+
   const search =
-    searchValue
+    String(searchValue || "")
       .trim()
       .toLowerCase();
 
+
+  /* -------------------------------------------------------
+     DEPARTMENT
+  ------------------------------------------------------- */
 
   const department =
     document.getElementById(
@@ -862,70 +676,102 @@ function searchAttendanceStudents(
     )?.value || "ALL";
 
 
+  /* -------------------------------------------------------
+     CLASS
+  ------------------------------------------------------- */
+
   const className =
     document.getElementById(
       "attendanceClassFilter"
     )?.value || "ALL";
 
 
+  /* -------------------------------------------------------
+     SOURCE STUDENTS
+  ------------------------------------------------------- */
+
   let filtered =
     window.attendanceStudents || [];
 
 
-  /* DEPARTMENT FILTER */
+  /* -------------------------------------------------------
+     DEPARTMENT FILTER
+  ------------------------------------------------------- */
 
-  if (department !== "ALL") {
+  if (
+    department !== "ALL"
+  ) {
 
     filtered =
       filtered.filter(
         student =>
-          student.department === department
+          String(
+            student.department || ""
+          ) ===
+          String(department)
       );
 
   }
 
 
-  /* CLASS FILTER */
+  /* -------------------------------------------------------
+     CLASS FILTER
+  ------------------------------------------------------- */
 
-  if (className !== "ALL") {
+  if (
+    className !== "ALL"
+  ) {
 
     filtered =
       filtered.filter(
         student =>
-          student.class === className
+          String(
+            student.class || ""
+          ) ===
+          String(className)
       );
 
   }
 
 
-  /* SEARCH */
+  /* -------------------------------------------------------
+     NAME / REGISTRATION NUMBER SEARCH
+  ------------------------------------------------------- */
 
   if (search) {
 
     filtered =
-      filtered.filter(student => {
+      filtered.filter(
+        student => {
 
-        const name =
-          String(
-            student.student_name || ""
-          ).toLowerCase();
-
-
-        const regNo =
-          String(
-            student.reg_no || ""
-          ).toLowerCase();
+          const name =
+            String(
+              student.student_name || ""
+            )
+              .toLowerCase();
 
 
-        return (
-          name.includes(search) ||
-          regNo.includes(search)
-        );
+          const regNo =
+            String(
+              student.reg_no || ""
+            )
+              .toLowerCase();
 
-      });
+
+          return (
+            name.includes(search) ||
+            regNo.includes(search)
+          );
+
+        }
+      );
 
   }
 
+
+  /* -------------------------------------------------------
+     RENDER
+  ------------------------------------------------------- */
 
   renderAttendanceStudentResults(
     filtered
@@ -951,7 +797,14 @@ function renderAttendanceStudentResults(
   if (!results) return;
 
 
-  if (!students.length) {
+  /* -------------------------------------------------------
+     NO RESULTS
+  ------------------------------------------------------- */
+
+  if (
+    !students ||
+    !students.length
+  ) {
 
     results.innerHTML = `
       <div class="attendance-no-results">
@@ -964,57 +817,340 @@ function renderAttendanceStudentResults(
   }
 
 
+  /* -------------------------------------------------------
+     RENDER STUDENTS
+  ------------------------------------------------------- */
+
   results.innerHTML =
-    students.map(student => `
+    students
+      .map(
+        student => {
 
-      <label class="attendance-student-row">
+          const studentId =
+            String(
+              student.id
+            );
 
-        <input
-          type="checkbox"
-          class="attendance-student-checkbox"
-          value="${student.id}"
-          data-student-id="${student.id}"
-        >
 
-        <span class="attendance-student-name">
-          ${escapeAttendanceHTML(
-            student.student_name || ""
-          )}
-        </span>
+          const isSelected =
+            (
+              window.attendanceSelectedStudents ||
+              []
+            )
+              .some(
+                selected =>
+                  String(
+                    selected.id
+                  ) ===
+                  studentId
+              );
 
-        <span class="attendance-student-class">
-          ${escapeAttendanceHTML(
-            student.class || ""
-          )}
-        </span>
 
-        <span class="attendance-student-reg">
-          ${escapeAttendanceHTML(
-            student.reg_no || ""
-          )}
-        </span>
+          return `
 
-      </label>
+            <label
+              class="attendance-student-row"
+              data-student-id="${escapeAttendanceHTML(
+                studentId
+              )}"
+            >
 
-    `).join("");
+              <input
+                type="checkbox"
+                class="attendance-student-checkbox"
+                value="${escapeAttendanceHTML(
+                  studentId
+                )}"
+                data-student-id="${escapeAttendanceHTML(
+                  studentId
+                )}"
+                ${isSelected ? "checked" : ""}
+              >
+
+              <span class="attendance-student-name">
+                ${escapeAttendanceHTML(
+                  student.student_name || ""
+                )}
+              </span>
+
+              <span class="attendance-student-class">
+                ${escapeAttendanceHTML(
+                  student.class || ""
+                )}
+              </span>
+
+              <span class="attendance-student-reg">
+                ${escapeAttendanceHTML(
+                  student.reg_no || ""
+                )}
+              </span>
+
+            </label>
+
+          `;
+
+        }
+      )
+      .join("");
+
+
+  /* -------------------------------------------------------
+     CHECKBOX EVENTS
+  ------------------------------------------------------- */
+
+  const checkboxes =
+    results.querySelectorAll(
+      ".attendance-student-checkbox"
+    );
+
+
+  checkboxes.forEach(
+    checkbox => {
+
+      checkbox.addEventListener(
+        "change",
+        function () {
+
+          const studentId =
+            this.dataset.studentId;
+
+
+          const student =
+            (window.attendanceStudents || [])
+              .find(
+                item =>
+                  String(
+                    item.id
+                  ) ===
+                  String(studentId)
+              );
+
+
+          if (!student) return;
+
+
+          handleAttendanceStudentSelection(
+            student,
+            this.checked
+          );
+
+        }
+      );
+
+    }
+  );
 
 }
 
 
 /* =========================================================
-   ATTENDANCE HTML ESCAPE
+   HANDLE STUDENT SELECTION
 ========================================================= */
 
-function escapeAttendanceHTML(value) {
+function handleAttendanceStudentSelection(
+  student,
+  checked
+) {
 
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  if (
+    !Array.isArray(
+      window.attendanceSelectedStudents
+    )
+  ) {
+
+    window.attendanceSelectedStudents =
+      [];
+
+  }
+
+
+  const selected =
+    window.attendanceSelectedStudents;
+
+
+  const existingIndex =
+    selected.findIndex(
+      item =>
+        String(item.id) ===
+        String(student.id)
+    );
+
+
+  /* -------------------------------------------------------
+     SELECT
+  ------------------------------------------------------- */
+
+  if (checked) {
+
+    if (
+      existingIndex === -1
+    ) {
+
+      selected.push(
+        student
+      );
+
+    }
+
+  }
+
+
+  /* -------------------------------------------------------
+     UNSELECT
+  ------------------------------------------------------- */
+
+  else {
+
+    if (
+      existingIndex !== -1
+    ) {
+
+      selected.splice(
+        existingIndex,
+        1
+      );
+
+    }
+
+  }
+
+
+  console.log(
+    "Selected attendance students:",
+    selected
+  );
 
 }
+
+
+/* =========================================================
+   CLOSE MODAL
+========================================================= */
+
+function closeAttendanceModal() {
+
+  const modal =
+    document.getElementById(
+      "attendanceModalOverlay"
+    );
+
+
+  if (modal) {
+
+    modal.remove();
+
+  }
+
+
+  window.attendanceSelectedStudents =
+    [];
+
+}
+
+
+/* =========================================================
+   BULK MODE
+========================================================= */
+
+function toggleAttendanceBulkMode() {
+
+  const filters =
+    document.getElementById(
+      "attendanceFilters"
+    );
+
+
+  if (!filters) return;
+
+
+  if (
+    filters.style.display === "none" ||
+    filters.style.display === ""
+  ) {
+
+    filters.style.display =
+      "grid";
+
+  } else {
+
+    filters.style.display =
+      "none";
+
+  }
+
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
+
+function escapeAttendanceHTML(
+  value
+) {
+
+  return String(
+    value ?? ""
+  )
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+/* =========================================================
+   ESCAPE TEXT
+   Kept as a compatibility function in case another
+   attendance function uses it.
+========================================================= */
+
+function escapeAttendanceText(
+  value
+) {
+
+  return escapeAttendanceHTML(
+    value
+  );
+
+}
+
+
+/* =========================================================
+   VIEW STUDENT ATTENDANCE
+========================================================= */
+
+function openStudentAttendanceViewer() {
+
+  hideTeacherAttendanceMenu();
+
+
+  // Viewer will be built in the next stage.
+
+  console.log(
+    "Student attendance viewer selected."
+  );
+
+}
+
+
 /* =========================================================
    MARK ATTENDANCE
    ONE ENGINE FOR MORNING + AFTERNOON
@@ -1024,6 +1160,11 @@ async function markSelectedAttendance() {
 
   const session =
     window.currentAttendanceSession;
+
+
+  /* -------------------------------------------------------
+     VALIDATE SESSION
+  ------------------------------------------------------- */
 
   if (
     session !== "morning" &&
@@ -1036,10 +1177,13 @@ async function markSelectedAttendance() {
     );
 
     return;
+
   }
 
 
-  /* GET SELECTED STUDENTS */
+  /* -------------------------------------------------------
+     GET SELECTED STUDENTS
+  ------------------------------------------------------- */
 
   const checkboxes =
     document.querySelectorAll(
@@ -1047,7 +1191,9 @@ async function markSelectedAttendance() {
     );
 
 
-  if (!checkboxes.length) {
+  if (
+    !checkboxes.length
+  ) {
 
     showAttendanceMessage(
       "Please select at least one student.",
@@ -1055,28 +1201,41 @@ async function markSelectedAttendance() {
     );
 
     return;
+
   }
 
 
+  /* -------------------------------------------------------
+     SELECTED IDS
+  ------------------------------------------------------- */
+
   const selectedIds =
-    [...checkboxes].map(
-      checkbox =>
-        Number(checkbox.dataset.studentId)
-    );
-
-
-  /* FIND SELECTED STUDENTS */
-
-  const selectedStudents =
-    (window.attendanceStudents || [])
-      .filter(student =>
-        selectedIds.includes(
-          Number(student.id)
-        )
+    [...checkboxes]
+      .map(
+        checkbox =>
+          String(
+            checkbox.dataset.studentId
+          )
       );
 
 
-  if (!selectedStudents.length) {
+  /* -------------------------------------------------------
+     FIND SELECTED STUDENTS
+  ------------------------------------------------------- */
+
+  const selectedStudents =
+    (window.attendanceStudents || [])
+      .filter(
+        student =>
+          selectedIds.includes(
+            String(student.id)
+          )
+      );
+
+
+  if (
+    !selectedStudents.length
+  ) {
 
     showAttendanceMessage(
       "No valid students selected.",
@@ -1084,10 +1243,13 @@ async function markSelectedAttendance() {
     );
 
     return;
+
   }
 
 
-  /* CURRENT DATE + TIME */
+  /* -------------------------------------------------------
+     CURRENT DATE + TIME
+  ------------------------------------------------------- */
 
   const now =
     new Date();
@@ -1095,18 +1257,35 @@ async function markSelectedAttendance() {
 
   const attendanceDate =
     `${now.getFullYear()}-${
-      String(now.getMonth() + 1).padStart(2, "0")
+      String(
+        now.getMonth() + 1
+      ).padStart(
+        2,
+        "0"
+      )
     }-${
-      String(now.getDate()).padStart(2, "0")
+      String(
+        now.getDate()
+      ).padStart(
+        2,
+        "0"
+      )
     }`;
 
 
-  let markedCount = 0;
-  let alreadyMarkedCount = 0;
-  let failedCount = 0;
+  let markedCount =
+    0;
+
+  let alreadyMarkedCount =
+    0;
+
+  let failedCount =
+    0;
 
 
-  /* DISABLE BUTTON WHILE PROCESSING */
+  /* -------------------------------------------------------
+     DISABLE BUTTON WHILE PROCESSING
+  ------------------------------------------------------- */
 
   const markButton =
     document.getElementById(
@@ -1116,7 +1295,8 @@ async function markSelectedAttendance() {
 
   if (markButton) {
 
-    markButton.disabled = true;
+    markButton.disabled =
+      true;
 
     markButton.textContent =
       "Marking...";
@@ -1126,7 +1306,13 @@ async function markSelectedAttendance() {
 
   try {
 
-    for (const student of selectedStudents) {
+    /* =====================================================
+       PROCESS EACH STUDENT
+    ===================================================== */
+
+    for (
+      const student of selectedStudents
+    ) {
 
       try {
 
@@ -1134,13 +1320,18 @@ async function markSelectedAttendance() {
           student.school_code;
 
 
-        /* -----------------------------------------
+        /* -----------------------------------------------
            CHECK TODAY'S ATTENDANCE RECORD
-        ----------------------------------------- */
+        ----------------------------------------------- */
 
-        const { data: existingRecord, error: selectError } =
-          await supabase
-            .from("student_attendance")
+        const {
+          data: existingRecord,
+          error: selectError
+        } =
+          await supabaseClient
+            .from(
+              "student_attendance"
+            )
             .select(`
               id,
               morning_present,
@@ -1161,6 +1352,10 @@ async function markSelectedAttendance() {
             .maybeSingle();
 
 
+        /* -----------------------------------------------
+           LOOKUP ERROR
+        ----------------------------------------------- */
+
         if (selectError) {
 
           console.error(
@@ -1171,12 +1366,13 @@ async function markSelectedAttendance() {
           failedCount++;
 
           continue;
+
         }
 
 
-        /* -----------------------------------------
-           DETERMINE WHETHER ALREADY MARKED
-        ----------------------------------------- */
+        /* -----------------------------------------------
+           ALREADY MARKED
+        ----------------------------------------------- */
 
         if (
           existingRecord &&
@@ -1190,33 +1386,50 @@ async function markSelectedAttendance() {
           alreadyMarkedCount++;
 
           continue;
+
         }
 
 
-        /* -----------------------------------------
+        /* -----------------------------------------------
            UPDATE EXISTING DAY
-        ----------------------------------------- */
+        ----------------------------------------------- */
 
         if (existingRecord) {
 
           const updateData =
             session === "morning"
               ? {
-                  morning_present: true,
-                  morning_marked_at: now.toISOString(),
-                  updated_at: now.toISOString()
+                  morning_present:
+                    true,
+
+                  morning_marked_at:
+                    now.toISOString(),
+
+                  updated_at:
+                    now.toISOString()
                 }
               : {
-                  afternoon_present: true,
-                  afternoon_marked_at: now.toISOString(),
-                  updated_at: now.toISOString()
+                  afternoon_present:
+                    true,
+
+                  afternoon_marked_at:
+                    now.toISOString(),
+
+                  updated_at:
+                    now.toISOString()
                 };
 
 
-          const { error: updateError } =
-            await supabase
-              .from("student_attendance")
-              .update(updateData)
+          const {
+            error: updateError
+          } =
+            await supabaseClient
+              .from(
+                "student_attendance"
+              )
+              .update(
+                updateData
+              )
               .eq(
                 "id",
                 existingRecord.id
@@ -1233,18 +1446,20 @@ async function markSelectedAttendance() {
             failedCount++;
 
             continue;
+
           }
 
 
           markedCount++;
 
           continue;
+
         }
 
 
-        /* -----------------------------------------
+        /* -----------------------------------------------
            CREATE NEW DAY RECORD
-        ----------------------------------------- */
+        ----------------------------------------------- */
 
         const insertData = {
 
@@ -1255,7 +1470,8 @@ async function markSelectedAttendance() {
             student.id,
 
           reg_no:
-            student.reg_no || null,
+            student.reg_no ||
+            null,
 
           attendance_date:
             attendanceDate,
@@ -1285,11 +1501,21 @@ async function markSelectedAttendance() {
         };
 
 
-        const { error: insertError } =
-          await supabase
-            .from("student_attendance")
-            .insert(insertData);
+        const {
+          error: insertError
+        } =
+          await supabaseClient
+            .from(
+              "student_attendance"
+            )
+            .insert(
+              insertData
+            );
 
+
+        /* -----------------------------------------------
+           INSERT ERROR
+        ----------------------------------------------- */
 
         if (insertError) {
 
@@ -1299,16 +1525,13 @@ async function markSelectedAttendance() {
           );
 
 
-          /*
+          /* ---------------------------------------------
              UNIQUE CONSTRAINT PROTECTION
-
-             If another request already marked
-             this student for today, don't count
-             it as a successful mark.
-          */
+          --------------------------------------------- */
 
           if (
-            insertError.code === "23505"
+            insertError.code ===
+            "23505"
           ) {
 
             alreadyMarkedCount++;
@@ -1320,12 +1543,15 @@ async function markSelectedAttendance() {
           }
 
           continue;
+
         }
 
 
         markedCount++;
 
-      } catch (studentError) {
+      } catch (
+        studentError
+      ) {
 
         console.error(
           "Student attendance error:",
@@ -1339,19 +1565,26 @@ async function markSelectedAttendance() {
     }
 
 
-    /* -----------------------------------------
+    /* =====================================================
        RESULT MESSAGE
-    ----------------------------------------- */
+    ===================================================== */
 
-    let message = "";
+    let message =
+      "";
 
 
-    if (markedCount === 1) {
+    if (
+      markedCount === 1
+    ) {
 
       message =
         "1 student has been marked.";
 
-    } else if (markedCount > 1) {
+    }
+
+    else if (
+      markedCount > 1
+    ) {
 
       message =
         `${markedCount} students have been marked.`;
@@ -1359,25 +1592,39 @@ async function markSelectedAttendance() {
     }
 
 
-    if (alreadyMarkedCount > 0) {
+    if (
+      alreadyMarkedCount > 0
+    ) {
 
       if (message) {
-        message += " ";
+
+        message +=
+          " ";
+
       }
+
 
       message +=
         `${alreadyMarkedCount} already marked and skipped.`;
+
     }
 
 
-    if (failedCount > 0) {
+    if (
+      failedCount > 0
+    ) {
 
       if (message) {
-        message += " ";
+
+        message +=
+          " ";
+
       }
+
 
       message +=
         `${failedCount} could not be marked.`;
+
     }
 
 
@@ -1397,7 +1644,9 @@ async function markSelectedAttendance() {
     );
 
 
-    /* REFRESH RESULTS */
+    /* =====================================================
+       REFRESH SEARCH RESULTS
+    ===================================================== */
 
     searchAttendanceStudents(
       document.getElementById(
@@ -1419,11 +1668,13 @@ async function markSelectedAttendance() {
       "error"
     );
 
+
   } finally {
 
     if (markButton) {
 
-      markButton.disabled = false;
+      markButton.disabled =
+        false;
 
       markButton.textContent =
         "Mark Attendance";
@@ -1451,12 +1702,16 @@ function showAttendanceMessage(
 
 
   if (existing) {
+
     existing.remove();
+
   }
 
 
   const messageBox =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
 
   messageBox.id =
@@ -1476,11 +1731,20 @@ function showAttendanceMessage(
   );
 
 
-  setTimeout(() => {
+  setTimeout(
+    () => {
 
-    messageBox.remove();
+      if (
+        messageBox &&
+        messageBox.parentNode
+      ) {
 
-  }, 4000);
+        messageBox.remove();
+
+      }
+
+    },
+    4000
+  );
 
 }
-
