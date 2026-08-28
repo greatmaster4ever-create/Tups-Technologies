@@ -793,18 +793,10 @@ function renderAttendanceStudentResults(
       "attendanceResults"
     );
 
-
   if (!results) return;
 
 
-  /* -------------------------------------------------------
-     NO RESULTS
-  ------------------------------------------------------- */
-
-  if (
-    !students ||
-    !students.length
-  ) {
+  if (!students || !students.length) {
 
     results.innerHTML = `
       <div class="attendance-no-results">
@@ -817,86 +809,75 @@ function renderAttendanceStudentResults(
   }
 
 
-  /* -------------------------------------------------------
-     RENDER STUDENTS
-  ------------------------------------------------------- */
-
   results.innerHTML =
-    students
-      .map(
-        student => {
+    students.map(
+      student => {
 
-          const studentId =
-            String(
-              student.id
-            );
+        const studentId =
+          String(student.id);
 
 
-          const isSelected =
-            (
-              window.attendanceSelectedStudents ||
-              []
-            )
-              .some(
-                selected =>
-                  String(
-                    selected.id
-                  ) ===
-                  studentId
-              );
+        const isSelected =
+          (
+            window.attendanceSelectedStudents ||
+            []
+          ).some(
+            selected =>
+              String(selected.id) ===
+              studentId
+          );
 
 
-          return `
+        return `
 
-            <label
-              class="attendance-student-row"
+          <label
+            class="attendance-student-row"
+            data-student-id="${escapeAttendanceHTML(
+              studentId
+            )}"
+          >
+
+            <input
+              type="checkbox"
+              class="attendance-student-checkbox"
+              value="${escapeAttendanceHTML(
+                studentId
+              )}"
               data-student-id="${escapeAttendanceHTML(
                 studentId
               )}"
+              ${isSelected ? "checked" : ""}
             >
 
-              <input
-                type="checkbox"
-                class="attendance-student-checkbox"
-                value="${escapeAttendanceHTML(
-                  studentId
-                )}"
-                data-student-id="${escapeAttendanceHTML(
-                  studentId
-                )}"
-                ${isSelected ? "checked" : ""}
-              >
+            <span class="attendance-student-name">
+              ${escapeAttendanceHTML(
+                student.student_name || ""
+              )}
+            </span>
 
-              <span class="attendance-student-name">
-                ${escapeAttendanceHTML(
-                  student.student_name || ""
-                )}
-              </span>
+            <span class="attendance-student-class">
+              ${escapeAttendanceHTML(
+                student.class || ""
+              )}
+            </span>
 
-              <span class="attendance-student-class">
-                ${escapeAttendanceHTML(
-                  student.class || ""
-                )}
-              </span>
+            <span class="attendance-student-reg">
+              ${escapeAttendanceHTML(
+                student.reg_no || ""
+              )}
+            </span>
 
-              <span class="attendance-student-reg">
-                ${escapeAttendanceHTML(
-                  student.reg_no || ""
-                )}
-              </span>
+          </label>
 
-            </label>
+        `;
 
-          `;
-
-        }
-      )
-      .join("");
+      }
+    ).join("");
 
 
-  /* -------------------------------------------------------
+  /* =======================================================
      CHECKBOX EVENTS
-  ------------------------------------------------------- */
+  ======================================================= */
 
   const checkboxes =
     results.querySelectorAll(
@@ -916,14 +897,14 @@ function renderAttendanceStudentResults(
 
 
           const student =
-            (window.attendanceStudents || [])
-              .find(
-                item =>
-                  String(
-                    item.id
-                  ) ===
-                  String(studentId)
-              );
+            (
+              window.attendanceStudents ||
+              []
+            ).find(
+              item =>
+                String(item.id) ===
+                String(studentId)
+            );
 
 
           if (!student) return;

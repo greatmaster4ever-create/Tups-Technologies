@@ -297,24 +297,43 @@
   font-size: 14px;
 }
 
-
 /* =========================================================
+   TUPS ATTENDANCE
    STUDENT RESULTS
 ========================================================= */
 
 .attendance-results {
+  width: 100%;
   margin-top: 12px;
+
+  max-height: 420px;
+  overflow-y: auto;
+
+  border-radius: 6px;
 }
+
+
+/* =========================================================
+   STUDENT RESULT ROW
+========================================================= */
 
 .attendance-student-row {
   display: grid;
 
-  grid-template-columns: 34px 1fr 120px 120px;
+  /*
+     CHECKBOX | NAME | CLASS | REG NO.
+  */
+  grid-template-columns:
+    34px
+    minmax(0, 1fr)
+    120px
+    120px;
 
   align-items: center;
 
   gap: 8px;
 
+  width: 100%;
   min-height: 42px;
 
   padding: 7px 8px;
@@ -322,13 +341,119 @@
   border-bottom: 1px solid #eeeeee;
 
   font-size: 14px;
+
+  cursor: pointer;
+
+  box-sizing: border-box;
 }
 
-.attendance-student-row input[type="checkbox"] {
+
+/* =========================================================
+   STUDENT CHECKBOX
+========================================================= */
+
+.attendance-student-checkbox {
   width: 17px;
   height: 17px;
 
+  margin: 0;
+
   cursor: pointer;
+
+  accent-color: #00a9ff;
+}
+
+
+/* =========================================================
+   STUDENT NAME
+========================================================= */
+
+.attendance-student-name {
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   STUDENT CLASS
+========================================================= */
+
+.attendance-student-class {
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   STUDENT REGISTRATION NUMBER
+========================================================= */
+
+.attendance-student-reg {
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   ROW HOVER
+========================================================= */
+
+.attendance-student-row:hover {
+  background: rgba(0, 169, 255, 0.06);
+}
+
+
+/* =========================================================
+   NO RESULTS / EMPTY / ERROR
+========================================================= */
+
+.attendance-no-results,
+.attendance-empty,
+.attendance-error,
+.attendance-loading {
+  width: 100%;
+
+  padding: 18px 12px;
+
+  text-align: center;
+
+  font-size: 14px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   MARK ATTENDANCE AREA
+========================================================= */
+
+.attendance-mark-area {
+  display: flex;
+
+  justify-content: center;
+
+  margin-top: 15px;
 }
 
 
@@ -336,32 +461,36 @@
    MARK ATTENDANCE BUTTON
 ========================================================= */
 
-.attendance-mark-area {
-  display: flex;
-  justify-content: center;
-
-  margin-top: 15px;
-}
-
 .attendance-mark-btn {
   min-width: 180px;
 
   padding: 11px 20px;
 
   border: none;
+
   border-radius: 7px;
 
   background: #00a9ff;
+
   color: #000000;
 
   font-size: 14px;
+
   font-weight: 700;
 
   cursor: pointer;
 }
 
+
 .attendance-mark-btn:hover {
   background: #36c0ff;
+}
+
+
+.attendance-mark-btn:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
 }
 
 
@@ -371,51 +500,63 @@
 
 @media (max-width: 600px) {
 
-  .attendance-modal-overlay {
-    padding: 10px;
+  .attendance-results {
+    max-height: 55vh;
   }
 
-  .attendance-modal {
-    width: 100%;
-    max-height: 92vh;
 
-    padding: 12px;
-  }
+  .attendance-student-row {
+    /*
+       CHECKBOX | NAME | REG NO.
+       CLASS is moved underneath the name.
+    */
+    grid-template-columns:
+      30px
+      minmax(0, 1fr)
+      95px;
 
-  .attendance-top-row {
     gap: 5px;
+
+    padding: 8px 6px;
   }
 
-  .attendance-search-box {
+
+  .attendance-student-checkbox {
+    width: 16px;
+    height: 16px;
+  }
+
+
+  .attendance-student-name {
     font-size: 13px;
   }
 
-  .attendance-bulk-btn {
-    padding: 0 9px;
+
+  .attendance-student-class {
+    grid-column: 2;
 
     font-size: 12px;
   }
 
-  .attendance-close-btn {
-    width: 38px;
-    height: 38px;
 
-    font-size: 20px;
+  .attendance-student-reg {
+    grid-column: 3;
+
+    grid-row: 1;
+
+    font-size: 11px;
   }
 
-  .attendance-student-row {
-    grid-template-columns: 30px 1fr;
 
-    gap: 5px;
+  .attendance-mark-area {
+    margin-top: 12px;
   }
 
-  .attendance-student-row .student-class,
-  .attendance-student-row .student-reg {
-    grid-column: 2;
+
+  .attendance-mark-btn {
+    width: 100%;
+
+    min-width: 0;
   }
 
-  .attendance-filters {
-    grid-template-columns: 1fr;
-  }
 }
-
