@@ -1246,28 +1246,65 @@ function openStudentAttendanceViewer() {
          SELECTED STUDENT
     ================================================== -->
 
+ <div
+  id="studentAttendanceSelected"
+  class="student-attendance-selected"
+  style="display:none;"
+>
+
+  <div class="student-attendance-selected-info">
+
     <div
-      id="studentAttendanceSelected"
-      class="student-attendance-selected"
-      style="display:none;"
-    >
+      id="studentAttendanceSelectedName"
+      class="student-attendance-selected-name"
+    ></div>
 
-      <div class="student-attendance-selected-info">
+    <div
+      id="studentAttendanceSelectedDetails"
+      class="student-attendance-selected-details"
+    ></div>
 
-        <div
-          id="studentAttendanceSelectedName"
-          class="student-attendance-selected-name"
-        ></div>
+  </div>
 
-        <div
-          id="studentAttendanceSelectedDetails"
-          class="student-attendance-selected-details"
-        ></div>
+  <div
+    id="studentAttendanceCounters"
+    class="student-attendance-counters"
+  >
 
-      </div>
+    <div class="student-attendance-counter morning">
+
+      <span class="student-attendance-counter-label">
+        Morning Marks
+      </span>
+
+      <span
+        id="studentAttendanceMorningCount"
+        class="student-attendance-counter-value"
+      >
+        0
+      </span>
 
     </div>
 
+
+    <div class="student-attendance-counter afternoon">
+
+      <span class="student-attendance-counter-label">
+        Afternoon Marks
+      </span>
+
+      <span
+        id="studentAttendanceAfternoonCount"
+        class="student-attendance-counter-value"
+      >
+        0
+      </span>
+
+    </div>
+
+  </div>
+
+</div>
 
     <!-- =================================================
          CALENDAR
@@ -1763,14 +1800,19 @@ async function loadStudentAttendanceCalendar(
     }
 
 
-    window.studentAttendanceViewerRecords =
-      data || [];
+window.studentAttendanceViewerRecords =
+  data || [];
 
 
-    renderStudentAttendanceCalendar(
-      student,
-      data || []
-    );
+updateStudentAttendanceCounters(
+  data || []
+);
+
+
+renderStudentAttendanceCalendar(
+  student,
+  data || []
+);
 
 
   } catch (error) {
@@ -1791,6 +1833,56 @@ async function loadStudentAttendanceCalendar(
 
 }
 
+/* =========================================================
+   ATTENDANCE COUNTERS
+========================================================= */
+
+function updateStudentAttendanceCounters(
+  records
+) {
+
+  const morningCount =
+    records.filter(
+      record =>
+        record.morning_present === true
+    ).length;
+
+
+  const afternoonCount =
+    records.filter(
+      record =>
+        record.afternoon_present === true
+    ).length;
+
+
+  const morningElement =
+    document.getElementById(
+      "studentAttendanceMorningCount"
+    );
+
+
+  const afternoonElement =
+    document.getElementById(
+      "studentAttendanceAfternoonCount"
+    );
+
+
+  if (morningElement) {
+
+    morningElement.textContent =
+      morningCount;
+
+  }
+
+
+  if (afternoonElement) {
+
+    afternoonElement.textContent =
+      afternoonCount;
+
+  }
+
+}
 
 /* =========================================================
    RENDER CALENDAR

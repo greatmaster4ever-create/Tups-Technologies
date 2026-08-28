@@ -902,12 +902,23 @@
 }
 
 
+
 /* =========================================================
-   CALENDAR
+   STUDENT ATTENDANCE CALENDAR
 ========================================================= */
 
 .student-attendance-calendar {
+
   margin-top: 15px;
+
+  padding: 10px;
+
+  background: #f7f8f9;
+
+  border: 1px solid #e1e1e1;
+
+  border-radius: 8px;
+
 }
 
 
@@ -956,28 +967,47 @@
    WEEKDAYS
 ========================================================= */
 
+/* =========================================================
+   CALENDAR WEEKDAY HEADERS
+========================================================= */
+
 .student-attendance-calendar-weekdays {
+
   display: grid;
 
   grid-template-columns:
     repeat(7, 1fr);
 
-  border-bottom: 1px solid #dddddd;
+  border-left: 1px solid #d5d5d5;
 
-  color: #555555;
+  border-top: 1px solid #d5d5d5;
+
+  color: #000000;
 
   font-size: 12px;
 
-  font-weight: 700;
+  font-weight: 800;
 
   text-align: center;
+
 }
 
 
 .student-attendance-calendar-weekdays > div {
-  padding: 7px 2px;
-}
 
+  padding: 8px 3px;
+
+  background: #e8f5fb;
+
+  border-right: 1px solid #d5d5d5;
+
+  border-bottom: 1px solid #d5d5d5;
+
+  font-weight: 800;
+
+  letter-spacing: 0.2px;
+
+}
 
 /* =========================================================
    CALENDAR GRID
@@ -1138,5 +1168,109 @@
   .attendance-tick {
     font-size: 14px;
   }
+  
+   .student-attendance-counters {
+
+    grid-template-columns:
+      1fr;
+
+  }
 
 }
+
+/* =========================================================
+   ATTENDANCE COUNTERS
+========================================================= */
+
+.student-attendance-counters {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 8px;
+
+  margin-top: 10px;
+
+}
+
+
+.student-attendance-counter {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 8px 11px;
+
+  border-radius: 6px;
+
+  background: #f7f8f9;
+
+  border: 1px solid #dddddd;
+
+}
+
+
+.student-attendance-counter-label {
+
+  color: #333333;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+}
+
+
+.student-attendance-counter-value {
+
+  font-size: 17px;
+
+  font-weight: 800;
+
+}
+
+
+/* =========================================================
+   MORNING COUNTER
+========================================================= */
+
+.student-attendance-counter.morning {
+
+  border-left:
+    4px solid #159447;
+
+}
+
+
+.student-attendance-counter.morning
+.student-attendance-counter-value {
+
+  color: #159447;
+
+}
+
+
+/* =========================================================
+   AFTERNOON COUNTER
+========================================================= */
+
+.student-attendance-counter.afternoon {
+
+  border-left:
+    4px solid #d62828;
+
+}
+
+
+.student-attendance-counter.afternoon
+.student-attendance-counter-value {
+
+  color: #d62828;
+
+}
+
