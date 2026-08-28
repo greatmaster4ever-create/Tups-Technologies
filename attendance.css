@@ -297,6 +297,7 @@
   font-size: 14px;
 }
 
+
 /* =========================================================
    TUPS ATTENDANCE
    STUDENT RESULTS
@@ -349,7 +350,7 @@
 
 
 /* =========================================================
-   STUDENT CHECKBOX
+   CHECKBOX
 ========================================================= */
 
 .attendance-student-checkbox {
@@ -371,6 +372,8 @@
 .attendance-student-name {
   min-width: 0;
 
+  color: #000000 !important;
+
   overflow: hidden;
 
   text-overflow: ellipsis;
@@ -388,6 +391,8 @@
 .attendance-student-class {
   min-width: 0;
 
+  color: #000000 !important;
+
   overflow: hidden;
 
   text-overflow: ellipsis;
@@ -404,6 +409,8 @@
 
 .attendance-student-reg {
   min-width: 0;
+
+  color: #000000 !important;
 
   overflow: hidden;
 
@@ -425,7 +432,7 @@
 
 
 /* =========================================================
-   NO RESULTS / EMPTY / ERROR
+   NO RESULTS / EMPTY / ERROR / LOADING
 ========================================================= */
 
 .attendance-no-results,
@@ -435,6 +442,8 @@
   width: 100%;
 
   padding: 18px 12px;
+
+  color: #000000;
 
   text-align: center;
 
@@ -508,7 +517,7 @@
   .attendance-student-row {
     /*
        CHECKBOX | NAME | REG NO.
-       CLASS is moved underneath the name.
+       CLASS appears underneath the name.
     */
     grid-template-columns:
       30px
