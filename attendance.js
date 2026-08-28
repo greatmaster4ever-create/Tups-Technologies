@@ -3084,32 +3084,34 @@ for (
 
   try {
 
-    const {
-      data,
-      error
-    } =
-      await supabaseClient.functions.invoke(
-        "send-attendance-whatsapp",
-        {
+const {
+  data,
+  error
+} =
+  await supabaseClient.functions.invoke(
+    "send-attendance-whatsapp",
+    {
 
-          body: {
+      body: {
 
-            recipient: recipient,
+        recipient: recipient,
 
-            message: message
+        message: message
 
-          },
+      },
 
-          headers: {
+      headers: {
 
-            Authorization:
-              "Bearer " + supabaseKey
+        apikey:
+          supabaseKey,
 
-          }
+        Authorization:
+          "Bearer " + supabaseKey
 
-        }
-      );
+      }
 
+    }
+  );
 
     /* =================================================
        FUNCTION ERROR
