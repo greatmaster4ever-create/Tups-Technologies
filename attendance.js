@@ -2927,7 +2927,7 @@ let failedCount = 0;
 
 try {
 
-```
+
 /* =====================================================
    SCHOOL INFORMATION
 ===================================================== */
@@ -3195,11 +3195,11 @@ return {
     failedCount
 
 };
-```
+
 
 } catch (error) {
 
-```
+
 console.error(
   "Attendance WhatsApp notification failed:",
   error
@@ -3216,7 +3216,7 @@ return {
   failedCount: 1
 
 };
-```
+
 
 }
 
