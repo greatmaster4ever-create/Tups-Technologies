@@ -2922,11 +2922,8 @@ session,
 attendanceTimestamp
 ) {
 
-let sentCount =
-0;
-
-let failedCount =
-0;
+let sentCount = 0;
+let failedCount = 0;
 
 try {
 
@@ -2938,24 +2935,16 @@ try {
 const schoolInfo =
   window.attendanceSchoolInfo || {};
 
-
 const schoolName =
-  schoolInfo.School_name ||
-  "School";
+  schoolInfo.School_name || "School";
 
 
 /* =====================================================
    FORMAT STORED ATTENDANCE TIME
-
-   Uses the exact timestamp that was stored in
-   student_attendance.
 ===================================================== */
 
 const attendanceDateTime =
-  new Date(
-    attendanceTimestamp
-  );
-
+  new Date(attendanceTimestamp);
 
 const formattedDate =
   attendanceDateTime.toLocaleDateString(
@@ -2966,7 +2955,6 @@ const formattedDate =
       year: "numeric"
     }
   );
-
 
 const formattedTime =
   attendanceDateTime.toLocaleTimeString(
@@ -2984,19 +2972,19 @@ const formattedTime =
 ===================================================== */
 
 const message =
-  `${student.student_name || "Student"} has arrived ${schoolName} Premises.\n\n` +
-  `Date: ${formattedDate}\n` +
-  `Time: ${formattedTime}`;
+  String(student.student_name || "Student") +
+  " has arrived " +
+  String(schoolName) +
+  " Premises.\n\n" +
+  "Date: " +
+  formattedDate +
+  "\n" +
+  "Time: " +
+  formattedTime;
 
 
 /* =====================================================
    COLLECT RECIPIENTS
-
-   Parent 1
-   Parent 2
-   School phone
-
-   Duplicate numbers are removed.
 ===================================================== */
 
 const rawRecipients = [
@@ -3009,7 +2997,6 @@ const rawRecipients = [
 
 ];
 
-
 const recipients = [];
 
 
@@ -3020,7 +3007,6 @@ rawRecipients.forEach(
       normalizeAttendanceWhatsAppNumber(
         number
       );
-
 
     if (
       normalized &&
@@ -3040,7 +3026,7 @@ rawRecipients.forEach(
 
 
 /* =====================================================
-   NO WHATSAPP NUMBERS
+   NO RECIPIENTS
 ===================================================== */
 
 if (!recipients.length) {
@@ -3053,12 +3039,35 @@ if (!recipients.length) {
   return {
 
     sent: false,
-
     failed: false,
-
     sentCount: 0,
-
     failedCount: 0
+
+  };
+
+}
+
+
+/* =====================================================
+   CHECK SUPABASE CLIENT
+===================================================== */
+
+if (
+  typeof supabaseClient === "undefined" ||
+  !supabaseClient ||
+  !supabaseClient.functions
+) {
+
+  console.error(
+    "Supabase Functions client unavailable."
+  );
+
+  return {
+
+    sent: false,
+    failed: true,
+    sentCount: 0,
+    failedCount: recipients.length
 
   };
 
@@ -3075,31 +3084,6 @@ for (
 
   try {
 
-    if (
-      typeof supabaseClient === "undefined" ||
-      !supabaseClient ||
-      !supabaseClient.functions
-    ) {
-
-      console.error(
-        "Supabase Functions client unavailable."
-      );
-
-      failedCount++;
-
-      continue;
-
-    }
-
-
-    /* =================================================
-       SUPABASE FUNCTION CALL
-
-       Explicitly use the current Supabase key for
-       authorization. This matches the successful
-       manual Edge Function test.
-    ================================================= */
-
     const {
       data,
       error
@@ -3110,17 +3094,15 @@ for (
 
           body: {
 
-            recipient:
-              recipient,
+            recipient: recipient,
 
-            message:
-              message
+            message: message
 
           },
 
           headers: {
 
-            "Authorization":
+            Authorization:
               "Bearer " + supabaseKey
 
           }
@@ -3168,7 +3150,7 @@ for (
     } else {
 
       console.error(
-        "WhatsApp function returned an unsuccessful result:",
+        "WhatsApp function returned unsuccessful result:",
         recipient,
         data
       );
@@ -3176,7 +3158,6 @@ for (
       failedCount++;
 
     }
-
 
   } catch (
     recipientError
@@ -3224,7 +3205,6 @@ console.error(
   error
 );
 
-
 return {
 
   sent: false,
@@ -3241,6 +3221,7 @@ return {
 }
 
 }
+
 
 
 
