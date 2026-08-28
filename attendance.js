@@ -1155,16 +1155,933 @@ function escapeAttendanceText(
    VIEW STUDENT ATTENDANCE
 ========================================================= */
 
+/* =========================================================
+   VIEW STUDENT ATTENDANCE
+   CALENDAR-BASED ATTENDANCE LOG BOOK
+========================================================= */
+
 function openStudentAttendanceViewer() {
 
   hideTeacherAttendanceMenu();
 
+  const existing =
+    document.getElementById(
+      "studentAttendanceViewerOverlay"
+    );
 
-  // Viewer will be built in the next stage.
+  if (existing) {
+    existing.remove();
+  }
 
-  console.log(
-    "Student attendance viewer selected."
+
+  const overlay =
+    document.createElement("div");
+
+  overlay.id =
+    "studentAttendanceViewerOverlay";
+
+  overlay.className =
+    "student-attendance-viewer-overlay";
+
+
+  const modal =
+    document.createElement("div");
+
+  modal.className =
+    "student-attendance-viewer";
+
+
+  modal.innerHTML = `
+
+    <!-- =================================================
+         HEADER
+    ================================================== -->
+
+    <div class="student-attendance-viewer-header">
+
+      <div class="student-attendance-viewer-title">
+        Student Attendance
+      </div>
+
+      <button
+        type="button"
+        class="student-attendance-viewer-close"
+        id="studentAttendanceViewerClose"
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <!-- =================================================
+         STUDENT SEARCH
+    ================================================== -->
+
+    <div class="student-attendance-viewer-search">
+
+      <input
+        type="text"
+        id="studentAttendanceViewerSearch"
+        placeholder="Search student / Reg No."
+        autocomplete="off"
+      >
+
+    </div>
+
+
+    <!-- =================================================
+         SEARCH RESULTS
+    ================================================== -->
+
+    <div
+      id="studentAttendanceViewerResults"
+      class="student-attendance-viewer-results"
+    >
+    </div>
+
+
+    <!-- =================================================
+         SELECTED STUDENT
+    ================================================== -->
+
+    <div
+      id="studentAttendanceSelected"
+      class="student-attendance-selected"
+      style="display:none;"
+    >
+
+      <div class="student-attendance-selected-info">
+
+        <div
+          id="studentAttendanceSelectedName"
+          class="student-attendance-selected-name"
+        ></div>
+
+        <div
+          id="studentAttendanceSelectedDetails"
+          class="student-attendance-selected-details"
+        ></div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =================================================
+         CALENDAR
+    ================================================== -->
+
+    <div
+      id="studentAttendanceCalendar"
+      class="student-attendance-calendar"
+      style="display:none;"
+    >
+    </div>
+
+
+  `;
+
+
+  overlay.appendChild(modal);
+
+  document.body.appendChild(overlay);
+
+
+  /* =====================================================
+     CLOSE
+  ===================================================== */
+
+  document
+    .getElementById(
+      "studentAttendanceViewerClose"
+    )
+    .addEventListener(
+      "click",
+      closeStudentAttendanceViewer
+    );
+
+
+  /* =====================================================
+     SEARCH
+  ===================================================== */
+
+  document
+    .getElementById(
+      "studentAttendanceViewerSearch"
+    )
+    .addEventListener(
+      "input",
+      function () {
+
+        searchStudentAttendanceViewer(
+          this.value
+        );
+
+      }
+    );
+
+
+  /* =====================================================
+     STORE STATE
+  ===================================================== */
+
+  window.studentAttendanceViewerStudent =
+    null;
+
+  window.studentAttendanceViewerRecords =
+    [];
+
+
+  /* =====================================================
+     LOAD SCHOOL STUDENTS
+  ===================================================== */
+
+  loadStudentAttendanceViewerStudents();
+
+}
+
+
+/* =========================================================
+   CLOSE VIEWER
+========================================================= */
+
+function closeStudentAttendanceViewer() {
+
+  const overlay =
+    document.getElementById(
+      "studentAttendanceViewerOverlay"
+    );
+
+  if (overlay) {
+    overlay.remove();
+  }
+
+}
+
+/* =========================================================
+   LOAD STUDENTS FOR ATTENDANCE VIEWER
+========================================================= */
+
+async function loadStudentAttendanceViewerStudents() {
+
+  try {
+
+    if (
+      typeof schoolCode === "undefined" ||
+      !schoolCode
+    ) {
+
+      console.error(
+        "Student Attendance Viewer: schoolCode unavailable."
+      );
+
+      return;
+    }
+
+
+    if (
+      typeof supabaseClient === "undefined" ||
+      !supabaseClient ||
+      typeof supabaseClient.from !== "function"
+    ) {
+
+      console.error(
+        "Student Attendance Viewer: Supabase unavailable."
+      );
+
+      return;
+    }
+
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("students")
+        .select(`
+          id,
+          school_code,
+          department,
+          student_name,
+          class,
+          reg_no
+        `)
+        .eq(
+          "school_code",
+          schoolCode
+        )
+        .order(
+          "student_name",
+          {
+            ascending: true
+          }
+        );
+
+
+    if (error) {
+
+      console.error(
+        "Student Attendance Viewer student loading error:",
+        error
+      );
+
+      return;
+    }
+
+
+    window.studentAttendanceViewerStudents =
+      data || [];
+
+
+  } catch (error) {
+
+    console.error(
+      "Student Attendance Viewer loading failed:",
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   SEARCH VIEWER STUDENTS
+========================================================= */
+
+function searchStudentAttendanceViewer(
+  searchValue = ""
+) {
+
+  const results =
+    document.getElementById(
+      "studentAttendanceViewerResults"
+    );
+
+  if (!results) return;
+
+
+  const search =
+    String(searchValue || "")
+      .trim()
+      .toLowerCase();
+
+
+  if (!search) {
+
+    results.innerHTML = "";
+
+    return;
+  }
+
+
+  const students =
+    window.studentAttendanceViewerStudents ||
+    [];
+
+
+  const filtered =
+    students.filter(
+      student => {
+
+        const name =
+          String(
+            student.student_name || ""
+          ).toLowerCase();
+
+
+        const regNo =
+          String(
+            student.reg_no || ""
+          ).toLowerCase();
+
+
+        return (
+          name.includes(search) ||
+          regNo.includes(search)
+        );
+
+      }
+    )
+    .slice(0, 30);
+
+
+  if (!filtered.length) {
+
+    results.innerHTML = `
+      <div class="student-attendance-viewer-empty">
+        No students found.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  results.innerHTML =
+    filtered.map(
+      student => `
+
+        <button
+          type="button"
+          class="student-attendance-viewer-student"
+          data-student-id="${student.id}"
+        >
+
+          <span class="student-attendance-viewer-student-name">
+            ${escapeAttendanceHTML(
+              student.student_name || ""
+            )}
+          </span>
+
+          <span class="student-attendance-viewer-student-class">
+            ${escapeAttendanceHTML(
+              student.class || ""
+            )}
+          </span>
+
+          <span class="student-attendance-viewer-student-reg">
+            ${escapeAttendanceHTML(
+              student.reg_no || ""
+            )}
+          </span>
+
+        </button>
+
+      `
+    )
+    .join("");
+
+
+  results
+    .querySelectorAll(
+      ".student-attendance-viewer-student"
+    )
+    .forEach(
+      button => {
+
+        button.addEventListener(
+          "click",
+          function () {
+
+            const studentId =
+              this.dataset.studentId;
+
+
+            const student =
+              students.find(
+                item =>
+                  String(item.id) ===
+                  String(studentId)
+              );
+
+
+            if (student) {
+
+              selectStudentForAttendanceViewer(
+                student
+              );
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   SELECT STUDENT
+========================================================= */
+
+function selectStudentForAttendanceViewer(
+  student
+) {
+
+  window.studentAttendanceViewerStudent =
+    student;
+
+
+  const searchBox =
+    document.getElementById(
+      "studentAttendanceViewerSearch"
+    );
+
+  const results =
+    document.getElementById(
+      "studentAttendanceViewerResults"
+    );
+
+  const selected =
+    document.getElementById(
+      "studentAttendanceSelected"
+    );
+
+  const name =
+    document.getElementById(
+      "studentAttendanceSelectedName"
+    );
+
+  const details =
+    document.getElementById(
+      "studentAttendanceSelectedDetails"
+    );
+
+  const calendar =
+    document.getElementById(
+      "studentAttendanceCalendar"
+    );
+
+
+  if (searchBox) {
+
+    searchBox.value =
+      student.student_name || "";
+
+  }
+
+
+  if (results) {
+
+    results.innerHTML = "";
+
+  }
+
+
+  if (selected) {
+
+    selected.style.display =
+      "block";
+
+  }
+
+
+  if (name) {
+
+    name.textContent =
+      student.student_name || "";
+
+  }
+
+
+  if (details) {
+
+    details.textContent =
+      `${student.class || ""}  •  ${student.reg_no || ""}`;
+
+  }
+
+
+  if (calendar) {
+
+    calendar.style.display =
+      "block";
+
+  }
+
+
+  loadStudentAttendanceCalendar(
+    student
   );
+
+}
+
+/* =========================================================
+   LOAD STUDENT ATTENDANCE
+========================================================= */
+
+async function loadStudentAttendanceCalendar(
+  student
+) {
+
+  const calendar =
+    document.getElementById(
+      "studentAttendanceCalendar"
+    );
+
+  if (!calendar) return;
+
+
+  calendar.innerHTML = `
+    <div class="student-attendance-calendar-loading">
+      Loading attendance...
+    </div>
+  `;
+
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("student_attendance")
+        .select(`
+          id,
+          attendance_date,
+          morning_present,
+          afternoon_present
+        `)
+        .eq(
+          "school_code",
+          schoolCode
+        )
+        .eq(
+          "student_id",
+          student.id
+        )
+        .order(
+          "attendance_date",
+          {
+            ascending: true
+          }
+        );
+
+
+    if (error) {
+
+      console.error(
+        "Student attendance calendar loading error:",
+        error
+      );
+
+
+      calendar.innerHTML = `
+        <div class="student-attendance-viewer-empty">
+          Unable to load attendance.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    window.studentAttendanceViewerRecords =
+      data || [];
+
+
+    renderStudentAttendanceCalendar(
+      student,
+      data || []
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Student attendance calendar failed:",
+      error
+    );
+
+
+    calendar.innerHTML = `
+      <div class="student-attendance-viewer-empty">
+        Unable to load attendance.
+      </div>
+    `;
+
+  }
+
+}
+
+
+/* =========================================================
+   RENDER CALENDAR
+========================================================= */
+
+function renderStudentAttendanceCalendar(
+  student,
+  records
+) {
+
+  const calendar =
+    document.getElementById(
+      "studentAttendanceCalendar"
+    );
+
+  if (!calendar) return;
+
+
+  const recordMap =
+    new Map();
+
+
+  records.forEach(
+    record => {
+
+      recordMap.set(
+        record.attendance_date,
+        record
+      );
+
+    }
+  );
+
+
+  const today =
+    new Date();
+
+
+  let year =
+    today.getFullYear();
+
+
+  let month =
+    today.getMonth();
+
+
+  function renderMonth() {
+
+    const firstDay =
+      new Date(
+        year,
+        month,
+        1
+      );
+
+
+    const lastDay =
+      new Date(
+        year,
+        month + 1,
+        0
+      );
+
+
+    const monthName =
+      firstDay.toLocaleString(
+        "en-US",
+        {
+          month: "long"
+        }
+      );
+
+
+    const daysInMonth =
+      lastDay.getDate();
+
+
+    /*
+       Monday-based calendar
+    */
+
+    let startingDay =
+      firstDay.getDay();
+
+    startingDay =
+      startingDay === 0
+        ? 6
+        : startingDay - 1;
+
+
+    let html = `
+
+      <div class="student-attendance-calendar-header">
+
+        <button
+          type="button"
+          class="student-attendance-calendar-nav"
+          id="attendanceCalendarPrev"
+        >
+          ‹
+        </button>
+
+        <div class="student-attendance-calendar-month">
+          ${monthName} ${year}
+        </div>
+
+        <button
+          type="button"
+          class="student-attendance-calendar-nav"
+          id="attendanceCalendarNext"
+        >
+          ›
+        </button>
+
+      </div>
+
+
+      <div class="student-attendance-calendar-weekdays">
+
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+        <div>Sun</div>
+
+      </div>
+
+
+      <div class="student-attendance-calendar-grid">
+    `;
+
+
+    /* EMPTY CELLS */
+
+    for (
+      let i = 0;
+      i < startingDay;
+      i++
+    ) {
+
+      html += `
+        <div class="student-attendance-calendar-day empty">
+        </div>
+      `;
+
+    }
+
+
+    /* DAYS */
+
+    for (
+      let day = 1;
+      day <= daysInMonth;
+      day++
+    ) {
+
+      const date =
+        `${year}-${
+          String(
+            month + 1
+          ).padStart(
+            2,
+            "0"
+          )
+        }-${
+          String(day).padStart(
+            2,
+            "0"
+          )
+        }`;
+
+
+      const record =
+        recordMap.get(date);
+
+
+      let ticks = "";
+
+
+      if (
+        record &&
+        record.morning_present
+      ) {
+
+        ticks += `
+          <span
+            class="attendance-tick morning"
+            title="Morning"
+          >✓</span>
+        `;
+
+      }
+
+
+      if (
+        record &&
+        record.afternoon_present
+      ) {
+
+        ticks += `
+          <span
+            class="attendance-tick afternoon"
+            title="Afternoon"
+          >✓</span>
+        `;
+
+      }
+
+
+      html += `
+
+        <div
+          class="student-attendance-calendar-day"
+          data-date="${date}"
+        >
+
+          <div class="student-attendance-calendar-date">
+            ${day}
+          </div>
+
+          <div class="student-attendance-calendar-ticks">
+            ${ticks}
+          </div>
+
+        </div>
+
+      `;
+
+    }
+
+
+    html += `
+      </div>
+    `;
+
+
+    calendar.innerHTML =
+      html;
+
+
+    document
+      .getElementById(
+        "attendanceCalendarPrev"
+      )
+      .addEventListener(
+        "click",
+        function () {
+
+          month--;
+
+          if (month < 0) {
+
+            month = 11;
+            year--;
+
+          }
+
+          renderMonth();
+
+        }
+      );
+
+
+    document
+      .getElementById(
+        "attendanceCalendarNext"
+      )
+      .addEventListener(
+        "click",
+        function () {
+
+          month++;
+
+          if (month > 11) {
+
+            month = 0;
+            year++;
+
+          }
+
+          renderMonth();
+
+        }
+      );
+
+  }
+
+
+  renderMonth();
 
 }
 
