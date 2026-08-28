@@ -301,7 +301,7 @@ async function searchAttendanceStudents(searchTerm) {
 
   try {
 
-    let query = supabase
+    let query = supabaseClient
       .from("students")
       .select(`
         id,
@@ -1325,7 +1325,7 @@ async function markSelectedAttendance() {
         ----------------------------------------- */
 
         const { data: existingRecord, error: selectError } =
-          await supabase
+          await supabaseClient
             .from("student_attendance")
             .select(`
               id,
@@ -1400,7 +1400,7 @@ async function markSelectedAttendance() {
 
 
           const { error: updateError } =
-            await supabase
+            await supabaseClient
               .from("student_attendance")
               .update(updateData)
               .eq(
@@ -1472,7 +1472,7 @@ async function markSelectedAttendance() {
 
 
         const { error: insertError } =
-          await supabase
+          await supabaseClient
             .from("student_attendance")
             .insert(insertData);
 
