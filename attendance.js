@@ -318,6 +318,13 @@ window.attendanceSelectedStudents = [];
 
 
 /* =========================================================
+   SCHOOL WHATSAPP INFORMATION
+========================================================= */
+
+window.attendanceSchoolInfo = null;
+
+
+/* =========================================================
    SEARCH TIMER
 ========================================================= */
 
@@ -401,6 +408,8 @@ async function loadAttendanceStudents() {
 
     /* =====================================================
        LOAD ONLY STUDENTS FROM LOGGED-IN SCHOOL
+
+       WhatsApp contacts are loaded here as well.
     ===================================================== */
 
     const {
@@ -415,7 +424,9 @@ async function loadAttendanceStudents() {
           department,
           student_name,
           class,
-          reg_no
+          reg_no,
+          parent_contact1,
+          parent_contact2
         `)
         .eq(
           "school_code",
@@ -469,6 +480,15 @@ async function loadAttendanceStudents() {
 
 
     /* =====================================================
+       LOAD SCHOOL INFORMATION
+
+       School phone is also used for WhatsApp.
+    ===================================================== */
+
+    await loadAttendanceSchoolInfo();
+
+
+    /* =====================================================
        POPULATE FILTERS
     ===================================================== */
 
@@ -508,6 +528,70 @@ async function loadAttendanceStudents() {
       `;
 
     }
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD SCHOOL INFORMATION FOR WHATSAPP
+========================================================= */
+
+async function loadAttendanceSchoolInfo() {
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("schools")
+        .select(`
+          school_code,
+          School_name,
+          phone
+        `)
+        .eq(
+          "school_code",
+          schoolCode
+        )
+        .maybeSingle();
+
+
+    if (error) {
+
+      console.error(
+        "Attendance school information loading error:",
+        error
+      );
+
+      window.attendanceSchoolInfo = null;
+
+      return;
+
+    }
+
+
+    window.attendanceSchoolInfo =
+      data || null;
+
+
+    console.log(
+      "Attendance school information loaded:",
+      window.attendanceSchoolInfo
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Attendance school information failed:",
+      error
+    );
+
+    window.attendanceSchoolInfo = null;
 
   }
 
@@ -1153,10 +1237,6 @@ function escapeAttendanceText(
 
 /* =========================================================
    VIEW STUDENT ATTENDANCE
-========================================================= */
-
-/* =========================================================
-   VIEW STUDENT ATTENDANCE
    CALENDAR-BASED ATTENDANCE LOG BOOK
 ========================================================= */
 
@@ -1246,65 +1326,66 @@ function openStudentAttendanceViewer() {
          SELECTED STUDENT
     ================================================== -->
 
- <div
-  id="studentAttendanceSelected"
-  class="student-attendance-selected"
-  style="display:none;"
->
-
-  <div class="student-attendance-selected-info">
-
     <div
-      id="studentAttendanceSelectedName"
-      class="student-attendance-selected-name"
-    ></div>
+      id="studentAttendanceSelected"
+      class="student-attendance-selected"
+      style="display:none;"
+    >
 
-    <div
-      id="studentAttendanceSelectedDetails"
-      class="student-attendance-selected-details"
-    ></div>
+      <div class="student-attendance-selected-info">
 
-  </div>
+        <div
+          id="studentAttendanceSelectedName"
+          class="student-attendance-selected-name"
+        ></div>
 
-  <div
-    id="studentAttendanceCounters"
-    class="student-attendance-counters"
-  >
+        <div
+          id="studentAttendanceSelectedDetails"
+          class="student-attendance-selected-details"
+        ></div>
 
-    <div class="student-attendance-counter morning">
+      </div>
 
-      <span class="student-attendance-counter-label">
-        Morning Marks
-      </span>
-
-      <span
-        id="studentAttendanceMorningCount"
-        class="student-attendance-counter-value"
+      <div
+        id="studentAttendanceCounters"
+        class="student-attendance-counters"
       >
-        0
-      </span>
+
+        <div class="student-attendance-counter morning">
+
+          <span class="student-attendance-counter-label">
+            Morning Marks
+          </span>
+
+          <span
+            id="studentAttendanceMorningCount"
+            class="student-attendance-counter-value"
+          >
+            0
+          </span>
+
+        </div>
+
+
+        <div class="student-attendance-counter afternoon">
+
+          <span class="student-attendance-counter-label">
+            Afternoon Marks
+          </span>
+
+          <span
+            id="studentAttendanceAfternoonCount"
+            class="student-attendance-counter-value"
+          >
+            0
+          </span>
+
+        </div>
+
+      </div>
 
     </div>
 
-
-    <div class="student-attendance-counter afternoon">
-
-      <span class="student-attendance-counter-label">
-        Afternoon Marks
-      </span>
-
-      <span
-        id="studentAttendanceAfternoonCount"
-        class="student-attendance-counter-value"
-      >
-        0
-      </span>
-
-    </div>
-
-  </div>
-
-</div>
 
     <!-- =================================================
          CALENDAR
@@ -1316,7 +1397,6 @@ function openStudentAttendanceViewer() {
       style="display:none;"
     >
     </div>
-
 
   `;
 
@@ -1396,6 +1476,7 @@ function closeStudentAttendanceViewer() {
   }
 
 }
+
 
 /* =========================================================
    LOAD STUDENTS FOR ATTENDANCE VIEWER
@@ -1729,6 +1810,7 @@ function selectStudentForAttendanceViewer(
 
 }
 
+
 /* =========================================================
    LOAD STUDENT ATTENDANCE
 ========================================================= */
@@ -1800,19 +1882,19 @@ async function loadStudentAttendanceCalendar(
     }
 
 
-window.studentAttendanceViewerRecords =
-  data || [];
+    window.studentAttendanceViewerRecords =
+      data || [];
 
 
-updateStudentAttendanceCounters(
-  data || []
-);
+    updateStudentAttendanceCounters(
+      data || []
+    );
 
 
-renderStudentAttendanceCalendar(
-  student,
-  data || []
-);
+    renderStudentAttendanceCalendar(
+      student,
+      data || []
+    );
 
 
   } catch (error) {
@@ -1832,6 +1914,7 @@ renderStudentAttendanceCalendar(
   }
 
 }
+
 
 /* =========================================================
    ATTENDANCE COUNTERS
@@ -1883,6 +1966,7 @@ function updateStudentAttendanceCounters(
   }
 
 }
+
 
 /* =========================================================
    RENDER CALENDAR
@@ -2276,10 +2360,17 @@ async function markSelectedAttendance() {
 
   /* -------------------------------------------------------
      CURRENT DATE + TIME
+
+     This timestamp is the same timestamp stored in
+     student_attendance and used for WhatsApp.
   ------------------------------------------------------- */
 
   const now =
     new Date();
+
+
+  const attendanceTimestamp =
+    now.toISOString();
 
 
   const attendanceDate =
@@ -2307,6 +2398,12 @@ async function markSelectedAttendance() {
     0;
 
   let failedCount =
+    0;
+
+  let whatsappSentCount =
+    0;
+
+  let whatsappFailedCount =
     0;
 
 
@@ -2343,7 +2440,7 @@ async function markSelectedAttendance() {
 
       try {
 
-        const schoolCode =
+        const studentSchoolCode =
           student.school_code;
 
 
@@ -2366,7 +2463,7 @@ async function markSelectedAttendance() {
             `)
             .eq(
               "school_code",
-              schoolCode
+              studentSchoolCode
             )
             .eq(
               "student_id",
@@ -2417,6 +2514,10 @@ async function markSelectedAttendance() {
         }
 
 
+        let attendanceWasSaved =
+          false;
+
+
         /* -----------------------------------------------
            UPDATE EXISTING DAY
         ----------------------------------------------- */
@@ -2430,20 +2531,20 @@ async function markSelectedAttendance() {
                     true,
 
                   morning_marked_at:
-                    now.toISOString(),
+                    attendanceTimestamp,
 
                   updated_at:
-                    now.toISOString()
+                    attendanceTimestamp
                 }
               : {
                   afternoon_present:
                     true,
 
                   afternoon_marked_at:
-                    now.toISOString(),
+                    attendanceTimestamp,
 
                   updated_at:
-                    now.toISOString()
+                    attendanceTimestamp
                 };
 
 
@@ -2479,7 +2580,8 @@ async function markSelectedAttendance() {
 
           markedCount++;
 
-          continue;
+          attendanceWasSaved =
+            true;
 
         }
 
@@ -2488,93 +2590,139 @@ async function markSelectedAttendance() {
            CREATE NEW DAY RECORD
         ----------------------------------------------- */
 
-        const insertData = {
+        else {
 
-          school_code:
-            schoolCode,
+          const insertData = {
 
-          student_id:
-            student.id,
+            school_code:
+              studentSchoolCode,
 
-          reg_no:
-            student.reg_no ||
-            null,
+            student_id:
+              student.id,
 
-          attendance_date:
-            attendanceDate,
+            reg_no:
+              student.reg_no ||
+              null,
 
-          morning_present:
-            session === "morning",
+            attendance_date:
+              attendanceDate,
 
-          afternoon_present:
-            session === "afternoon",
+            morning_present:
+              session === "morning",
 
-          morning_marked_at:
-            session === "morning"
-              ? now.toISOString()
-              : null,
+            afternoon_present:
+              session === "afternoon",
 
-          afternoon_marked_at:
-            session === "afternoon"
-              ? now.toISOString()
-              : null,
+            morning_marked_at:
+              session === "morning"
+                ? attendanceTimestamp
+                : null,
 
-          created_at:
-            now.toISOString(),
+            afternoon_marked_at:
+              session === "afternoon"
+                ? attendanceTimestamp
+                : null,
 
-          updated_at:
-            now.toISOString()
+            created_at:
+              attendanceTimestamp,
 
-        };
+            updated_at:
+              attendanceTimestamp
 
-
-        const {
-          error: insertError
-        } =
-          await supabaseClient
-            .from(
-              "student_attendance"
-            )
-            .insert(
-              insertData
-            );
+          };
 
 
-        /* -----------------------------------------------
-           INSERT ERROR
-        ----------------------------------------------- */
-
-        if (insertError) {
-
-          console.error(
-            "Attendance insert error:",
-            insertError
-          );
+          const {
+            error: insertError
+          } =
+            await supabaseClient
+              .from(
+                "student_attendance"
+              )
+              .insert(
+                insertData
+              );
 
 
           /* ---------------------------------------------
-             UNIQUE CONSTRAINT PROTECTION
+             INSERT ERROR
           --------------------------------------------- */
 
-          if (
-            insertError.code ===
-            "23505"
-          ) {
+          if (insertError) {
 
-            alreadyMarkedCount++;
+            console.error(
+              "Attendance insert error:",
+              insertError
+            );
 
-          } else {
 
-            failedCount++;
+            /* -------------------------------------------
+               UNIQUE CONSTRAINT PROTECTION
+            ------------------------------------------- */
+
+            if (
+              insertError.code ===
+              "23505"
+            ) {
+
+              alreadyMarkedCount++;
+
+            } else {
+
+              failedCount++;
+
+            }
+
+            continue;
 
           }
 
-          continue;
+
+          markedCount++;
+
+          attendanceWasSaved =
+            true;
 
         }
 
 
-        markedCount++;
+        /* =================================================
+           SEND WHATSAPP ONLY AFTER SUCCESSFUL MARKING
+        ================================================= */
+
+        if (
+          attendanceWasSaved
+        ) {
+
+          const whatsappResult =
+            await sendAttendanceWhatsAppNotification(
+              student,
+              session,
+              attendanceTimestamp
+            );
+
+
+          if (
+            whatsappResult.sent
+          ) {
+
+            whatsappSentCount +=
+              whatsappResult.sentCount;
+
+          }
+
+
+          if (
+            whatsappResult.failed
+          ) {
+
+            whatsappFailedCount +=
+              whatsappResult.failedCount;
+
+          }
+
+        }
+
 
       } catch (
         studentError
@@ -2655,6 +2803,54 @@ async function markSelectedAttendance() {
     }
 
 
+    /* =====================================================
+       WHATSAPP RESULT
+    ===================================================== */
+
+    if (
+      whatsappSentCount > 0
+    ) {
+
+      if (message) {
+
+        message +=
+          " ";
+
+      }
+
+
+      message +=
+        `WhatsApp sent to ${whatsappSentCount} recipient${
+          whatsappSentCount === 1
+            ? ""
+            : "s"
+        }.`;
+
+    }
+
+
+    if (
+      whatsappFailedCount > 0
+    ) {
+
+      if (message) {
+
+        message +=
+          " ";
+
+      }
+
+
+      message +=
+        `WhatsApp notification failed for ${whatsappFailedCount} recipient${
+          whatsappFailedCount === 1
+            ? ""
+            : "s"
+        }.`;
+
+    }
+
+
     if (!message) {
 
       message =
@@ -2665,7 +2861,10 @@ async function markSelectedAttendance() {
 
     showAttendanceMessage(
       message,
-      failedCount > 0
+      (
+        failedCount > 0 ||
+        whatsappFailedCount > 0
+      )
         ? "error"
         : "success"
     );
@@ -2709,6 +2908,405 @@ async function markSelectedAttendance() {
     }
 
   }
+
+}
+
+
+/* =========================================================
+   SEND ATTENDANCE WHATSAPP NOTIFICATION
+========================================================= */
+
+async function sendAttendanceWhatsAppNotification(
+  student,
+  session,
+  attendanceTimestamp
+) {
+
+  let sentCount =
+    0;
+
+  let failedCount =
+    0;
+
+
+  try {
+
+    /* =====================================================
+       SCHOOL INFORMATION
+    ===================================================== */
+
+    const schoolInfo =
+      window.attendanceSchoolInfo || {};
+
+
+    const schoolName =
+      schoolInfo.School_name ||
+      "School";
+
+
+    /* =====================================================
+       FORMAT STORED ATTENDANCE TIME
+
+       Uses the exact timestamp that was stored in
+       student_attendance.
+    ===================================================== */
+
+    const attendanceDateTime =
+      new Date(
+        attendanceTimestamp
+      );
+
+
+    const formattedDate =
+      attendanceDateTime.toLocaleDateString(
+        "en-NG",
+        {
+          day: "2-digit",
+          month: "long",
+          year: "numeric"
+        }
+      );
+
+
+    const formattedTime =
+      attendanceDateTime.toLocaleTimeString(
+        "en-NG",
+        {
+          hour: "numeric",
+          minute: "2-digit",
+          hour12: true
+        }
+      );
+
+
+    /* =====================================================
+       MESSAGE
+    ===================================================== */
+
+    const message =
+      `${student.student_name || "Student"} has arrived ${schoolName} Premises.\n\n` +
+      `Date: ${formattedDate}\n` +
+      `Time: ${formattedTime}`;
+
+
+    /* =====================================================
+       COLLECT RECIPIENTS
+
+       Parent 1
+       Parent 2
+       School phone
+
+       Duplicate numbers are removed.
+    ===================================================== */
+
+    const rawRecipients = [
+
+      student.parent_contact1,
+
+      student.parent_contact2,
+
+      schoolInfo.phone
+
+    ];
+
+
+    const recipients = [];
+
+
+    rawRecipients.forEach(
+      number => {
+
+        const normalized =
+          normalizeAttendanceWhatsAppNumber(
+            number
+          );
+
+
+        if (
+          normalized &&
+          !recipients.includes(
+            normalized
+          )
+        ) {
+
+          recipients.push(
+            normalized
+          );
+
+        }
+
+      }
+    );
+
+
+    /* =====================================================
+       NO WHATSAPP NUMBERS
+    ===================================================== */
+
+    if (!recipients.length) {
+
+      console.warn(
+        "No WhatsApp recipients available for:",
+        student.student_name
+      );
+
+      return {
+        sent: false,
+        failed: 0,
+        sentCount: 0
+      };
+
+    }
+
+
+    /* =====================================================
+       SEND TO EACH RECIPIENT
+    ===================================================== */
+
+    for (
+      const recipient of recipients
+    ) {
+
+      try {
+
+        if (
+          typeof supabaseClient === "undefined" ||
+          !supabaseClient ||
+          !supabaseClient.functions
+        ) {
+
+          console.error(
+            "Supabase Functions client unavailable."
+          );
+
+          failedCount++;
+
+          continue;
+
+        }
+
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.functions.invoke(
+            "send-attendance-whatsapp",
+            {
+              body: {
+                recipient:
+                  recipient,
+
+                message:
+                  message
+              }
+            }
+          );
+
+
+        if (error) {
+
+          console.error(
+            "WhatsApp notification error for",
+            recipient,
+            error,
+            data
+          );
+
+          failedCount++;
+
+          continue;
+
+        }
+
+
+        if (
+          data &&
+          data.success === true
+        ) {
+
+          sentCount++;
+
+          console.log(
+            "Attendance WhatsApp sent successfully:",
+            recipient
+          );
+
+        } else {
+
+          console.error(
+            "WhatsApp function returned an unsuccessful result:",
+            recipient,
+            data
+          );
+
+          failedCount++;
+
+        }
+
+
+      } catch (recipientError) {
+
+        console.error(
+          "WhatsApp recipient error:",
+          recipient,
+          recipientError
+        );
+
+        failedCount++;
+
+      }
+
+    }
+
+
+    return {
+
+      sent:
+        sentCount > 0,
+
+      failed:
+        failedCount > 0,
+
+      sentCount:
+        sentCount,
+
+      failedCount:
+        failedCount
+
+    };
+
+
+  } catch (error) {
+
+    console.error(
+      "Attendance WhatsApp notification failed:",
+      error
+    );
+
+
+    return {
+
+      sent: false,
+
+      failed: true,
+
+      sentCount: 0,
+
+      failedCount: 1
+
+    };
+
+  }
+
+}
+
+
+/* =========================================================
+   NORMALIZE WHATSAPP NUMBER
+========================================================= */
+
+function normalizeAttendanceWhatsAppNumber(
+  number
+) {
+
+  if (
+    number === null ||
+    number === undefined
+  ) {
+
+    return null;
+
+  }
+
+
+  let value =
+    String(number)
+      .trim();
+
+
+  if (!value) {
+
+    return null;
+
+  }
+
+
+  /* -------------------------------------------------------
+     Remove spaces, brackets, dashes and other symbols
+     while preserving a leading +
+  ------------------------------------------------------- */
+
+  value =
+    value.replace(
+      /[^\d+]/g,
+      ""
+    );
+
+
+  /* -------------------------------------------------------
+     Convert +234XXXXXXXXXX
+     to 234XXXXXXXXXX
+  ------------------------------------------------------- */
+
+  if (
+    value.startsWith("+")
+  ) {
+
+    value =
+      value.substring(1);
+
+  }
+
+
+  /* -------------------------------------------------------
+     Nigerian local format:
+     08123456789
+     ->
+     2348123456789
+  ------------------------------------------------------- */
+
+  if (
+    value.startsWith("0") &&
+    value.length === 11
+  ) {
+
+    value =
+      "234" +
+      value.substring(1);
+
+  }
+
+
+  /* -------------------------------------------------------
+     Already international Nigerian number
+  ------------------------------------------------------- */
+
+  if (
+    value.startsWith("234") &&
+    value.length === 13
+  ) {
+
+    return value;
+
+  }
+
+
+  /* -------------------------------------------------------
+     Return other international numbers unchanged
+     when they appear reasonably valid.
+  ------------------------------------------------------- */
+
+  if (
+    value.length >= 10
+  ) {
+
+    return value;
+
+  }
+
+
+  return null;
 
 }
 
@@ -2771,7 +3369,7 @@ function showAttendanceMessage(
       }
 
     },
-    4000
+    5000
   );
 
 }
