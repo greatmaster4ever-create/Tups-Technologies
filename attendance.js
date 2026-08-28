@@ -332,9 +332,42 @@ async function loadAttendanceStudents() {
 
   try {
 
-    /* -------------------------------------------------------
+    /* =====================================================
+       VERIFY SCHOOL CODE
+    ===================================================== */
+
+    if (
+      typeof schoolCode === "undefined" ||
+      !schoolCode
+    ) {
+
+      console.error(
+        "Attendance: schoolCode is not available."
+      );
+
+      const results =
+        document.getElementById(
+          "attendanceResults"
+        );
+
+      if (results) {
+
+        results.innerHTML = `
+          <div class="attendance-error">
+            School information is unavailable.
+          </div>
+        `;
+
+      }
+
+      return;
+
+    }
+
+
+    /* =====================================================
        VERIFY SUPABASE CLIENT
-    ------------------------------------------------------- */
+    ===================================================== */
 
     if (
       typeof supabaseClient === "undefined" ||
@@ -366,9 +399,9 @@ async function loadAttendanceStudents() {
     }
 
 
-    /* -------------------------------------------------------
-       LOAD STUDENTS
-    ------------------------------------------------------- */
+    /* =====================================================
+       LOAD ONLY STUDENTS FROM LOGGED-IN SCHOOL
+    ===================================================== */
 
     const {
       data,
@@ -384,6 +417,10 @@ async function loadAttendanceStudents() {
           class,
           reg_no
         `)
+        .eq(
+          "school_code",
+          schoolCode
+        )
         .order(
           "student_name",
           {
@@ -392,9 +429,9 @@ async function loadAttendanceStudents() {
         );
 
 
-    /* -------------------------------------------------------
+    /* =====================================================
        DATABASE ERROR
-    ------------------------------------------------------- */
+    ===================================================== */
 
     if (error) {
 
@@ -423,24 +460,24 @@ async function loadAttendanceStudents() {
     }
 
 
-    /* -------------------------------------------------------
-       STORE STUDENTS
-    ------------------------------------------------------- */
+    /* =====================================================
+       STORE ONLY THIS SCHOOL'S STUDENTS
+    ===================================================== */
 
     window.attendanceStudents =
       data || [];
 
 
-    /* -------------------------------------------------------
+    /* =====================================================
        POPULATE FILTERS
-    ------------------------------------------------------- */
+    ===================================================== */
 
     populateAttendanceFilters();
 
 
-    /* -------------------------------------------------------
+    /* =====================================================
        INITIAL DISPLAY
-    ------------------------------------------------------- */
+    ===================================================== */
 
     searchAttendanceStudents(
       document.getElementById(
