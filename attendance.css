@@ -1274,3 +1274,27 @@
 
 }
 
+/* =========================================================
+   STUDENT ATTENDANCE SECTION
+========================================================= */
+
+.student-attendance-section {
+
+  width: 100%;
+
+  margin-top: 20px;
+
+}
+
+
+.student-attendance-title {
+
+  margin-bottom: 8px;
+
+  color: #000000;
+
+  font-size: 16px;
+
+  font-weight: 800;
+
+}
