@@ -3138,18 +3138,40 @@ const {
     ================================================= */
 
     if (
-      data &&
-      data.success === true
-    ) {
+  data &&
+  data.success === true
+) {
 
-      sentCount++;
+  sentCount++;
 
-      console.log(
-        "Attendance WhatsApp sent successfully:",
-        recipient
-      );
+  console.log(
+    "Attendance WhatsApp Edge Function response:",
+    recipient,
+    data
+  );
 
-    } else {
+  console.log(
+    "Meta HTTP status:",
+    data.meta_status
+  );
+
+  console.log(
+    "WhatsApp message ID:",
+    data.whatsapp_message_id
+  );
+
+  console.log(
+    "WhatsApp WA ID:",
+    data.wa_id
+  );
+
+  console.log(
+    "Meta response:",
+    data.meta_response
+  );
+
+} 
+	else {
 
       console.error(
         "WhatsApp function returned unsuccessful result:",
