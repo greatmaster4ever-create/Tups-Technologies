@@ -12432,6 +12432,21 @@ async function openStudentUpdateForm(
     <br><br>
 
     <label>
+      Parent Email
+    </label>
+
+    <input
+      type="email"
+      id="parentEmail"
+      value="${
+        data.parent_email || ""
+      }"
+      placeholder="Parent's email address"
+    >
+
+    <br><br>
+
+    <label>
       Address
     </label>
 
@@ -12462,10 +12477,10 @@ async function openStudentUpdateForm(
         id="termFeesUpdateBtn"
         class="admin-btn"
         onclick="
-  processTermFeesPayment(
-    ${studentId}
-  )
-"
+          processTermFeesPayment(
+            ${studentId}
+          )
+        "
       >
         Update
       </button>
@@ -12553,6 +12568,11 @@ async function saveStudentInfo(
     document.getElementById(
       "parentContact2"
     ).value.trim();
+	
+	const parentEmail =
+  document.getElementById(
+    "parentEmail"
+  ).value.trim();
 
   const address =
     document.getElementById(
@@ -12941,6 +12961,8 @@ const studentUpdate = {
 
     parent_contact2: parent2,
 
+	parent_email: parentEmail,
+	
     address: address
 
 };
