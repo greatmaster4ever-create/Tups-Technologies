@@ -204,8 +204,9 @@ function openAttendanceResetDialog() {
 }
 
 
+
 /* =========================================================
-   PERFORM RESET
+   PERFORM END OF TERM ATTENDANCE RESET
 ========================================================= */
 
 async function performAttendanceTermReset() {
@@ -219,6 +220,7 @@ async function performAttendanceTermReset() {
     document.getElementById(
       "attendanceResetConfirm"
     );
+
 
   if (
     !passwordInput ||
@@ -247,9 +249,12 @@ async function performAttendanceTermReset() {
   }
 
 
-  /* Prevent double-click */
+  /* -------------------------------------------------------
+     PREVENT DOUBLE CLICK
+  ------------------------------------------------------- */
 
-  confirmButton.disabled = true;
+  confirmButton.disabled =
+    true;
 
   confirmButton.textContent =
     "Resetting...";
@@ -258,18 +263,21 @@ async function performAttendanceTermReset() {
   try {
 
     /* =====================================================
-       CURRENT SCHOOL
+       GET CURRENT SCHOOL CODE
+
+       The existing attendance module already uses
+       the global schoolCode variable.
+
+       We use the SAME source here.
     ===================================================== */
 
-    const schoolCode =
-      window.attendanceSchoolInfo?.school_code ||
-      window.schoolCode ||
-      sessionStorage.getItem(
-        "schoolCode"
-      );
+    const currentSchoolCode =
+      typeof schoolCode !== "undefined"
+        ? schoolCode
+        : null;
 
 
-    if (!schoolCode) {
+    if (!currentSchoolCode) {
 
       throw new Error(
         "School code could not be determined."
@@ -278,13 +286,20 @@ async function performAttendanceTermReset() {
     }
 
 
+    console.log(
+      "Attendance reset school:",
+      currentSchoolCode
+    );
+
+
     /* =====================================================
-       SUPABASE CLIENT
+       VERIFY SUPABASE CLIENT
     ===================================================== */
 
     if (
       typeof supabaseClient === "undefined" ||
-      !supabaseClient
+      !supabaseClient ||
+      typeof supabaseClient.from !== "function"
     ) {
 
       throw new Error(
@@ -309,10 +324,14 @@ async function performAttendanceTermReset() {
         )
         .eq(
           "school_code",
-          schoolCode
+          currentSchoolCode
         )
         .maybeSingle();
 
+
+    /* =====================================================
+       SCHOOL LOOKUP ERROR
+    ===================================================== */
 
     if (schoolError) {
 
@@ -328,6 +347,10 @@ async function performAttendanceTermReset() {
     }
 
 
+    /* =====================================================
+       SCHOOL NOT FOUND
+    ===================================================== */
+
     if (!school) {
 
       throw new Error(
@@ -336,6 +359,10 @@ async function performAttendanceTermReset() {
 
     }
 
+
+    /* =====================================================
+       PASSWORD CHECK
+    ===================================================== */
 
     if (
       String(school.password) !==
@@ -368,7 +395,7 @@ async function performAttendanceTermReset() {
     const confirmed =
       window.confirm(
         "Are you sure you want to clear ALL attendance records for " +
-        schoolCode +
+        currentSchoolCode +
         "?\n\n" +
         "This action is for the end of term."
       );
@@ -399,9 +426,13 @@ async function performAttendanceTermReset() {
         .delete()
         .eq(
           "school_code",
-          schoolCode
+          currentSchoolCode
         );
 
+
+    /* =====================================================
+       DELETE ERROR
+    ===================================================== */
 
     if (deleteError) {
 
@@ -418,7 +449,7 @@ async function performAttendanceTermReset() {
 
 
     /* =====================================================
-       SUCCESS
+       CLOSE RESET DIALOG
     ===================================================== */
 
     const overlay =
@@ -427,9 +458,15 @@ async function performAttendanceTermReset() {
       );
 
     if (overlay) {
+
       overlay.remove();
+
     }
 
+
+    /* =====================================================
+       SUCCESS
+    ===================================================== */
 
     alert(
       "End of term attendance reset completed successfully."
@@ -438,7 +475,7 @@ async function performAttendanceTermReset() {
 
     console.log(
       "ATTENDANCE TERM RESET COMPLETED:",
-      schoolCode
+      currentSchoolCode
     );
 
 
