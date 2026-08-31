@@ -841,8 +841,7 @@ async function loadAttendanceStudents() {
           student_name,
           class,
           reg_no,
-          parent_contact1,
-          parent_contact2
+          parent_email
         `)
         .eq(
           "school_code",
@@ -2816,11 +2815,11 @@ async function markSelectedAttendance() {
   let failedCount =
     0;
 
-  let whatsappSentCount =
-    0;
+let emailSentCount =
+  0;
 
-  let whatsappFailedCount =
-    0;
+let emailFailedCount =
+  0;
 
 
   /* -------------------------------------------------------
@@ -3103,39 +3102,39 @@ async function markSelectedAttendance() {
 
 
         /* =================================================
-           SEND WHATSAPP ONLY AFTER SUCCESSFUL MARKING
+           SEND EMAIL ONLY AFTER SUCCESSFUL MARKING
         ================================================= */
 
         if (
           attendanceWasSaved
         ) {
 
-          const whatsappResult =
-            await sendAttendanceWhatsAppNotification(
-              student,
-              session,
-              attendanceTimestamp
-            );
+const emailResult =
+  await sendAttendanceEmailNotification(
+    student,
+    session,
+    attendanceTimestamp
+  );
 
 
-          if (
-            whatsappResult.sent
-          ) {
+if (
+  emailResult.sent
+) {
 
-            whatsappSentCount +=
-              whatsappResult.sentCount;
+  emailSentCount +=
+    emailResult.sentCount;
 
-          }
+}
 
 
-          if (
-            whatsappResult.failed
-          ) {
+if (
+  emailResult.failed
+) {
 
-            whatsappFailedCount +=
-              whatsappResult.failedCount;
+  emailFailedCount +=
+    emailResult.failedCount;
 
-          }
+}
 
         }
 
@@ -3220,51 +3219,51 @@ async function markSelectedAttendance() {
 
 
     /* =====================================================
-       WHATSAPP RESULT
+       EMAIL RESULT
     ===================================================== */
 
     if (
-      whatsappSentCount > 0
-    ) {
+  emailSentCount > 0
+) {
 
-      if (message) {
+  if (message) {
 
-        message +=
-          " ";
+    message +=
+      " ";
 
-      }
-
-
-      message +=
-        `WhatsApp sent to ${whatsappSentCount} recipient${
-          whatsappSentCount === 1
-            ? ""
-            : "s"
-        }.`;
-
-    }
+  }
 
 
-    if (
-      whatsappFailedCount > 0
-    ) {
+  message +=
+    `Email sent to ${emailSentCount} recipient${
+      emailSentCount === 1
+        ? ""
+        : "s"
+    }.`;
 
-      if (message) {
-
-        message +=
-          " ";
-
-      }
+}
 
 
-      message +=
-        `WhatsApp notification failed for ${whatsappFailedCount} recipient${
-          whatsappFailedCount === 1
-            ? ""
-            : "s"
-        }.`;
+if (
+  emailFailedCount > 0
+) {
 
-    }
+  if (message) {
+
+    message +=
+      " ";
+
+  }
+
+
+  message +=
+    `Email notification failed for ${emailFailedCount} recipient${
+      emailFailedCount === 1
+        ? ""
+        : "s"
+    }.`;
+
+}
 
 
     if (!message) {
@@ -3279,7 +3278,7 @@ async function markSelectedAttendance() {
       message,
       (
         failedCount > 0 ||
-        whatsappFailedCount > 0
+        emailFailedCount > 0
       )
         ? "error"
         : "success"
@@ -3329,229 +3328,161 @@ async function markSelectedAttendance() {
 
 
 /* =========================================================
-   SEND ATTENDANCE WHATSAPP NOTIFICATION
+   SEND ATTENDANCE EMAIL NOTIFICATION
 ========================================================= */
 
-async function sendAttendanceWhatsAppNotification(
-student,
-session,
-attendanceTimestamp
+async function sendAttendanceEmailNotification(
+  student,
+  session,
+  attendanceTimestamp
 ) {
 
-let sentCount = 0;
-let failedCount = 0;
+  let sentCount = 0;
 
-try {
+  let failedCount = 0;
 
-
-/* =====================================================
-   SCHOOL INFORMATION
-===================================================== */
-
-const schoolInfo =
-  window.attendanceSchoolInfo || {};
-
-const schoolName =
-  schoolInfo.School_name || "School";
-
-
-/* =====================================================
-   FORMAT STORED ATTENDANCE TIME
-===================================================== */
-
-const attendanceDateTime =
-  new Date(attendanceTimestamp);
-
-const formattedDate =
-  attendanceDateTime.toLocaleDateString(
-    "en-NG",
-    {
-      day: "2-digit",
-      month: "long",
-      year: "numeric"
-    }
-  );
-
-const formattedTime =
-  attendanceDateTime.toLocaleTimeString(
-    "en-NG",
-    {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true
-    }
-  );
-
-
-/* =====================================================
-   MESSAGE
-===================================================== */
-
-const message =
-  String(student.student_name || "Student") +
-  " has arrived " +
-  String(schoolName) +
-  " Premises.\n\n" +
-  "Date: " +
-  formattedDate +
-  "\n" +
-  "Time: " +
-  formattedTime;
-
-
-/* =====================================================
-   COLLECT RECIPIENTS
-===================================================== */
-
-const rawRecipients = [
-
-  student.parent_contact1,
-
-  student.parent_contact2,
-
-  schoolInfo.phone
-
-];
-
-const recipients = [];
-
-
-rawRecipients.forEach(
-  number => {
-
-    const normalized =
-      normalizeAttendanceWhatsAppNumber(
-        number
-      );
-
-    if (
-      normalized &&
-      !recipients.includes(
-        normalized
-      )
-    ) {
-
-      recipients.push(
-        normalized
-      );
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   NO RECIPIENTS
-===================================================== */
-
-if (!recipients.length) {
-
-  console.warn(
-    "No WhatsApp recipients available for:",
-    student.student_name
-  );
-
-  return {
-
-    sent: false,
-    failed: false,
-    sentCount: 0,
-    failedCount: 0
-
-  };
-
-}
-
-
-/* =====================================================
-   CHECK SUPABASE CLIENT
-===================================================== */
-
-if (
-  typeof supabaseClient === "undefined" ||
-  !supabaseClient ||
-  !supabaseClient.functions
-) {
-
-  console.error(
-    "Supabase Functions client unavailable."
-  );
-
-  return {
-
-    sent: false,
-    failed: true,
-    sentCount: 0,
-    failedCount: recipients.length
-
-  };
-
-}
-
-
-/* =====================================================
-   SEND TO EACH RECIPIENT
-===================================================== */
-
-for (
-  const recipient of recipients
-) {
 
   try {
 
-const {
-  data,
-  error
-} =
-  await supabaseClient.functions.invoke(
-    "send-attendance-whatsapp",
-    {
+    /* =====================================================
+       PARENT EMAIL
+    ===================================================== */
 
-      body: {
+    const parentEmail =
+      String(
+        student.parent_email || ""
+      ).trim();
 
-        recipient: recipient,
 
-        message: message
+    /* =====================================================
+       NO PARENT EMAIL
+    ===================================================== */
 
-      },
+    if (!parentEmail) {
 
-      headers: {
+      console.warn(
+        "No parent email available for:",
+        student.student_name
+      );
 
-        apikey:
-          supabaseKey,
 
-        Authorization:
-          "Bearer " + supabaseKey
+      return {
 
-      }
+        sent: false,
+
+        failed: false,
+
+        sentCount: 0,
+
+        failedCount: 0
+
+      };
 
     }
-  );
 
-    /* =================================================
+
+    /* =====================================================
+       CHECK SUPABASE FUNCTIONS
+    ===================================================== */
+
+    if (
+      typeof supabaseClient === "undefined" ||
+      !supabaseClient ||
+      !supabaseClient.functions
+    ) {
+
+      console.error(
+        "Supabase Functions client unavailable."
+      );
+
+
+      return {
+
+        sent: false,
+
+        failed: true,
+
+        sentCount: 0,
+
+        failedCount: 1
+
+      };
+
+    }
+
+
+    /* =====================================================
+       INVOKE EMAIL EDGE FUNCTION
+    ===================================================== */
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.functions.invoke(
+        "send-attendance-email",
+        {
+
+          body: {
+
+            school_code:
+              student.school_code,
+
+            student_name:
+              student.student_name,
+
+            session:
+              session,
+
+            attendance_timestamp:
+              attendanceTimestamp,
+
+            parent_email:
+              parentEmail
+
+          }
+
+        }
+      );
+
+
+    /* =====================================================
        FUNCTION ERROR
-    ================================================= */
+    ===================================================== */
 
     if (error) {
 
       console.error(
-        "WhatsApp notification error for",
-        recipient,
-        error,
-        data
+        "Attendance email function error:",
+        error
       );
+
 
       failedCount++;
 
-      continue;
+
+      return {
+
+        sent: false,
+
+        failed: true,
+
+        sentCount:
+
+          sentCount,
+
+        failedCount:
+
+          failedCount
+
+      };
 
     }
 
 
-    /* =================================================
+    /* =====================================================
        SUCCESS
-    ================================================= */
+    ===================================================== */
 
     if (
       data &&
@@ -3560,83 +3491,113 @@ const {
 
       sentCount++;
 
+
       console.log(
-        "Attendance WhatsApp sent successfully:",
-        recipient
+        "Attendance email sent successfully:",
+        parentEmail
       );
 
-    } else {
 
-      console.error(
-        "WhatsApp function returned unsuccessful result:",
-        recipient,
-        data
-      );
+      return {
 
-      failedCount++;
+        sent: true,
+
+        failed: false,
+
+        sentCount:
+
+          sentCount,
+
+        failedCount:
+
+          failedCount
+
+      };
 
     }
 
-  } catch (
-    recipientError
-  ) {
+
+    /* =====================================================
+       SKIPPED
+    ===================================================== */
+
+    if (
+      data &&
+      data.skipped === true
+    ) {
+
+      console.warn(
+        "Attendance email skipped:",
+        data.error
+      );
+
+
+      return {
+
+        sent: false,
+
+        failed: false,
+
+        sentCount: 0,
+
+        failedCount: 0
+
+      };
+
+    }
+
+
+    /* =====================================================
+       UNSUCCESSFUL RESPONSE
+    ===================================================== */
 
     console.error(
-      "WhatsApp recipient error:",
-      recipient,
-      recipientError
+      "Attendance email returned unsuccessful result:",
+      data
     );
+
 
     failedCount++;
 
+
+    return {
+
+      sent: false,
+
+      failed: true,
+
+      sentCount:
+
+        sentCount,
+
+      failedCount:
+
+        failedCount
+
+    };
+
+
+  } catch (error) {
+
+    console.error(
+      "Attendance email notification failed:",
+      error
+    );
+
+
+    return {
+
+      sent: false,
+
+      failed: true,
+
+      sentCount: 0,
+
+      failedCount: 1
+
+    };
+
   }
-
-}
-
-
-/* =====================================================
-   RETURN RESULT
-===================================================== */
-
-return {
-
-  sent:
-    sentCount > 0,
-
-  failed:
-    failedCount > 0,
-
-  sentCount:
-    sentCount,
-
-  failedCount:
-    failedCount
-
-};
-
-
-} catch (error) {
-
-
-console.error(
-  "Attendance WhatsApp notification failed:",
-  error
-);
-
-return {
-
-  sent: false,
-
-  failed: true,
-
-  sentCount: 0,
-
-  failedCount: 1
-
-};
-
-
-}
 
 }
 
