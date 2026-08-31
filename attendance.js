@@ -203,10 +203,9 @@ function openAttendanceResetDialog() {
 
 }
 
-
-
 /* =========================================================
    PERFORM END OF TERM ATTENDANCE RESET
+   SERVER-SIDE RESET THROUGH SUPABASE EDGE FUNCTION
 ========================================================= */
 
 async function performAttendanceTermReset() {
@@ -249,9 +248,37 @@ async function performAttendanceTermReset() {
   }
 
 
-  /* -------------------------------------------------------
+  /* =======================================================
+     GET CURRENT SCHOOL CODE
+
+     Your existing attendance module already uses
+     the global schoolCode.
+  ======================================================= */
+
+  const currentSchoolCode =
+    typeof schoolCode !== "undefined"
+      ? String(schoolCode).trim()
+      : "";
+
+
+  if (!currentSchoolCode) {
+
+    alert(
+      "School information is unavailable."
+    );
+
+    console.error(
+      "Attendance reset: schoolCode is unavailable."
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
      PREVENT DOUBLE CLICK
-  ------------------------------------------------------- */
+  ======================================================= */
 
   confirmButton.disabled =
     true;
@@ -263,124 +290,6 @@ async function performAttendanceTermReset() {
   try {
 
     /* =====================================================
-       GET CURRENT SCHOOL CODE
-
-       The existing attendance module already uses
-       the global schoolCode variable.
-
-       We use the SAME source here.
-    ===================================================== */
-
-    const currentSchoolCode =
-      typeof schoolCode !== "undefined"
-        ? schoolCode
-        : null;
-
-
-    if (!currentSchoolCode) {
-
-      throw new Error(
-        "School code could not be determined."
-      );
-
-    }
-
-
-    console.log(
-      "Attendance reset school:",
-      currentSchoolCode
-    );
-
-
-    /* =====================================================
-       VERIFY SUPABASE CLIENT
-    ===================================================== */
-
-    if (
-      typeof supabaseClient === "undefined" ||
-      !supabaseClient ||
-      typeof supabaseClient.from !== "function"
-    ) {
-
-      throw new Error(
-        "Supabase client is unavailable."
-      );
-
-    }
-
-/* =====================================================
-   VERIFY ADMIN PASSWORD
-
-   Uses the SAME authentication source as the
-   existing Admin Portal.
-===================================================== */
-
-const {
-  data,
-  error
-} =
-  await supabaseClient
-    .from("subjects")
-    .select(
-      "admin_password"
-    )
-    .eq(
-      "school_code",
-      currentSchoolCode
-    );
-
-
-/* =====================================================
-   DATABASE ERROR
-===================================================== */
-
-if (error) {
-
-  console.error(
-    "Attendance reset password lookup error:",
-    error
-  );
-
-  throw new Error(
-    "Unable to verify Admin Password."
-  );
-
-}
-
-
-/* =====================================================
-   VERIFY PASSWORD
-===================================================== */
-
-const valid =
-  (data || []).some(
-    row =>
-      String(row.admin_password) ===
-      String(password)
-  );
-
-
-if (!valid) {
-
-  alert(
-    "Incorrect Admin Password."
-  );
-
-  confirmButton.disabled =
-    false;
-
-  confirmButton.textContent =
-    "OK";
-
-  passwordInput.value = "";
-
-  passwordInput.focus();
-
-  return;
-
-}
-
-    /* =====================================================
        FINAL CONFIRMATION
     ===================================================== */
 
@@ -389,6 +298,7 @@ if (!valid) {
         "Are you sure you want to clear ALL attendance records for " +
         currentSchoolCode +
         "?\n\n" +
+        "Student records will NOT be deleted.\n\n" +
         "This action is for the end of term."
       );
 
@@ -407,51 +317,81 @@ if (!valid) {
 
 
     /* =====================================================
-       DELETE ONLY THIS SCHOOL'S ATTENDANCE
+       VERIFY SUPABASE CLIENT
     ===================================================== */
 
-    const {
-      error: deleteError
-    } =
-      await supabaseClient
-        .from("student_attendance")
-        .delete()
-        .eq(
-          "school_code",
-          currentSchoolCode
-        );
-
-
-    /* =====================================================
-       DELETE ERROR
-    ===================================================== */
-
-    if (deleteError) {
-
-      console.error(
-        "Attendance reset delete error:",
-        deleteError
-      );
+    if (
+      typeof supabaseClient === "undefined" ||
+      !supabaseClient ||
+      !supabaseClient.functions
+    ) {
 
       throw new Error(
-        "Attendance records could not be cleared."
+        "Supabase Functions client is unavailable."
       );
 
     }
 
 
     /* =====================================================
-       CLOSE RESET DIALOG
+       CALL EDGE FUNCTION
     ===================================================== */
 
-    const overlay =
-      document.getElementById(
-        "attendanceResetOverlay"
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.functions.invoke(
+        "reset-attendance",
+        {
+
+          body: {
+
+            school_code:
+              currentSchoolCode,
+
+            password:
+              password
+
+          }
+
+        }
       );
 
-    if (overlay) {
 
-      overlay.remove();
+    /* =====================================================
+       FUNCTION INVOCATION ERROR
+    ===================================================== */
+
+    if (error) {
+
+      console.error(
+        "Attendance reset Edge Function error:",
+        error,
+        data
+      );
+
+      throw new Error(
+        data?.message ||
+        "Attendance reset failed."
+      );
+
+    }
+
+
+    /* =====================================================
+       FUNCTION RETURNED FAILURE
+    ===================================================== */
+
+    if (
+      !data ||
+      data.success !== true
+    ) {
+
+      throw new Error(
+        data?.message ||
+        "Attendance reset failed."
+      );
 
     }
 
@@ -459,6 +399,19 @@ if (!valid) {
     /* =====================================================
        SUCCESS
     ===================================================== */
+
+    const overlay =
+      document.getElementById(
+        "attendanceResetOverlay"
+      );
+
+
+    if (overlay) {
+
+      overlay.remove();
+
+    }
+
 
     alert(
       "End of term attendance reset completed successfully."
