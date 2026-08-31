@@ -181,37 +181,53 @@
 >
 
   <button
-  type="button"
-  class="attendance-menu-btn morning-btn"
-  onclick="
-    hideTeacherAttendanceMenu();
-    openAttendanceMarker('morning');
-  "
->
-  Morning
-</button>
+    type="button"
+    class="attendance-menu-btn morning-btn"
+    onclick="
+      hideTeacherAttendanceMenu();
+      openAttendanceMarker('morning');
+    "
+  >
+    Morning
+  </button>
 
-<button
-  type="button"
-  class="attendance-menu-btn afternoon-btn"
-  onclick="
-    hideTeacherAttendanceMenu();
-    openAttendanceMarker('afternoon');
-  "
->
-  Afternoon
-</button>
+  <button
+    type="button"
+    class="attendance-menu-btn afternoon-btn"
+    onclick="
+      hideTeacherAttendanceMenu();
+      openAttendanceMarker('afternoon');
+    "
+  >
+    Afternoon
+  </button>
 
-<button
-  type="button"
-  class="attendance-menu-btn view-attendance-btn"
-  onclick="
-    hideTeacherAttendanceMenu();
-    openStudentAttendanceViewer();
-  "
->
-  View Students Attendance
-</button>
+  <button
+    type="button"
+    class="attendance-menu-btn view-attendance-btn"
+    onclick="
+      hideTeacherAttendanceMenu();
+      openStudentAttendanceViewer();
+    "
+  >
+    View Students Attendance
+  </button>
+
+  <!-- =============================================
+       END OF TERM RESET
+  ============================================== -->
+
+  <button
+    type="button"
+    class="attendance-menu-btn attendance-reset-btn"
+    onclick="
+      hideTeacherAttendanceMenu();
+      openAttendanceResetDialog();
+    "
+  >
+    END OF TERM RESET
+  </button>
+
 </div>
         </form>
 

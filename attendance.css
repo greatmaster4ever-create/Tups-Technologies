@@ -1298,3 +1298,188 @@
   font-weight: 800;
 
 }
+
+/* =========================================================
+   END OF TERM ATTENDANCE RESET
+========================================================= */
+
+.attendance-reset-btn {
+  background: #374151;
+  color: #ffffff;
+
+  font-size: 12px !important;
+  padding: 8px 10px !important;
+}
+
+.attendance-reset-btn:hover {
+  background: #1f2937;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.25);
+}
+
+
+/* =========================================================
+   RESET PASSWORD DIALOG
+========================================================= */
+
+.attendance-reset-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 100000;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 15px;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  box-sizing: border-box;
+}
+
+
+.attendance-reset-dialog {
+
+  width: min(360px, 94vw);
+
+  padding: 20px;
+
+  background: #ffffff;
+
+  border-radius: 10px;
+
+  box-shadow:
+    0 15px 40px rgba(0, 0, 0, 0.30);
+
+  box-sizing: border-box;
+
+  text-align: center;
+
+}
+
+
+.attendance-reset-title {
+
+  margin-bottom: 8px;
+
+  color: #111111;
+
+  font-size: 17px;
+
+  font-weight: 800;
+}
+
+
+.attendance-reset-warning {
+
+  margin-bottom: 15px;
+
+  color: #555555;
+
+  font-size: 13px;
+
+  line-height: 1.45;
+}
+
+
+.attendance-reset-password {
+
+  width: 100%;
+
+  height: 42px;
+
+  padding: 0 12px;
+
+  border: 1px solid #cccccc;
+
+  border-radius: 7px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  color: #000000;
+
+  font-size: 14px;
+
+  box-sizing: border-box;
+}
+
+
+.attendance-reset-password:focus {
+
+  border-color: #00a9ff;
+
+  box-shadow:
+    0 0 0 2px rgba(0, 169, 255, 0.12);
+}
+
+
+.attendance-reset-actions {
+
+  display: flex;
+
+  gap: 8px;
+
+  margin-top: 14px;
+}
+
+
+.attendance-reset-cancel,
+.attendance-reset-confirm {
+
+  flex: 1;
+
+  height: 40px;
+
+  border: none;
+
+  border-radius: 7px;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+.attendance-reset-cancel {
+
+  background: #eeeeee;
+
+  color: #222222;
+}
+
+
+.attendance-reset-cancel:hover {
+
+  background: #dddddd;
+}
+
+
+.attendance-reset-confirm {
+
+  background: #dc2626;
+
+  color: #ffffff;
+}
+
+
+.attendance-reset-confirm:hover {
+
+  background: #b91c1c;
+}
+
+
+.attendance-reset-confirm:disabled {
+
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}

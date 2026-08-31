@@ -31,6 +31,440 @@ function toggleTeacherAttendanceMenu() {
 
 }
 
+/* =========================================================
+   END OF TERM ATTENDANCE RESET
+   ADDITIVE MODULE
+   DOES NOT MODIFY EXISTING ATTENDANCE FUNCTIONS
+========================================================= */
+
+function openAttendanceResetDialog() {
+
+  /* Prevent duplicate dialogs */
+
+  const existing =
+    document.getElementById(
+      "attendanceResetOverlay"
+    );
+
+  if (existing) {
+    existing.remove();
+  }
+
+
+  /* Create overlay */
+
+  const overlay =
+    document.createElement("div");
+
+  overlay.id =
+    "attendanceResetOverlay";
+
+  overlay.className =
+    "attendance-reset-overlay";
+
+
+  /* Create dialog */
+
+  overlay.innerHTML = `
+
+    <div class="attendance-reset-dialog">
+
+      <div class="attendance-reset-title">
+        END OF TERM RESET
+      </div>
+
+
+      <div class="attendance-reset-warning">
+
+        This will clear all attendance records
+        for this school and reset the attendance
+        counters for the new term.
+
+        <br><br>
+
+        <strong>
+          Student records will NOT be deleted.
+        </strong>
+
+      </div>
+
+
+      <input
+        type="password"
+        id="attendanceResetPassword"
+        class="attendance-reset-password"
+        placeholder="Enter admin password"
+        autocomplete="off"
+      >
+
+
+      <div class="attendance-reset-actions">
+
+        <button
+          type="button"
+          class="attendance-reset-cancel"
+          id="attendanceResetCancel"
+        >
+          Cancel
+        </button>
+
+
+        <button
+          type="button"
+          class="attendance-reset-confirm"
+          id="attendanceResetConfirm"
+        >
+          OK
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.body.appendChild(
+    overlay
+  );
+
+
+  /* Cancel */
+
+  document
+    .getElementById(
+      "attendanceResetCancel"
+    )
+    .addEventListener(
+      "click",
+      function () {
+
+        overlay.remove();
+
+      }
+    );
+
+
+  /* Confirm */
+
+  document
+    .getElementById(
+      "attendanceResetConfirm"
+    )
+    .addEventListener(
+      "click",
+      function () {
+
+        performAttendanceTermReset();
+
+      }
+    );
+
+
+  /* Enter key */
+
+  document
+    .getElementById(
+      "attendanceResetPassword"
+    )
+    .addEventListener(
+      "keydown",
+      function (event) {
+
+        if (
+          event.key === "Enter"
+        ) {
+
+          performAttendanceTermReset();
+
+        }
+
+      }
+    );
+
+
+  /* Focus password */
+
+  setTimeout(
+    function () {
+
+      const passwordInput =
+        document.getElementById(
+          "attendanceResetPassword"
+        );
+
+      if (passwordInput) {
+        passwordInput.focus();
+      }
+
+    },
+    50
+  );
+
+}
+
+
+/* =========================================================
+   PERFORM RESET
+========================================================= */
+
+async function performAttendanceTermReset() {
+
+  const passwordInput =
+    document.getElementById(
+      "attendanceResetPassword"
+    );
+
+  const confirmButton =
+    document.getElementById(
+      "attendanceResetConfirm"
+    );
+
+  if (
+    !passwordInput ||
+    !confirmButton
+  ) {
+
+    return;
+
+  }
+
+
+  const password =
+    passwordInput.value.trim();
+
+
+  if (!password) {
+
+    alert(
+      "Please enter the admin password."
+    );
+
+    passwordInput.focus();
+
+    return;
+
+  }
+
+
+  /* Prevent double-click */
+
+  confirmButton.disabled = true;
+
+  confirmButton.textContent =
+    "Resetting...";
+
+
+  try {
+
+    /* =====================================================
+       CURRENT SCHOOL
+    ===================================================== */
+
+    const schoolCode =
+      window.attendanceSchoolInfo?.school_code ||
+      window.schoolCode ||
+      sessionStorage.getItem(
+        "schoolCode"
+      );
+
+
+    if (!schoolCode) {
+
+      throw new Error(
+        "School code could not be determined."
+      );
+
+    }
+
+
+    /* =====================================================
+       SUPABASE CLIENT
+    ===================================================== */
+
+    if (
+      typeof supabaseClient === "undefined" ||
+      !supabaseClient
+    ) {
+
+      throw new Error(
+        "Supabase client is unavailable."
+      );
+
+    }
+
+
+    /* =====================================================
+       VERIFY SCHOOL PASSWORD
+    ===================================================== */
+
+    const {
+      data: school,
+      error: schoolError
+    } =
+      await supabaseClient
+        .from("schools")
+        .select(
+          "school_code,password"
+        )
+        .eq(
+          "school_code",
+          schoolCode
+        )
+        .maybeSingle();
+
+
+    if (schoolError) {
+
+      console.error(
+        "Attendance reset school lookup error:",
+        schoolError
+      );
+
+      throw new Error(
+        "Unable to verify school information."
+      );
+
+    }
+
+
+    if (!school) {
+
+      throw new Error(
+        "School record was not found."
+      );
+
+    }
+
+
+    if (
+      String(school.password) !==
+      String(password)
+    ) {
+
+      alert(
+        "Incorrect admin password."
+      );
+
+      confirmButton.disabled =
+        false;
+
+      confirmButton.textContent =
+        "OK";
+
+      passwordInput.value = "";
+
+      passwordInput.focus();
+
+      return;
+
+    }
+
+
+    /* =====================================================
+       FINAL CONFIRMATION
+    ===================================================== */
+
+    const confirmed =
+      window.confirm(
+        "Are you sure you want to clear ALL attendance records for " +
+        schoolCode +
+        "?\n\n" +
+        "This action is for the end of term."
+      );
+
+
+    if (!confirmed) {
+
+      confirmButton.disabled =
+        false;
+
+      confirmButton.textContent =
+        "OK";
+
+      return;
+
+    }
+
+
+    /* =====================================================
+       DELETE ONLY THIS SCHOOL'S ATTENDANCE
+    ===================================================== */
+
+    const {
+      error: deleteError
+    } =
+      await supabaseClient
+        .from("student_attendance")
+        .delete()
+        .eq(
+          "school_code",
+          schoolCode
+        );
+
+
+    if (deleteError) {
+
+      console.error(
+        "Attendance reset delete error:",
+        deleteError
+      );
+
+      throw new Error(
+        "Attendance records could not be cleared."
+      );
+
+    }
+
+
+    /* =====================================================
+       SUCCESS
+    ===================================================== */
+
+    const overlay =
+      document.getElementById(
+        "attendanceResetOverlay"
+      );
+
+    if (overlay) {
+      overlay.remove();
+    }
+
+
+    alert(
+      "End of term attendance reset completed successfully."
+    );
+
+
+    console.log(
+      "ATTENDANCE TERM RESET COMPLETED:",
+      schoolCode
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "Attendance term reset failed:",
+      error
+    );
+
+
+    alert(
+      error.message ||
+      "Attendance reset failed."
+    );
+
+
+    confirmButton.disabled =
+      false;
+
+    confirmButton.textContent =
+      "OK";
+
+  }
+
+}
 
 function hideTeacherAttendanceMenu() {
 
@@ -3138,40 +3572,18 @@ const {
     ================================================= */
 
     if (
-  data &&
-  data.success === true
-) {
+      data &&
+      data.success === true
+    ) {
 
-  sentCount++;
+      sentCount++;
 
-  console.log(
-    "Attendance WhatsApp Edge Function response:",
-    recipient,
-    data
-  );
+      console.log(
+        "Attendance WhatsApp sent successfully:",
+        recipient
+      );
 
-  console.log(
-    "Meta HTTP status:",
-    data.meta_status
-  );
-
-  console.log(
-    "WhatsApp message ID:",
-    data.whatsapp_message_id
-  );
-
-  console.log(
-    "WhatsApp WA ID:",
-    data.wa_id
-  );
-
-  console.log(
-    "Meta response:",
-    data.meta_response
-  );
-
-} 
-	else {
+    } else {
 
       console.error(
         "WhatsApp function returned unsuccessful result:",
