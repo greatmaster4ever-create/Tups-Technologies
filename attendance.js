@@ -308,85 +308,77 @@ async function performAttendanceTermReset() {
 
     }
 
+/* =====================================================
+   VERIFY ADMIN PASSWORD
 
-    /* =====================================================
-       VERIFY SCHOOL PASSWORD
-    ===================================================== */
+   Uses the SAME authentication source as the
+   existing Admin Portal.
+===================================================== */
 
-    const {
-      data: school,
-      error: schoolError
-    } =
-      await supabaseClient
-        .from("schools")
-        .select(
-          "school_code,password"
-        )
-        .eq(
-          "school_code",
-          currentSchoolCode
-        )
-        .maybeSingle();
-
-
-    /* =====================================================
-       SCHOOL LOOKUP ERROR
-    ===================================================== */
-
-    if (schoolError) {
-
-      console.error(
-        "Attendance reset school lookup error:",
-        schoolError
-      );
-
-      throw new Error(
-        "Unable to verify school information."
-      );
-
-    }
+const {
+  data,
+  error
+} =
+  await supabaseClient
+    .from("subjects")
+    .select(
+      "admin_password"
+    )
+    .eq(
+      "school_code",
+      currentSchoolCode
+    );
 
 
-    /* =====================================================
-       SCHOOL NOT FOUND
-    ===================================================== */
+/* =====================================================
+   DATABASE ERROR
+===================================================== */
 
-    if (!school) {
+if (error) {
 
-      throw new Error(
-        "School record was not found."
-      );
+  console.error(
+    "Attendance reset password lookup error:",
+    error
+  );
 
-    }
+  throw new Error(
+    "Unable to verify Admin Password."
+  );
+
+}
 
 
-    /* =====================================================
-       PASSWORD CHECK
-    ===================================================== */
+/* =====================================================
+   VERIFY PASSWORD
+===================================================== */
 
-    if (
-      String(school.password) !==
+const valid =
+  (data || []).some(
+    row =>
+      String(row.admin_password) ===
       String(password)
-    ) {
+  );
 
-      alert(
-        "Incorrect admin password."
-      );
 
-      confirmButton.disabled =
-        false;
+if (!valid) {
 
-      confirmButton.textContent =
-        "OK";
+  alert(
+    "Incorrect Admin Password."
+  );
 
-      passwordInput.value = "";
+  confirmButton.disabled =
+    false;
 
-      passwordInput.focus();
+  confirmButton.textContent =
+    "OK";
 
-      return;
+  passwordInput.value = "";
 
-    }
+  passwordInput.focus();
 
+  return;
+
+}
 
     /* =====================================================
        FINAL CONFIRMATION
