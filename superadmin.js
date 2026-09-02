@@ -215,7 +215,7 @@ function resetTimer() {
 
       logoutAdmin();
 
-    }, 300000);
+    }, 60000);
 
 }
 
@@ -476,6 +476,14 @@ async function loadSchools() {
 
 }
 
+// ======================================================
+// SUBJECTS TABLE — NEW DESIGN
+// Cadre remains in Supabase but is NOT DISPLAYED
+// ======================================================
+
+let subjectsCache = [];
+let selectedSubjectIds = new Set();
+
 async function loadSubjects() {
 
   try {
@@ -488,56 +496,11 @@ async function loadSubjects() {
 
     if (error) throw error;
 
-    const tbody =
-      document.getElementById(
-        "subjectsTableBody"
-      );
+    subjectsCache = data || [];
 
-    tbody.innerHTML = "";
+    populateSubjectFilters();
 
-    data.forEach(row => {
-
-      tbody.innerHTML += `
-        <tr>
-
-          <td>${row.school_code}</td>
-
-          <td>${row.cadre}</td>
-
-          <td>${row.department}</td>
-
-          <td>${row.subject}</td>
-
-          <td>
-
-            <button
-              class="edit-btn"
-              onclick="openEditSubject('${row.id}')"
-            >
-              Edit
-            </button>
-
-            <button
-              class="password-btn"
-              onclick="openSubjectPasswordModal('${row.id}')"
-            >
-              Password
-            </button>
-
-            <button
-              class="delete-btn"
-			  data-action="delete"
-              onclick="deleteSubject('${row.id}')"
-            >
-              Delete
-            </button>
-
-          </td>
-
-        </tr>
-      `;
-
-    });
+    renderSubjectsTable();
 
   } catch (err) {
 
@@ -547,10 +510,604 @@ async function loadSubjects() {
     );
 
   } finally {
-    hideLoader(); // IMPORTANT
+
+    hideLoader();
+
   }
 
 }
+
+
+// ======================================================
+// SUBJECT FILTERS
+// ======================================================
+
+function populateSubjectFilters() {
+
+  const departmentFilter =
+    document.getElementById(
+      "subjectDepartmentFilter"
+    );
+
+  const schoolFilter =
+    document.getElementById(
+      "subjectSchoolFilter"
+    );
+
+  if (!departmentFilter || !schoolFilter)
+    return;
+
+
+  const departments = [
+    ...new Set(
+      subjectsCache
+        .map(row => (row.department || "").trim())
+        .filter(Boolean)
+    )
+  ].sort();
+
+
+  const schools = [
+    ...new Set(
+      subjectsCache
+        .map(row => (row.school_code || "").trim())
+        .filter(Boolean)
+    )
+  ].sort();
+
+
+  const currentDepartment =
+    departmentFilter.value;
+
+  const currentSchool =
+    schoolFilter.value;
+
+
+  departmentFilter.innerHTML =
+    `<option value="">All Departments</option>`;
+
+  departments.forEach(department => {
+
+    departmentFilter.innerHTML += `
+      <option value="${escapeSubjectHtml(department)}">
+        ${escapeSubjectHtml(department)}
+      </option>
+    `;
+
+  });
+
+
+  schoolFilter.innerHTML =
+    `<option value="">All Schools</option>`;
+
+  schools.forEach(school => {
+
+    schoolFilter.innerHTML += `
+      <option value="${escapeSubjectHtml(school)}">
+        ${escapeSubjectHtml(school)}
+      </option>
+    `;
+
+  });
+
+
+  if (
+    departments.includes(
+      currentDepartment
+    )
+  ) {
+
+    departmentFilter.value =
+      currentDepartment;
+
+  }
+
+
+  if (
+    schools.includes(
+      currentSchool
+    )
+  ) {
+
+    schoolFilter.value =
+      currentSchool;
+
+  }
+
+}
+
+
+// ======================================================
+// SAFE HTML
+// ======================================================
+
+function escapeSubjectHtml(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+// ======================================================
+// GET FILTERED SUBJECTS
+// ======================================================
+
+function getFilteredSubjects() {
+
+  const searchInput =
+    document.getElementById(
+      "subjectSearch"
+    );
+
+  const departmentFilter =
+    document.getElementById(
+      "subjectDepartmentFilter"
+    );
+
+  const schoolFilter =
+    document.getElementById(
+      "subjectSchoolFilter"
+    );
+
+
+  const search =
+    (
+      searchInput?.value || ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const department =
+    (
+      departmentFilter?.value || ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const school =
+    (
+      schoolFilter?.value || ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  return subjectsCache.filter(row => {
+
+    const rowSchool =
+      String(
+        row.school_code || ""
+      )
+        .trim()
+        .toLowerCase();
+
+
+    const rowDepartment =
+      String(
+        row.department || ""
+      )
+        .trim()
+        .toLowerCase();
+
+
+    const rowSubject =
+      String(
+        row.subject || ""
+      )
+        .trim()
+        .toLowerCase();
+
+
+    const matchesSearch =
+      !search ||
+      rowSchool.includes(search) ||
+      rowDepartment.includes(search) ||
+      rowSubject.includes(search);
+
+
+    const matchesDepartment =
+      !department ||
+      rowDepartment === department;
+
+
+    const matchesSchool =
+      !school ||
+      rowSchool === school;
+
+
+    return (
+      matchesSearch &&
+      matchesDepartment &&
+      matchesSchool
+    );
+
+  });
+
+}
+
+
+// ======================================================
+// RENDER SUBJECT TABLE
+// ======================================================
+
+function renderSubjectsTable() {
+
+  const tbody =
+    document.getElementById(
+      "subjectsTableBody"
+    );
+
+  if (!tbody)
+    return;
+
+
+  const filteredSubjects =
+    getFilteredSubjects();
+
+
+  tbody.innerHTML = "";
+
+
+  if (!filteredSubjects.length) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td
+          colspan="7"
+          style="text-align:center;"
+        >
+          No subjects found.
+        </td>
+      </tr>
+    `;
+
+    updateSelectAllSubjectsState();
+
+    return;
+
+  }
+
+
+  filteredSubjects.forEach(row => {
+
+    const id =
+      String(row.id);
+
+
+    const isSelected =
+      selectedSubjectIds.has(id);
+
+
+    tbody.innerHTML += `
+
+      <tr>
+
+        <!-- CHECKBOX -->
+
+        <td>
+          <input
+            type="checkbox"
+            class="subject-row-checkbox"
+            data-subject-id="${escapeSubjectHtml(id)}"
+            ${isSelected ? "checked" : ""}
+          >
+        </td>
+
+
+        <!-- SCHOOL -->
+
+        <td>
+          ${escapeSubjectHtml(
+            row.school_code
+          )}
+        </td>
+
+
+        <!-- DEPARTMENT -->
+
+        <td>
+          ${escapeSubjectHtml(
+            row.department
+          )}
+        </td>
+
+
+        <!-- SUBJECT -->
+
+        <td>
+          ${escapeSubjectHtml(
+            row.subject
+          )}
+        </td>
+
+
+        <!-- SUBJECT PASSWORD -->
+
+        <td>
+          ${escapeSubjectHtml(
+            row.subject_password
+          )}
+        </td>
+
+
+        <!-- ADMIN PASSWORD -->
+
+        <td>
+          ${escapeSubjectHtml(
+            row.admin_password
+          )}
+        </td>
+
+
+        <!-- ACTIONS -->
+
+        <td>
+
+          <button
+            class="edit-btn"
+            onclick="openEditSubject('${escapeSubjectHtml(id)}')"
+          >
+            Edit
+          </button>
+
+
+          <button
+            class="password-btn"
+            onclick="openSubjectPasswordModal('${escapeSubjectHtml(id)}')"
+          >
+            Password
+          </button>
+
+
+          <button
+            class="delete-btn"
+            data-action="delete"
+            onclick="deleteSubject('${escapeSubjectHtml(id)}')"
+          >
+            Delete
+          </button>
+
+        </td>
+
+      </tr>
+
+    `;
+
+  });
+
+
+  updateSelectAllSubjectsState();
+
+}
+
+
+// ======================================================
+// SELECT ALL CHECKBOX
+// ======================================================
+
+function updateSelectAllSubjectsState() {
+
+  const selectAll =
+    document.getElementById(
+      "selectAllSubjects"
+    );
+
+  if (!selectAll)
+    return;
+
+
+  const visibleRows =
+    document.querySelectorAll(
+      ".subject-row-checkbox"
+    );
+
+
+  if (!visibleRows.length) {
+
+    selectAll.checked = false;
+    selectAll.indeterminate = false;
+
+    return;
+
+  }
+
+
+  const checkedRows =
+    [...visibleRows]
+      .filter(
+        checkbox =>
+          checkbox.checked
+      );
+
+
+  selectAll.checked =
+    checkedRows.length ===
+    visibleRows.length;
+
+
+  selectAll.indeterminate =
+    checkedRows.length > 0 &&
+    checkedRows.length <
+      visibleRows.length;
+
+}
+
+
+// ======================================================
+// GET SELECTED SUBJECT IDS
+// ======================================================
+
+function getSelectedSubjectIds() {
+
+  return [
+    ...selectedSubjectIds
+  ];
+
+}
+
+
+// ======================================================
+// SUBJECT FILTER EVENTS
+// ======================================================
+
+const subjectSearch =
+  document.getElementById(
+    "subjectSearch"
+  );
+
+if (subjectSearch) {
+
+  subjectSearch.addEventListener(
+    "input",
+    () => {
+
+      renderSubjectsTable();
+
+    }
+  );
+
+}
+
+
+const subjectDepartmentFilter =
+  document.getElementById(
+    "subjectDepartmentFilter"
+  );
+
+if (subjectDepartmentFilter) {
+
+  subjectDepartmentFilter.addEventListener(
+    "change",
+    () => {
+
+      renderSubjectsTable();
+
+    }
+  );
+
+}
+
+
+const subjectSchoolFilter =
+  document.getElementById(
+    "subjectSchoolFilter"
+  );
+
+if (subjectSchoolFilter) {
+
+  subjectSchoolFilter.addEventListener(
+    "change",
+    () => {
+
+      renderSubjectsTable();
+
+    }
+  );
+
+}
+
+
+// ======================================================
+// SELECT ALL
+// ======================================================
+
+const selectAllSubjects =
+  document.getElementById(
+    "selectAllSubjects"
+  );
+
+if (selectAllSubjects) {
+
+  selectAllSubjects.addEventListener(
+    "change",
+    function () {
+
+      const visibleRows =
+        document.querySelectorAll(
+          ".subject-row-checkbox"
+        );
+
+
+      visibleRows.forEach(
+        checkbox => {
+
+          const id =
+            String(
+              checkbox.dataset.subjectId
+            );
+
+
+          if (this.checked) {
+
+            selectedSubjectIds.add(id);
+
+          } else {
+
+            selectedSubjectIds.delete(id);
+
+          }
+
+
+          checkbox.checked =
+            this.checked;
+
+        }
+      );
+
+
+      updateSelectAllSubjectsState();
+
+    }
+  );
+
+}
+
+
+// ======================================================
+// INDIVIDUAL CHECKBOXES
+// ======================================================
+
+document.addEventListener(
+  "change",
+  function (event) {
+
+    const checkbox =
+      event.target.closest(
+        ".subject-row-checkbox"
+      );
+
+    if (!checkbox)
+      return;
+
+
+    const id =
+      String(
+        checkbox.dataset.subjectId
+      );
+
+
+    if (checkbox.checked) {
+
+      selectedSubjectIds.add(id);
+
+    } else {
+
+      selectedSubjectIds.delete(id);
+
+    }
+
+
+    updateSelectAllSubjectsState();
+
+  }
+);
 
 async function loadSheets() {
 
@@ -1106,7 +1663,6 @@ console.log("STEP 6");
 // ==========================
 
 let sheetUrl = "";
-let result = null;
 
 try {
 
@@ -1149,38 +1705,16 @@ console.log(
   text
 );
 
-result =
+const result =
   JSON.parse(text);
 
-result =
-  JSON.parse(text);
+  if (!result.success) {
 
-console.log(
-  "PARSED APPS SCRIPT RESULT:",
-  result
-);
+    throw new Error(
+      result.error
+    );
 
-if (!result.success) {
-
-  throw new Error(
-    result.error ||
-    "Apps Script failed"
-  );
-
-}
-
-if (
-  !Array.isArray(
-    result.subjects
-  ) ||
-  result.subjects.length === 0
-) {
-
-  throw new Error(
-    "Apps Script did not return the created subjects."
-  );
-
-}
+  }
 
   sheetUrl =
     result.sheetUrl;
@@ -1223,59 +1757,43 @@ document.getElementById(
 
       }
 
-      // =====================================================
-// SAVE ALL CREATED SUBJECTS TO SUPABASE
-// =====================================================
+      const { error } =
+        await supabaseClient
+          .from("subjects")
+          .insert([{
 
-const subjectsToSave =
-  (result.subjects || [])
-    .map(
-      item => ({
+            school_code:
+              schoolCode,
 
-        school_code:
-          schoolCode,
+            cadre:
+              cadre,
 
-        cadre:
-          cadre,
+            department:
+              department,
 
-        department:
-          department,
+            subject:
+              subject,
 
-        subject:
-          item.subject,
+            subject_password:
+              subjectPassword,
 
-        subject_password:
-          item.subject === subject
-            ? subjectPassword
-            : "Subject",
+            admin_password:
+              adminPassword,
 
-        admin_password:
-          adminPassword,
+            sheet_url:
+              sheetUrl
 
-        sheet_url:
-          item.sheetUrl
+          }]);
 
-      })
-    );
+      if (error) {
 
+        alert(
+          error.message
+        );
 
-const { error } =
-  await supabaseClient
-    .from("subjects")
-    .insert(
-      subjectsToSave
-    );
+        return;
 
-
-if (error) {
-
-  alert(
-    error.message
-  );
-
-  return;
-
-}
+      }
 
       alert(
         "Subject Added Successfully"
@@ -2190,6 +2708,522 @@ if (!data.sheet_url) {
     );
 
   }
+
+}
+
+// ======================================================
+// BULK DELETE SUBJECTS
+// ======================================================
+
+async function deleteSubjectRecord(id) {
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("subjects")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+
+    if (error)
+      throw error;
+
+
+    // ==========================================
+    // DELETE GOOGLE SHEET FIRST
+    // ==========================================
+
+    if (data.sheet_url) {
+
+      const spreadsheetId =
+        data.sheet_url
+          .split("/d/")[1]
+          .split("/")[0];
+
+
+      const formData =
+        new URLSearchParams();
+
+
+      formData.append(
+        "action",
+        "deleteSheet"
+      );
+
+
+      formData.append(
+        "spreadsheetId",
+        spreadsheetId
+      );
+
+
+      const response =
+        await fetch(
+          "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
+          {
+            method: "POST",
+            body: formData
+          }
+        );
+
+
+      const text =
+        await response.text();
+
+
+      const result =
+        JSON.parse(text);
+
+
+      if (!result.success) {
+
+        throw new Error(
+          result.error
+        );
+
+      }
+
+    }
+
+
+    // ==========================================
+    // DELETE SUPABASE RECORD
+    // ==========================================
+
+    const {
+      error: deleteError
+    } =
+      await supabaseClient
+        .from("subjects")
+        .delete()
+        .eq("id", id);
+
+
+    if (deleteError)
+      throw deleteError;
+
+
+    return {
+      success: true
+    };
+
+
+  } catch (err) {
+
+    console.error(
+      "Subject Delete Error:",
+      id,
+      err
+    );
+
+
+    return {
+      success: false,
+      error: err
+    };
+
+  }
+
+}
+
+
+// ======================================================
+// BULK DELETE
+// ======================================================
+
+async function bulkDeleteSubjects() {
+
+  const selectedIds =
+    getSelectedSubjectIds();
+
+
+  if (!selectedIds.length) {
+
+    alert(
+      "Please select at least one subject."
+    );
+
+    return;
+
+  }
+
+
+  const confirmed =
+    confirm(
+      `You are about to delete ${selectedIds.length} subject(s).\n\n` +
+      `This will:\n\n` +
+      `• Delete the subject record(s)\n` +
+      `• Move their Google Sheets to Drive Trash\n\n` +
+      `Continue?`
+    );
+
+
+  if (!confirmed)
+    return;
+
+
+  showLoader(
+    "Deleting subjects..."
+  );
+
+
+  let deleted = 0;
+  let failed = 0;
+
+
+  try {
+
+    for (const id of selectedIds) {
+
+      const result =
+        await deleteSubjectRecord(
+          id
+        );
+
+
+      if (result.success) {
+
+        deleted++;
+
+      } else {
+
+        failed++;
+
+      }
+
+    }
+
+
+    selectedSubjectIds.clear();
+
+
+    await loadSubjects();
+
+    await loadDashboardStats();
+
+
+    if (failed === 0) {
+
+      alert(
+        `${deleted} subject(s) deleted successfully.`
+      );
+
+    } else {
+
+      alert(
+        `${deleted} subject(s) deleted successfully.\n` +
+        `${failed} subject(s) could not be deleted.`
+      );
+
+    }
+
+
+  } catch (err) {
+
+    console.error(
+      "Bulk Delete Error:",
+      err
+    );
+
+
+    alert(
+      err.toString()
+    );
+
+
+  } finally {
+
+    hideLoader();
+
+  }
+
+}
+
+
+// Make available to HTML if needed
+window.bulkDeleteSubjects =
+  bulkDeleteSubjects;
+  
+// ======================================================
+// EXPORT FILTERED SUBJECTS TO PDF
+// ======================================================
+
+async function exportSubjectsToPdf() {
+
+  const filteredSubjects =
+    getFilteredSubjects();
+
+
+  if (!filteredSubjects.length) {
+
+    alert(
+      "There are no subjects to export."
+    );
+
+    return;
+
+  }
+
+
+  // ==========================================
+  // LOAD jsPDF
+  // ==========================================
+
+  if (
+    !window.jspdf ||
+    !window.jspdf.jsPDF
+  ) {
+
+    await loadScript(
+      "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+    );
+
+  }
+
+
+  // ==========================================
+  // LOAD AUTO TABLE
+  // ==========================================
+
+  if (
+    !window.jspdf?.jsPDF?.API?.autoTable
+  ) {
+
+    await loadScript(
+      "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"
+    );
+
+  }
+
+
+  if (
+    !window.jspdf ||
+    !window.jspdf.jsPDF
+  ) {
+
+    alert(
+      "PDF library could not be loaded."
+    );
+
+    return;
+
+  }
+
+
+  const {
+    jsPDF
+  } =
+    window.jspdf;
+
+
+  const doc =
+    new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4"
+    });
+
+
+  // ==========================================
+  // TITLE
+  // ==========================================
+
+  doc.setFontSize(16);
+
+  doc.text(
+    "TUPS SUBJECTS",
+    14,
+    15
+  );
+
+
+  // ==========================================
+  // FILTER INFORMATION
+  // ==========================================
+
+  const department =
+    document.getElementById(
+      "subjectDepartmentFilter"
+    )?.value ||
+    "All Departments";
+
+
+  const school =
+    document.getElementById(
+      "subjectSchoolFilter"
+    )?.value ||
+    "All Schools";
+
+
+  doc.setFontSize(9);
+
+  doc.text(
+    `School: ${school}    Department: ${department}    Records: ${filteredSubjects.length}`,
+    14,
+    22
+  );
+
+
+  // ==========================================
+  // TABLE
+  // ==========================================
+
+  const tableData =
+    filteredSubjects.map(
+      row => [
+
+        row.school_code || "",
+
+        row.department || "",
+
+        row.subject || "",
+
+        row.subject_password || "",
+
+        row.admin_password || ""
+
+      ]
+    );
+
+
+  doc.autoTable({
+
+    startY: 27,
+
+    head: [[
+
+      "School",
+
+      "Dept",
+
+      "Subject",
+
+      "Sub-Pass",
+
+      "Admin-Pass"
+
+    ]],
+
+    body: tableData,
+
+    theme: "grid",
+
+    styles: {
+
+      fontSize: 8,
+
+      cellPadding: 3
+
+    },
+
+    headStyles: {
+
+      fontStyle: "bold"
+
+    },
+
+    margin: {
+
+      left: 14,
+
+      right: 14
+
+    }
+
+  });
+
+
+  // ==========================================
+  // DOWNLOAD PDF
+  // ==========================================
+
+  const today =
+    new Date()
+      .toISOString()
+      .slice(0, 10);
+
+
+  doc.save(
+    `TUPS-Subjects-${today}.pdf`
+  );
+
+}
+
+
+// ======================================================
+// LOAD EXTERNAL JAVASCRIPT
+// ======================================================
+
+function loadScript(src) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      const script =
+        document.createElement(
+          "script"
+        );
+
+
+      script.src = src;
+
+      script.onload =
+        resolve;
+
+      script.onerror =
+        reject;
+
+
+      document.head.appendChild(
+        script
+      );
+
+    }
+  );
+
+}
+
+
+// Make available globally
+window.exportSubjectsToPdf =
+  exportSubjectsToPdf;
+
+
+// ======================================================
+// SUBJECTS NEW DESIGN BUTTONS
+// ======================================================
+
+const bulkDeleteSubjectsBtn =
+  document.getElementById(
+    "bulkDeleteSubjectsBtn"
+  );
+
+if (bulkDeleteSubjectsBtn) {
+
+  bulkDeleteSubjectsBtn.addEventListener(
+    "click",
+    bulkDeleteSubjects
+  );
+
+}
+
+
+const exportSubjectsBtn =
+  document.getElementById(
+    "exportSubjectsBtn"
+  );
+
+if (exportSubjectsBtn) {
+
+  exportSubjectsBtn.addEventListener(
+    "click",
+    exportSubjectsToPdf
+  );
 
 }
 
