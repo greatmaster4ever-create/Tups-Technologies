@@ -3401,41 +3401,7 @@ async function deleteSchool(schoolCode) {
 
 window.deleteSchool = deleteSchool;
 
-document
-  .getElementById(
-    "subjectSearch"
-  )
-  .addEventListener(
-    "keyup",
-    function () {
 
-      const value =
-        this.value
-          .toLowerCase();
-
-      const rows =
-        document
-          .querySelectorAll(
-            "#subjectsTableBody tr"
-          );
-
-      rows.forEach(
-        row => {
-
-          row.style.display =
-            row.innerText
-              .toLowerCase()
-              .includes(
-                value
-              )
-            ? ""
-            : "none";
-
-        }
-      );
-
-    }
-  );
 
 const viewPasswordsBtn =
   document.getElementById(

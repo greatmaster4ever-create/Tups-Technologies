@@ -327,56 +327,131 @@
 
 </section>
 
-    <!-- SUBJECTS -->
-    <section id="subjects" class="tab-content">
-
-  <div
-  style="
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:10px;
-    gap:5px;
-  "
->
-
-  <h2>
-    Subjects Management
-  </h2>
+<!-- SUBJECTS -->
+<section id="subjects" class="tab-content">
 
   <div
     style="
       display:flex;
       align-items:center;
-      gap:5px;
+      justify-content:space-between;
+      margin-bottom:10px;
+      gap:10px;
+      flex-wrap:wrap;
     "
   >
 
-    🔍
+    <h2 style="margin:0;">
+      Subjects Management
+    </h2>
 
-   <input
-  type="text"
-  id="subjectSearch"
-  placeholder="Search school, department or subject..."
-  style="
-    width:300px;
-    padding:8px 12px;
-    border-radius:6px;
-    border:1px solid #ccc;
-  "
->
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        gap:8px;
+        flex-wrap:wrap;
+      "
+    >
+
+      <!-- SEARCH -->
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          gap:5px;
+        "
+      >
+
+        <span>🔍</span>
+
+        <input
+          type="text"
+          id="subjectSearch"
+          placeholder="Search school, department or subject..."
+          style="
+            width:300px;
+            max-width:100%;
+            padding:8px 12px;
+            border-radius:6px;
+            border:1px solid #ccc;
+          "
+        >
+
+      </div>
+
+
+      <!-- SCHOOL FILTER -->
+      <select
+        id="subjectSchoolFilter"
+        style="
+          padding:8px 10px;
+          border-radius:6px;
+          border:1px solid #ccc;
+          min-width:150px;
+        "
+      >
+
+        <option value="">
+          All Schools
+        </option>
+
+      </select>
+
+
+      <!-- DEPARTMENT FILTER -->
+      <select
+        id="subjectDepartmentFilter"
+        style="
+          padding:8px 10px;
+          border-radius:6px;
+          border:1px solid #ccc;
+          min-width:150px;
+        "
+      >
+
+        <option value="">
+          All Departments
+        </option>
+
+      </select>
+
+
+      <!-- BULK DELETE -->
+      <button
+        id="bulkDeleteSubjectsBtn"
+        class="action-btn"
+        type="button"
+      >
+        BULK DELETE
+      </button>
+
+
+      <!-- EXPORT -->
+      <button
+        id="exportSubjectsBtn"
+        class="action-btn"
+        type="button"
+      >
+        EXPORT PDF
+      </button>
+
+
+      <!-- ADD SUBJECT -->
+      <button
+        id="addSubjectBtn"
+        class="action-btn"
+        type="button"
+      >
+        + Add Subject
+      </button>
+
+    </div>
 
   </div>
 
-  <button
-    id="addSubjectBtn"
-    class="action-btn"
-  >
-    + Add Subject
-  </button>
 
-</div>
-
+  <!-- SUBJECTS TABLE -->
   <div class="table-wrapper">
 
     <table id="subjectsTable">
@@ -384,10 +459,42 @@
       <thead>
 
         <tr>
-          <th>School</th>
-          <th>Cadre</th>
-          <th>Department</th>
-          <th>Subject</th>
+
+          <!-- SELECT ALL -->
+          <th style="width:40px; text-align:center;">
+
+            <input
+              type="checkbox"
+              id="selectAllSubjects"
+              title="Select all subjects"
+            >
+
+          </th>
+
+          <th>
+            School
+          </th>
+
+          <th>
+            Dept
+          </th>
+
+          <th>
+            Subject
+          </th>
+
+          <th>
+            Sub-Pass
+          </th>
+
+          <th>
+            Admin-Pass
+          </th>
+
+          <th>
+            Actions
+          </th>
+
         </tr>
 
       </thead>
