@@ -1757,33 +1757,55 @@ document.getElementById(
 
       }
 
-      const { error } =
-        await supabaseClient
-          .from("subjects")
-          .insert([{
+      // ==========================
+// SAVE ALL CREATED SUBJECTS
+// ==========================
 
-            school_code:
-              schoolCode,
+const createdSubjects =
+  Array.isArray(result.subjects)
+    ? result.subjects
+    : [];
 
-            cadre:
-              cadre,
+if (!createdSubjects.length) {
 
-            department:
-              department,
+  alert(
+    "Google Sheets were created, but no subject records were returned."
+  );
 
-            subject:
-              subject,
+  return;
 
-            subject_password:
-              subjectPassword,
+}
 
-            admin_password:
-              adminPassword,
+const subjectRecords =
+  createdSubjects.map(item => ({
 
-            sheet_url:
-              sheetUrl
+    school_code:
+      schoolCode,
 
-          }]);
+    cadre:
+      cadre,
+
+    department:
+      department,
+
+    subject:
+      item.subject,
+
+    subject_password:
+      subjectPassword,
+
+    admin_password:
+      adminPassword,
+
+    sheet_url:
+      item.sheetUrl
+
+  }));
+
+const { error } =
+  await supabaseClient
+    .from("subjects")
+    .insert(subjectRecords);
 
       if (error) {
 
