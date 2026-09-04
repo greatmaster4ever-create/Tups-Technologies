@@ -1658,8 +1658,9 @@ console.log("STEP 6");
 
       }
 
-      // ==========================
+     // ==========================
 // AUTO CREATE GOOGLE SHEET
+// + SAVE ALL CREATED SUBJECTS
 // ==========================
 
 let sheetUrl = "";
@@ -1669,44 +1670,44 @@ try {
   console.log("ABOUT TO FETCH");
 
   const formData =
-  new URLSearchParams();
+    new URLSearchParams();
 
-formData.append(
-  "schoolCode",
-  schoolCode
-);
-
-formData.append(
-  "department",
-  department
-);
-
-formData.append(
-  "subject",
-  subject
-);
-
-const response =
-  await fetch(
-    "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
-    {
-      method: "POST",
-      body: formData
-    }
+  formData.append(
+    "schoolCode",
+    schoolCode
   );
+
+  formData.append(
+    "department",
+    department
+  );
+
+  formData.append(
+    "subject",
+    subject
+  );
+
+  const response =
+    await fetch(
+      "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
 
   console.log("FETCH FINISHED");
 
- const text =
-  await response.text();
+  const text =
+    await response.text();
 
-console.log(
-  "Apps Script Response:",
-  text
-);
+  console.log(
+    "Apps Script Response:",
+    text
+  );
 
-const result =
-  JSON.parse(text);
+  const result =
+    JSON.parse(text);
 
   if (!result.success) {
 
@@ -1716,22 +1717,96 @@ const result =
 
   }
 
+  // Keep the original first sheet URL
   sheetUrl =
-    result.sheetUrl;
+    result.sheetUrl || "";
 
-document.getElementById(
-  "sheetUrl"
-).value = sheetUrl;
+  document.getElementById(
+    "sheetUrl"
+  ).value = sheetUrl;
 
   console.log(
     "NEW SHEET:",
     sheetUrl
   );
 
+  // ==========================================
+  // SAVE ALL SUBJECTS RETURNED BY APPS SCRIPT
+  // ==========================================
+
+  const createdSubjects =
+    Array.isArray(result.subjects)
+      ? result.subjects
+      : [];
+
+  console.log(
+    "CREATED SUBJECTS:",
+    createdSubjects
+  );
+
+  if (!createdSubjects.length) {
+
+    throw new Error(
+      "Google Sheets were created, but Apps Script returned no subject records."
+    );
+
+  }
+
+  const subjectRecords =
+    createdSubjects.map(item => ({
+
+      school_code:
+        schoolCode,
+
+      cadre:
+        cadre,
+
+      department:
+        department,
+
+      subject:
+        item.subject,
+
+      subject_password:
+        subjectPassword,
+
+      admin_password:
+        adminPassword,
+
+      sheet_url:
+        item.sheetUrl
+
+    }));
+
+  console.log(
+    "SUPABASE SUBJECT RECORDS:",
+    subjectRecords
+  );
+
+  const { error } =
+    await supabaseClient
+      .from("subjects")
+      .insert(subjectRecords);
+
+  if (error) {
+
+    console.error(
+      "SUPABASE SUBJECT INSERT ERROR:",
+      error
+    );
+
+    alert(
+      error.message
+    );
+
+    return;
+
+  }
+
 } catch (err) {
 
   console.error(
-    "GOOGLE SHEET ERROR:",
+    "SUBJECT CREATION ERROR:",
     err
   );
 
@@ -1742,81 +1817,6 @@ document.getElementById(
   return;
 
 }
-
-      if (
-        !schoolCode ||
-        !department ||
-        !subject
-      ) {
-
-        alert(
-          "Please complete all required fields."
-        );
-
-        return;
-
-      }
-
-      // ==========================
-// SAVE ALL CREATED SUBJECTS
-// ==========================
-
-const createdSubjects =
-  Array.isArray(result.subjects)
-    ? result.subjects
-    : [];
-
-if (!createdSubjects.length) {
-
-  alert(
-    "Google Sheets were created, but no subject records were returned."
-  );
-
-  return;
-
-}
-
-const subjectRecords =
-  createdSubjects.map(item => ({
-
-    school_code:
-      schoolCode,
-
-    cadre:
-      cadre,
-
-    department:
-      department,
-
-    subject:
-      item.subject,
-
-    subject_password:
-      subjectPassword,
-
-    admin_password:
-      adminPassword,
-
-    sheet_url:
-      item.sheetUrl
-
-  }));
-
-const { error } =
-  await supabaseClient
-    .from("subjects")
-    .insert(subjectRecords);
-
-      if (error) {
-
-        alert(
-          error.message
-        );
-
-        return;
-
-      }
-
       alert(
         "Subject Added Successfully"
       );
