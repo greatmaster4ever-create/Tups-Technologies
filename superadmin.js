@@ -1768,7 +1768,9 @@ try {
         item.subject,
 
       subject_password:
-        subjectPassword,
+  item.subject === "Psychomotor"
+    ? "Psychomotor"
+    : subjectPassword,
 
       admin_password:
         adminPassword,
