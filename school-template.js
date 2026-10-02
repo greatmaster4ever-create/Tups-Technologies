@@ -11708,17 +11708,31 @@ function showDeleteResultsConfirmation(
     "deleteResultsConfirmModal";
 
 
-  modal.style.cssText = `
+
+modal.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
     width: 520px;
     max-width: calc(100vw - 40px);
+
+    margin: 0;
     padding: 0;
+
     border: none;
     border-radius: 14px;
+
     background: #ffffff;
     color: #222222;
+
     box-shadow: 0 25px 80px rgba(0,0,0,0.45);
+
     overflow: hidden;
-  `;
+`;
+
+
 
 
   modal.innerHTML = `
