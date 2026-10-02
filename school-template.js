@@ -11877,6 +11877,7 @@ function showDeleteResultsConfirmation(
 }
 
 
+
 async function executeDeleteResults() {
 
   const students =
@@ -11889,204 +11890,6 @@ async function executeDeleteResults() {
     );
 
     return;
-	
-
-function showDeleteResultsConfirmation(
-  students
-) {
-
-  const existing =
-    document.getElementById(
-      "deleteResultsConfirmModal"
-    );
-
-  if (existing) {
-    existing.remove();
-  }
-
-
-  /*
-   * Use a native dialog here as well.
-   * This guarantees that the confirmation
-   * appears in the browser TOP LAYER.
-   */
-  const modal =
-    document.createElement(
-      "dialog"
-    );
-
-  modal.id =
-    "deleteResultsConfirmModal";
-
-
-  modal.style.cssText = `
-    width: 520px;
-    max-width: calc(100vw - 40px);
-    padding: 0;
-    border: none;
-    border-radius: 14px;
-    background: #ffffff;
-    color: #222222;
-    box-shadow: 0 25px 80px rgba(0,0,0,0.45);
-    overflow: hidden;
-  `;
-
-
-  modal.innerHTML = `
-
-    <div
-      style="
-        padding:24px;
-        font-family:Arial,sans-serif;
-      "
-    >
-
-      <h3
-        style="
-          margin:0 0 18px 0;
-          color:#800020;
-          font-size:20px;
-        "
-      >
-        ⚠️ Confirm Delete
-      </h3>
-
-
-      <p>
-        You are about to remove result links for
-        <strong>
-          ${students.length}
-        </strong>
-        student${students.length === 1 ? "" : "s"}.
-      </p>
-
-
-      <p>
-        <strong>
-          Student records will NOT be deleted.
-        </strong>
-      </p>
-
-
-      <p>
-        Only the
-        <strong>
-          result_url
-        </strong>
-        will be cleared from Supabase.
-      </p>
-
-
-      <p>
-        Do you want to continue?
-      </p>
-
-
-      <div
-        style="
-          display:flex;
-          justify-content:flex-end;
-          gap:10px;
-          margin-top:24px;
-        "
-      >
-
-        <button
-          type="button"
-          id="deleteResultsConfirmCancel"
-          style="
-            padding:10px 18px;
-            border:none;
-            border-radius:7px;
-            background:#777;
-            color:#fff;
-            cursor:pointer;
-          "
-        >
-          Cancel
-        </button>
-
-
-        <button
-          type="button"
-          id="deleteResultsConfirmButton"
-          style="
-            padding:10px 18px;
-            border:none;
-            border-radius:7px;
-            background:#800020;
-            color:#fff;
-            cursor:pointer;
-          "
-        >
-          Confirm Delete
-        </button>
-
-      </div>
-
-    </div>
-
-  `;
-
-
-  /*
-   * Dark backdrop.
-   */
-  const style =
-    document.createElement(
-      "style"
-    );
-
-  style.textContent = `
-    #deleteResultsConfirmModal::backdrop {
-      background: rgba(0,0,0,0.78);
-    }
-  `;
-
-  modal.appendChild(
-    style
-  );
-
-
-  document.body.appendChild(
-    modal
-  );
-
-
-  /*
-   * Cancel button.
-   */
-  document
-    .getElementById(
-      "deleteResultsConfirmCancel"
-    )
-    .addEventListener(
-      "click",
-      closeDeleteResultsConfirmation
-    );
-
-
-  /*
-   * Confirm Delete button.
-   */
-  document
-    .getElementById(
-      "deleteResultsConfirmButton"
-    )
-    .addEventListener(
-      "click",
-      executeDeleteResults
-    );
-
-
-  /*
-   * Open confirmation dialog
-   * in the browser TOP LAYER.
-   */
-  modal.showModal();
-
-}
-
 
   }
 
@@ -12111,7 +11914,16 @@ function showDeleteResultsConfirmation(
 
   }
 
+  /*
+   * Update ONLY the selected students
+   * belonging to the current school.
+   *
+   * .select() is important here because it
+   * lets us verify that Supabase actually
+   * updated the records.
+   */
   const {
+    data: updatedStudents,
     error
   } = await supabaseClient
     .from("students")
@@ -12125,6 +11937,9 @@ function showDeleteResultsConfirmation(
     .in(
       "id",
       studentIds
+    )
+    .select(
+      "id, result_url"
     );
 
   if (error) {
@@ -12154,28 +11969,90 @@ function showDeleteResultsConfirmation(
   }
 
   /*
-   * Remember the currently selected
-   * Students & Fees department before
-   * closing the popup.
+   * Supabase can return no error even when
+   * zero rows were actually updated.
+   *
+   * Therefore, do NOT report success unless
+   * Supabase confirms that records were updated.
    */
+  if (
+    !updatedStudents ||
+    !updatedStudents.length
+  ) {
+
+    console.error(
+      "DELETE RESULT: No student records were updated.",
+      {
+        schoolCode,
+        studentIds,
+        updatedStudents
+      }
+    );
+
+    alert(
+      "The result links were NOT deleted.\n\n" +
+      "Supabase did not update any of the selected student records."
+    );
+
+    if (confirmButton) {
+
+      confirmButton.disabled =
+        false;
+
+      confirmButton.textContent =
+        "Confirm Delete";
+
+    }
+
+    return;
+
+  }
+
+  /*
+   * Verify that the returned records actually
+   * have result_url cleared.
+   */
+  const failedUpdates =
+    updatedStudents.filter(
+      student =>
+        student.result_url !== null
+    );
+
+  if (failedUpdates.length) {
+
+    console.error(
+      "DELETE RESULT: Some result links were not cleared.",
+      failedUpdates
+    );
+
+    alert(
+      "The result links were not completely deleted.\n\n" +
+      "Please check the selected students."
+    );
+
+    if (confirmButton) {
+
+      confirmButton.disabled =
+        false;
+
+      confirmButton.textContent =
+        "Confirm Delete";
+
+    }
+
+    return;
+
+  }
+
   const currentDepartment =
     document.getElementById(
       "studentDepartment"
     )?.value;
 
-
-  /*
-   * Close confirmation and
-   * Delete Result popup.
-   */
   closeDeleteResultsConfirmation();
 
   closeDeleteResultsModal();
 
-
-  /*
-   * Clear temporary deletion data.
-   */
   window.pendingDeleteResultStudents =
     [];
 
@@ -12185,14 +12062,6 @@ function showDeleteResultsConfirmation(
   window.deleteResultFilteredStudents =
     [];
 
-
-  /*
-   * Refresh the existing Students &
-   * Fees table automatically.
-   *
-   * This reloads the data directly
-   * from Supabase.
-   */
   if (currentDepartment) {
 
     await loadStudentsTable(
@@ -12211,25 +12080,23 @@ function showDeleteResultsConfirmation(
 
   }
 
-
-  /*
-   * Final confirmation message.
-   */
   alert(
     `Result link${
-      students.length === 1
+      updatedStudents.length === 1
         ? ""
         : "s"
     } successfully removed for ${
-      students.length
+      updatedStudents.length
     } student${
-      students.length === 1
+      updatedStudents.length === 1
         ? ""
         : "s"
     }.`
   );
 
 }
+
+
 
 function closeDeleteResultsModal() {
 
