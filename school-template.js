@@ -11646,6 +11646,7 @@ function prepareDeleteResults() {
 
 }
 
+
 function showDeleteResultsConfirmation(
   students
 ) {
@@ -11659,6 +11660,7 @@ function showDeleteResultsConfirmation(
     existing.remove();
   }
 
+
   const modal =
     document.createElement(
       "div"
@@ -11666,6 +11668,7 @@ function showDeleteResultsConfirmation(
 
   modal.id =
     "deleteResultsConfirmModal";
+
 
   modal.innerHTML = `
 
@@ -11714,7 +11717,7 @@ function showDeleteResultsConfirmation(
           <button
             type="button"
             class="admin-btn"
-            onclick="closeDeleteResultsConfirmation()"
+            id="deleteResultsCancelBtn"
           >
             Cancel
           </button>
@@ -11722,7 +11725,7 @@ function showDeleteResultsConfirmation(
           <button
             type="button"
             class="admin-btn"
-            onclick="executeDeleteResults()"
+            id="deleteResultsConfirmBtn"
           >
             Confirm Delete
           </button>
@@ -11735,11 +11738,48 @@ function showDeleteResultsConfirmation(
 
   `;
 
+
   document.body.appendChild(
     modal
   );
 
+
+  // ==========================================================
+  // ATTACH BUTTON ACTIONS AFTER MODAL IS CREATED
+  // ==========================================================
+
+  const cancelButton =
+    document.getElementById(
+      "deleteResultsCancelBtn"
+    );
+
+  const confirmButton =
+    document.getElementById(
+      "deleteResultsConfirmBtn"
+    );
+
+
+  if (cancelButton) {
+
+    cancelButton.addEventListener(
+      "click",
+      closeDeleteResultsConfirmation
+    );
+
+  }
+
+
+  if (confirmButton) {
+
+    confirmButton.addEventListener(
+      "click",
+      executeDeleteResults
+    );
+
+  }
+
 }
+
 
 async function executeDeleteResults() {
 
