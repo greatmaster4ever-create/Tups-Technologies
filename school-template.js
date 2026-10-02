@@ -11226,12 +11226,12 @@ span:last-child {
         </button>
 
         <button
-            type="button"
-            class="dr-ok"
-            onclick="prepareDeleteResults()"
+    type="button"
+    class="dr-ok"
+    id="deleteResultsOkBtn"
         >
-            OK
-        </button>
+    OK
+</button>
 
     </div>
 
@@ -11254,11 +11254,26 @@ span:last-child {
   modal.showModal();
 
 
-  /*
-   * Populate the class filter
-   * and student list.
-   */
-  updateDeleteResultClasses();
+const deleteResultsOkBtn =
+  document.getElementById(
+    "deleteResultsOkBtn"
+  );
+
+if (deleteResultsOkBtn) {
+
+  deleteResultsOkBtn.addEventListener(
+    "click",
+    prepareDeleteResults
+  );
+
+}
+
+
+/*
+ * Populate the class filter
+ * and student list.
+ */
+updateDeleteResultClasses();
 
 }
 
