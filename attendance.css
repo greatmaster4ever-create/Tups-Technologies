@@ -50,11 +50,14 @@
   width: 100%;
   margin-top: 7px;
 
-  flex-direction: row;
+  display: flex;
+  flex-wrap: wrap;
+
   gap: 6px;
 
   align-items: stretch;
 }
+
 .attendance-menu-btn {
   flex: 1;
 
@@ -146,6 +149,43 @@
 .view-attendance-btn:hover {
   box-shadow: 0 0 9px rgba(11, 31, 77, 0.4);
 }
+
+
+/* =========================================================
+   ATTENDANCE MENU BUTTON SIZING
+   First four buttons share the top row.
+   End of Term occupies the full second row.
+========================================================= */
+
+.teacher-attendance-menu .attendance-menu-btn {
+  flex: 1 1 calc(25% - 6px);
+
+  min-width: 0;
+
+  padding: 9px 6px;
+
+  font-size: 12px;
+
+  white-space: nowrap;
+
+  box-sizing: border-box;
+}
+
+
+/* END OF TERM — FULL WIDTH SECOND ROW */
+
+.teacher-attendance-menu .attendance-reset-btn {
+  flex: 1 1 100%;
+
+  width: 100%;
+
+  font-size: 13px !important;
+
+  padding: 9px 10px !important;
+}
+
+
+
 
 /* =========================================================
    ATTENDANCE POPUP
