@@ -473,6 +473,956 @@ function openAttendanceMarker(session) {
 
 }
 
+// ============================================================
+// PREVIOUS ATTENDANCE — OPEN DATE & SESSION SELECTOR
+// ============================================================
+
+function openPreviousAttendanceMarker() {
+
+  // Remove any existing previous-date selector
+  const existingDialog =
+    document.getElementById("previousAttendanceDateOverlay");
+
+  if (existingDialog) {
+    existingDialog.remove();
+  }
+
+  const today = new Date();
+
+  const todayString =
+    `${today.getFullYear()}-` +
+    `${String(today.getMonth() + 1).padStart(2, "0")}-` +
+    `${String(today.getDate()).padStart(2, "0")}`;
+
+  const overlay = document.createElement("div");
+
+  overlay.id = "previousAttendanceDateOverlay";
+
+  overlay.style.cssText = `
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.65);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:99999;
+  `;
+
+  overlay.innerHTML = `
+
+    <div
+      style="
+        width:90%;
+        max-width:420px;
+        background:#ffffff;
+        border-radius:12px;
+        padding:25px;
+        box-sizing:border-box;
+        box-shadow:0 10px 35px rgba(0,0,0,0.3);
+      "
+    >
+
+      <h3
+        style="
+          margin:0 0 20px 0;
+          text-align:center;
+          color:#111;
+        "
+      >
+        Previous Attendance
+      </h3>
+
+      <label
+        style="
+          display:block;
+          margin-bottom:7px;
+          font-weight:600;
+          color:#222;
+        "
+      >
+        Attendance Date
+      </label>
+
+      <input
+        type="date"
+        id="previousAttendanceDate"
+        max="${todayString}"
+        style="
+          width:100%;
+          box-sizing:border-box;
+          padding:11px;
+          border:1px solid #ccc;
+          border-radius:6px;
+          margin-bottom:18px;
+          font-size:15px;
+        "
+      >
+
+      <label
+        style="
+          display:block;
+          margin-bottom:7px;
+          font-weight:600;
+          color:#222;
+        "
+      >
+        Attendance Session
+      </label>
+
+      <select
+        id="previousAttendanceSession"
+        style="
+          width:100%;
+          box-sizing:border-box;
+          padding:11px;
+          border:1px solid #ccc;
+          border-radius:6px;
+          margin-bottom:22px;
+          font-size:15px;
+        "
+      >
+
+        <option value="">
+          Select Session
+        </option>
+
+        <option value="morning">
+          Morning
+        </option>
+
+        <option value="afternoon">
+          Afternoon
+        </option>
+
+      </select>
+
+      <div
+        style="
+          display:flex;
+          gap:10px;
+        "
+      >
+
+        <button
+          type="button"
+          id="cancelPreviousAttendanceBtn"
+          style="
+            flex:1;
+            padding:11px;
+            border:none;
+            border-radius:6px;
+            background:#555;
+            color:#fff;
+            cursor:pointer;
+          "
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          id="continuePreviousAttendanceBtn"
+          style="
+            flex:1;
+            padding:11px;
+            border:none;
+            border-radius:6px;
+            background:#00a9ff;
+            color:#000;
+            font-weight:600;
+            cursor:pointer;
+          "
+        >
+          Continue
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+  document.body.appendChild(overlay);
+
+
+  // Cancel
+  document
+    .getElementById("cancelPreviousAttendanceBtn")
+    .onclick = function () {
+
+      overlay.remove();
+
+    };
+
+
+  // Continue
+  document
+    .getElementById("continuePreviousAttendanceBtn")
+    .onclick = function () {
+
+      const selectedDate =
+        document.getElementById(
+          "previousAttendanceDate"
+        ).value;
+
+      const selectedSession =
+        document.getElementById(
+          "previousAttendanceSession"
+        ).value;
+
+
+      if (!selectedDate) {
+
+        alert(
+          "Please select the attendance date."
+        );
+
+        return;
+      }
+
+
+      if (!selectedSession) {
+
+        alert(
+          "Please select Morning or Afternoon."
+        );
+
+        return;
+      }
+
+
+      // Prevent future dates
+      if (selectedDate > todayString) {
+
+        alert(
+          "Future attendance dates cannot be selected."
+        );
+
+        return;
+      }
+
+
+      // Store selected values separately.
+      // Existing attendance variables are NOT touched.
+      window.currentPreviousAttendanceDate =
+        selectedDate;
+
+      window.currentPreviousAttendanceSession =
+        selectedSession;
+
+
+      overlay.remove();
+
+
+      // Open the same student-selection style
+      // using our separate previous-attendance function.
+      createPreviousAttendanceModal(
+        selectedSession,
+        selectedDate
+      );
+
+    };
+
+}
+
+// ============================================================
+// PREVIOUS ATTENDANCE — STUDENT SELECTION MODAL
+// ============================================================
+
+async function createPreviousAttendanceModal(
+  session,
+  selectedDate
+) {
+
+  // Remove existing attendance modal if present
+  const existingModal =
+    document.getElementById(
+      "attendanceModalOverlay"
+    );
+
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+
+  // Keep previous attendance completely separate
+  window.currentPreviousAttendanceSession =
+    session;
+
+  window.currentPreviousAttendanceDate =
+    selectedDate;
+
+  window.attendanceSelectedStudents = [];
+
+
+  const overlay =
+    document.createElement("div");
+
+  overlay.id =
+    "attendanceModalOverlay";
+
+
+  overlay.innerHTML = `
+
+    <div class="attendance-modal">
+
+      <div class="attendance-modal-header">
+
+        <div>
+
+          <h3>
+            Previous Attendance
+          </h3>
+
+          <div
+            style="
+              font-size:13px;
+              margin-top:4px;
+              color:#555;
+            "
+          >
+            Date:
+            <strong>
+              ${selectedDate}
+            </strong>
+
+            &nbsp; | &nbsp;
+
+            Session:
+            <strong>
+              ${session === "morning"
+                ? "Morning"
+                : "Afternoon"}
+            </strong>
+          </div>
+
+        </div>
+
+
+        <button
+          type="button"
+          class="attendance-modal-close"
+          id="closePreviousAttendanceModal"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="attendance-modal-tools">
+
+        <input
+          type="text"
+          id="attendanceStudentSearch"
+          placeholder="Search student..."
+        >
+
+        <button
+          type="button"
+          id="attendanceBulkSelectBtn"
+        >
+          Bulk Marking
+        </button>
+
+      </div>
+
+
+      <div class="attendance-filters">
+
+        <select
+          id="attendanceDepartmentFilter"
+        >
+
+          <option value="">
+            All Departments
+          </option>
+
+        </select>
+
+
+        <select
+          id="attendanceClassFilter"
+        >
+
+          <option value="">
+            All Classes
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div
+        id="attendanceStudentsResults"
+        class="attendance-students-results"
+      >
+
+        <div
+          style="
+            padding:20px;
+            text-align:center;
+          "
+        >
+          Loading students...
+        </div>
+
+      </div>
+
+
+      <div class="attendance-modal-footer">
+
+        <button
+          type="button"
+          id="attendanceMarkBtn"
+        >
+          Mark Attendance
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  document.body.appendChild(overlay);
+
+
+  // ----------------------------------------------------------
+  // CLOSE
+  // ----------------------------------------------------------
+
+  document
+    .getElementById(
+      "closePreviousAttendanceModal"
+    )
+    .onclick = function () {
+
+      overlay.remove();
+
+      window.currentPreviousAttendanceSession =
+        null;
+
+      window.currentPreviousAttendanceDate =
+        null;
+
+      window.attendanceSelectedStudents = [];
+
+    };
+
+
+  // ----------------------------------------------------------
+  // SEARCH
+  // ----------------------------------------------------------
+
+  const searchInput =
+    document.getElementById(
+      "attendanceStudentSearch"
+    );
+
+  if (searchInput) {
+
+    searchInput.addEventListener(
+      "input",
+      function () {
+
+        if (
+          typeof renderAttendanceStudents ===
+          "function"
+        ) {
+
+          renderAttendanceStudents();
+
+        }
+
+      }
+    );
+
+  }
+
+
+  // ----------------------------------------------------------
+  // FILTERS
+  // ----------------------------------------------------------
+
+  const departmentFilter =
+    document.getElementById(
+      "attendanceDepartmentFilter"
+    );
+
+  const classFilter =
+    document.getElementById(
+      "attendanceClassFilter"
+    );
+
+
+  if (departmentFilter) {
+
+    departmentFilter.addEventListener(
+      "change",
+      function () {
+
+        if (
+          typeof renderAttendanceStudents ===
+          "function"
+        ) {
+
+          renderAttendanceStudents();
+
+        }
+
+      }
+    );
+
+  }
+
+
+  if (classFilter) {
+
+    classFilter.addEventListener(
+      "change",
+      function () {
+
+        if (
+          typeof renderAttendanceStudents ===
+          "function"
+        ) {
+
+          renderAttendanceStudents();
+
+        }
+
+      }
+    );
+
+  }
+
+
+  // ----------------------------------------------------------
+  // MARK BUTTON
+  // ----------------------------------------------------------
+
+  document
+    .getElementById("attendanceMarkBtn")
+    .onclick =
+    markPreviousAttendance;
+
+
+  // ----------------------------------------------------------
+  // LOAD STUDENTS
+  // ----------------------------------------------------------
+
+  await loadAttendanceStudents();
+
+}
+
+// ============================================================
+// PREVIOUS ATTENDANCE — MARK SELECTED STUDENTS
+// ============================================================
+
+async function markPreviousAttendance() {
+
+  const session =
+    window.currentPreviousAttendanceSession;
+
+  const attendanceDate =
+    window.currentPreviousAttendanceDate;
+
+
+  if (
+    session !== "morning" &&
+    session !== "afternoon"
+  ) {
+
+    alert(
+      "Invalid attendance session."
+    );
+
+    return;
+  }
+
+
+  if (!attendanceDate) {
+
+    alert(
+      "No attendance date was selected."
+    );
+
+    return;
+  }
+
+
+  const checkboxes =
+    document.querySelectorAll(
+      ".attendance-student-checkbox:checked"
+    );
+
+
+  if (!checkboxes.length) {
+
+    alert(
+      "Please select at least one student."
+    );
+
+    return;
+  }
+
+
+  const selectedIds =
+    [...checkboxes].map(
+      checkbox =>
+        String(
+          checkbox.dataset.studentId
+        )
+    );
+
+
+  const selectedStudents =
+    (window.attendanceStudents || [])
+      .filter(student =>
+        selectedIds.includes(
+          String(student.id)
+        )
+      );
+
+
+  if (!selectedStudents.length) {
+
+    alert(
+      "No students were selected."
+    );
+
+    return;
+  }
+
+
+  // IMPORTANT:
+  // This is the actual time the backdated attendance
+  // was entered into the system.
+  //
+  // attendance_date remains the PREVIOUS DATE selected
+  // by the teacher.
+  const attendanceTimestamp =
+    new Date().toISOString();
+
+
+  let markedCount = 0;
+  let alreadyMarkedCount = 0;
+  let failedCount = 0;
+
+
+  const markButton =
+    document.getElementById(
+      "attendanceMarkBtn"
+    );
+
+
+  if (markButton) {
+
+    markButton.disabled = true;
+
+    markButton.textContent =
+      "Saving...";
+
+  }
+
+
+  try {
+
+    for (
+      const student of selectedStudents
+    ) {
+
+      try {
+
+        const studentSchoolCode =
+          student.school_code;
+
+
+        // ----------------------------------------------------
+        // CHECK EXISTING RECORD FOR SELECTED PREVIOUS DATE
+        // ----------------------------------------------------
+
+        const {
+          data: existingRecord,
+          error: selectError
+        } =
+          await supabaseClient
+            .from("student_attendance")
+            .select(`
+              id,
+              morning_present,
+              afternoon_present
+            `)
+            .eq(
+              "school_code",
+              studentSchoolCode
+            )
+            .eq(
+              "student_id",
+              student.id
+            )
+            .eq(
+              "attendance_date",
+              attendanceDate
+            )
+            .maybeSingle();
+
+
+        if (selectError) {
+
+          console.error(
+            "Previous attendance lookup error:",
+            selectError
+          );
+
+          failedCount++;
+
+          continue;
+
+        }
+
+
+        // ----------------------------------------------------
+        // ALREADY MARKED
+        // ----------------------------------------------------
+
+        if (
+          existingRecord &&
+          (
+            session === "morning"
+              ? existingRecord.morning_present
+              : existingRecord.afternoon_present
+          )
+        ) {
+
+          alreadyMarkedCount++;
+
+          continue;
+
+        }
+
+
+        // ----------------------------------------------------
+        // UPDATE EXISTING DAY RECORD
+        // ----------------------------------------------------
+
+        if (existingRecord) {
+
+          const updateData =
+            session === "morning"
+
+              ? {
+                  morning_present: true,
+                  morning_marked_at:
+                    attendanceTimestamp,
+                  updated_at:
+                    attendanceTimestamp
+                }
+
+              : {
+                  afternoon_present: true,
+                  afternoon_marked_at:
+                    attendanceTimestamp,
+                  updated_at:
+                    attendanceTimestamp
+                };
+
+
+          const {
+            error: updateError
+          } =
+            await supabaseClient
+              .from("student_attendance")
+              .update(updateData)
+              .eq(
+                "id",
+                existingRecord.id
+              );
+
+
+          if (updateError) {
+
+            console.error(
+              "Previous attendance update error:",
+              updateError
+            );
+
+            failedCount++;
+
+            continue;
+
+          }
+
+
+          markedCount++;
+
+        }
+
+
+        // ----------------------------------------------------
+        // CREATE NEW DAY RECORD
+        // ----------------------------------------------------
+
+        else {
+
+          const insertData = {
+
+            school_code:
+              studentSchoolCode,
+
+            student_id:
+              student.id,
+
+            reg_no:
+              student.reg_no || null,
+
+            attendance_date:
+              attendanceDate,
+
+            morning_present:
+              session === "morning",
+
+            afternoon_present:
+              session === "afternoon",
+
+            morning_marked_at:
+              session === "morning"
+                ? attendanceTimestamp
+                : null,
+
+            afternoon_marked_at:
+              session === "afternoon"
+                ? attendanceTimestamp
+                : null,
+
+            created_at:
+              attendanceTimestamp,
+
+            updated_at:
+              attendanceTimestamp
+
+          };
+
+
+          const {
+            error: insertError
+          } =
+            await supabaseClient
+              .from("student_attendance")
+              .insert(insertData);
+
+
+          if (insertError) {
+
+            console.error(
+              "Previous attendance insert error:",
+              insertError
+            );
+
+            failedCount++;
+
+            continue;
+
+          }
+
+
+          markedCount++;
+
+        }
+
+      }
+
+      catch (studentError) {
+
+        console.error(
+          "Previous attendance student error:",
+          studentError
+        );
+
+        failedCount++;
+
+      }
+
+    }
+
+
+    // --------------------------------------------------------
+    // RESULT MESSAGE
+    // --------------------------------------------------------
+
+    let message =
+      `Attendance for ${attendanceDate}\n\n`;
+
+
+    message +=
+      `${markedCount} student(s) marked successfully.\n`;
+
+
+    if (alreadyMarkedCount > 0) {
+
+      message +=
+        `${alreadyMarkedCount} student(s) were already marked and skipped.\n`;
+
+    }
+
+
+    if (failedCount > 0) {
+
+      message +=
+        `${failedCount} student(s) failed to save.\n`;
+
+    }
+
+
+    alert(message);
+
+
+    // --------------------------------------------------------
+    // REFRESH STUDENT LIST
+    // --------------------------------------------------------
+
+    if (
+      typeof renderAttendanceStudents ===
+      "function"
+    ) {
+
+      renderAttendanceStudents();
+
+    }
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Previous attendance error:",
+      error
+    );
+
+    alert(
+      "An error occurred while saving previous attendance."
+    );
+
+  }
+
+  finally {
+
+    if (markButton) {
+
+      markButton.disabled = false;
+
+      markButton.textContent =
+        "Mark Attendance";
+
+    }
+
+  }
+
+}
+
 
 /* =========================================================
    CREATE ATTENDANCE MODAL
@@ -3775,3 +4725,10 @@ function showAttendanceMessage(
   );
 
 }
+
+// ============================================================
+// PREVIOUS ATTENDANCE — CLEANUP
+// ============================================================
+
+window.currentPreviousAttendanceDate = null;
+window.currentPreviousAttendanceSession = null;
