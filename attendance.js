@@ -729,6 +729,10 @@ function openPreviousAttendanceMarker() {
 // PREVIOUS ATTENDANCE — STUDENT SELECTION MODAL
 // ============================================================
 
+// ============================================================
+// PREVIOUS ATTENDANCE — STUDENT SELECTION MODAL
+// ============================================================
+
 async function createPreviousAttendanceModal(
   session,
   selectedDate
@@ -745,7 +749,7 @@ async function createPreviousAttendanceModal(
   }
 
 
-  // Keep previous attendance completely separate
+  // Keep previous attendance date/session separate
   window.currentPreviousAttendanceSession =
     session;
 
@@ -755,268 +759,311 @@ async function createPreviousAttendanceModal(
   window.attendanceSelectedStudents = [];
 
 
+  // ==========================================================
+  // CREATE SAME ATTENDANCE OVERLAY USED BY WORKING ATTENDANCE
+  // ==========================================================
+
   const overlay =
     document.createElement("div");
 
   overlay.id =
     "attendanceModalOverlay";
 
-
-  overlay.innerHTML = `
-
-    <div class="attendance-modal">
-
-      <div class="attendance-modal-header">
-
-        <div>
-
-          <h3>
-            Previous Attendance
-          </h3>
-
-          <div
-            style="
-              font-size:13px;
-              margin-top:4px;
-              color:#555;
-            "
-          >
-            Date:
-            <strong>
-              ${selectedDate}
-            </strong>
-
-            &nbsp; | &nbsp;
-
-            Session:
-            <strong>
-              ${session === "morning"
-                ? "Morning"
-                : "Afternoon"}
-            </strong>
-          </div>
-
-        </div>
+  // IMPORTANT:
+  // Use the existing attendance CSS positioning.
+  overlay.className =
+    "attendance-modal-overlay";
 
 
-        <button
-          type="button"
-          class="attendance-modal-close"
-          id="closePreviousAttendanceModal"
+  const modal =
+    document.createElement("div");
+
+  modal.className =
+    "attendance-modal";
+
+
+  modal.innerHTML = `
+
+    <!-- PREVIOUS ATTENDANCE HEADER -->
+
+    <div
+      style="
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        margin-bottom:12px;
+      "
+    >
+
+      <div>
+
+        <h3
+          style="
+            margin:0;
+            color:#111;
+            font-size:18px;
+          "
         >
-          ×
-        </button>
-
-      </div>
-
-
-      <div class="attendance-modal-tools">
-
-        <input
-          type="text"
-          id="attendanceStudentSearch"
-          placeholder="Search student..."
-        >
-
-        <button
-          type="button"
-          id="attendanceBulkSelectBtn"
-        >
-          Bulk Marking
-        </button>
-
-      </div>
-
-
-      <div class="attendance-filters">
-
-        <select
-          id="attendanceDepartmentFilter"
-        >
-
-          <option value="">
-            All Departments
-          </option>
-
-        </select>
-
-
-        <select
-          id="attendanceClassFilter"
-        >
-
-          <option value="">
-            All Classes
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div
-        id="attendanceStudentsResults"
-        class="attendance-students-results"
-      >
+          Previous Attendance
+        </h3>
 
         <div
           style="
-            padding:20px;
-            text-align:center;
+            font-size:13px;
+            margin-top:4px;
+            color:#555;
           "
         >
-          Loading students...
+
+          Date:
+          <strong>
+            ${selectedDate}
+          </strong>
+
+          &nbsp; | &nbsp;
+
+          Session:
+          <strong>
+            ${
+              session === "morning"
+                ? "Morning"
+                : "Afternoon"
+            }
+          </strong>
+
         </div>
 
       </div>
 
 
-      <div class="attendance-modal-footer">
+      <button
+        type="button"
+        class="attendance-close-btn"
+        id="attendanceCloseBtn"
+        aria-label="Close"
+      >
+        ×
+      </button>
 
-        <button
-          type="button"
-          id="attendanceMarkBtn"
-        >
-          Mark Attendance
-        </button>
+    </div>
 
+
+    <!-- TOP CONTROL ROW -->
+
+    <div class="attendance-top-row">
+
+      <input
+        type="text"
+        class="attendance-search-box"
+        id="attendanceStudentSearch"
+        placeholder="Search student / Reg No."
+        autocomplete="off"
+      >
+
+      <button
+        type="button"
+        class="attendance-bulk-btn"
+        id="attendanceBulkBtn"
+      >
+        Bulk Marking
+      </button>
+
+    </div>
+
+
+    <!-- BULK FILTERS -->
+
+    <div
+      class="attendance-filters"
+      id="attendanceFilters"
+    >
+
+      <select
+        class="attendance-filter"
+        id="attendanceDepartmentFilter"
+      >
+
+        <option value="ALL">
+          ALL Departments
+        </option>
+
+      </select>
+
+
+      <select
+        class="attendance-filter"
+        id="attendanceClassFilter"
+      >
+
+        <option value="ALL">
+          ALL Classes
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- STUDENT RESULTS -->
+
+    <div
+      class="attendance-results"
+      id="attendanceResults"
+    >
+
+      <div class="attendance-loading">
+        Loading students...
       </div>
+
+    </div>
+
+
+    <!-- MARK ATTENDANCE -->
+
+    <div class="attendance-mark-area">
+
+      <button
+        type="button"
+        class="attendance-mark-btn"
+        id="attendanceMarkBtn"
+      >
+        Mark Attendance
+      </button>
 
     </div>
 
   `;
 
 
+  // Add modal to overlay
+  overlay.appendChild(modal);
+
   document.body.appendChild(overlay);
 
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // CLOSE
-  // ----------------------------------------------------------
+  // ==========================================================
 
   document
-    .getElementById(
-      "closePreviousAttendanceModal"
-    )
-    .onclick = function () {
+    .getElementById("attendanceCloseBtn")
+    .addEventListener(
+      "click",
+      function () {
 
-      overlay.remove();
+        overlay.remove();
 
-      window.currentPreviousAttendanceSession =
-        null;
+        window.currentPreviousAttendanceSession =
+          null;
 
-      window.currentPreviousAttendanceDate =
-        null;
+        window.currentPreviousAttendanceDate =
+          null;
 
-      window.attendanceSelectedStudents = [];
+        window.attendanceSelectedStudents =
+          [];
 
-    };
-
-
-  // ----------------------------------------------------------
-  // SEARCH
-  // ----------------------------------------------------------
-
-  const searchInput =
-    document.getElementById(
-      "attendanceStudentSearch"
+      }
     );
 
-  if (searchInput) {
 
-    searchInput.addEventListener(
+  // ==========================================================
+  // BULK MARKING
+  // USE THE EXISTING WORKING BULK FUNCTION
+  // ==========================================================
+
+  document
+    .getElementById("attendanceBulkBtn")
+    .addEventListener(
+      "click",
+      toggleAttendanceBulkMode
+    );
+
+
+  // ==========================================================
+  // SEARCH
+  // USE THE EXISTING WORKING SEARCH FUNCTION
+  // ==========================================================
+
+  document
+    .getElementById("attendanceStudentSearch")
+    .addEventListener(
       "input",
       function () {
 
-        if (
-          typeof renderAttendanceStudents ===
-          "function"
-        ) {
-
-          renderAttendanceStudents();
-
-        }
+        searchAttendanceStudents(
+          this.value
+        );
 
       }
     );
 
-  }
 
+  // ==========================================================
+  // DEPARTMENT FILTER
+  // ==========================================================
 
-  // ----------------------------------------------------------
-  // FILTERS
-  // ----------------------------------------------------------
-
-  const departmentFilter =
-    document.getElementById(
+  document
+    .getElementById(
       "attendanceDepartmentFilter"
+    )
+    .addEventListener(
+      "change",
+      function () {
+
+        searchAttendanceStudents(
+          document.getElementById(
+            "attendanceStudentSearch"
+          )?.value || ""
+        );
+
+      }
     );
 
-  const classFilter =
-    document.getElementById(
+
+  // ==========================================================
+  // CLASS FILTER
+  // ==========================================================
+
+  document
+    .getElementById(
       "attendanceClassFilter"
-    );
-
-
-  if (departmentFilter) {
-
-    departmentFilter.addEventListener(
+    )
+    .addEventListener(
       "change",
       function () {
 
-        if (
-          typeof renderAttendanceStudents ===
-          "function"
-        ) {
-
-          renderAttendanceStudents();
-
-        }
+        searchAttendanceStudents(
+          document.getElementById(
+            "attendanceStudentSearch"
+          )?.value || ""
+        );
 
       }
     );
 
-  }
 
-
-  if (classFilter) {
-
-    classFilter.addEventListener(
-      "change",
-      function () {
-
-        if (
-          typeof renderAttendanceStudents ===
-          "function"
-        ) {
-
-          renderAttendanceStudents();
-
-        }
-
-      }
-    );
-
-  }
-
-
-  // ----------------------------------------------------------
-  // MARK BUTTON
-  // ----------------------------------------------------------
+  // ==========================================================
+  // MARK PREVIOUS ATTENDANCE
+  // ==========================================================
 
   document
     .getElementById("attendanceMarkBtn")
-    .onclick =
-    markPreviousAttendance;
+    .addEventListener(
+      "click",
+      markPreviousAttendance
+    );
 
 
-  // ----------------------------------------------------------
+  // ==========================================================
   // LOAD STUDENTS
-  // ----------------------------------------------------------
+  // USE THE EXISTING WORKING STUDENT LOADER
+  // ==========================================================
 
   await loadAttendanceStudents();
 
 }
+
+
 
 // ============================================================
 // PREVIOUS ATTENDANCE — MARK SELECTED STUDENTS
