@@ -1523,3 +1523,33 @@
 
   cursor: not-allowed;
 }
+
+/* =========================================================
+   WRAP LONG ATTENDANCE BUTTON TEXT
+========================================================= */
+
+.teacher-attendance-menu .attendance-menu-btn {
+  white-space: normal;
+
+  text-align: center;
+
+  line-height: 1.2;
+
+  min-height: 42px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+
+/* Keep the longer button labels neatly on two lines */
+
+.teacher-attendance-menu .view-attendance-btn,
+.teacher-attendance-menu .previous-attendance-btn {
+  white-space: normal;
+
+  line-height: 1.15;
+}
