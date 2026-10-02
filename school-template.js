@@ -11679,6 +11679,7 @@ function prepareDeleteResults() {
 
 
 
+
 function showDeleteResultsConfirmation(
   students
 ) {
@@ -11693,76 +11694,122 @@ function showDeleteResultsConfirmation(
   }
 
 
+  /*
+   * Use a native dialog here as well.
+   * This guarantees that the confirmation
+   * appears in the browser TOP LAYER.
+   */
   const modal =
     document.createElement(
-      "div"
+      "dialog"
     );
 
   modal.id =
     "deleteResultsConfirmModal";
 
 
+  modal.style.cssText = `
+    width: 520px;
+    max-width: calc(100vw - 40px);
+    padding: 0;
+    border: none;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #222222;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.45);
+    overflow: hidden;
+  `;
+
+
   modal.innerHTML = `
 
     <div
-      class="delete-results-overlay"
+      style="
+        padding:24px;
+        font-family:Arial,sans-serif;
+      "
     >
 
+      <h3
+        style="
+          margin:0 0 18px 0;
+          color:#800020;
+          font-size:20px;
+        "
+      >
+        ⚠️ Confirm Delete
+      </h3>
+
+
+      <p>
+        You are about to remove result links for
+        <strong>
+          ${students.length}
+        </strong>
+        student${students.length === 1 ? "" : "s"}.
+      </p>
+
+
+      <p>
+        <strong>
+          Student records will NOT be deleted.
+        </strong>
+      </p>
+
+
+      <p>
+        Only the
+        <strong>
+          result_url
+        </strong>
+        will be cleared from Supabase.
+      </p>
+
+
+      <p>
+        Do you want to continue?
+      </p>
+
+
       <div
-        class="delete-results-confirm-modal"
+        style="
+          display:flex;
+          justify-content:flex-end;
+          gap:10px;
+          margin-top:24px;
+        "
       >
 
-        <h3>
-          ⚠️ Confirm Delete
-        </h3>
-
-        <p>
-          You are about to remove result links for
-          <strong>
-            ${students.length}
-          </strong>
-          student${students.length === 1 ? "" : "s"}.
-        </p>
-
-        <p>
-          <strong>
-            Student records will NOT be deleted.
-          </strong>
-        </p>
-
-        <p>
-          Only the
-          <strong>
-            result_url
-          </strong>
-          will be cleared from Supabase.
-        </p>
-
-        <p>
-          Do you want to continue?
-        </p>
-
-        <div
-          class="delete-results-footer"
+        <button
+          type="button"
+          id="deleteResultsConfirmCancel"
+          style="
+            padding:10px 18px;
+            border:none;
+            border-radius:7px;
+            background:#777;
+            color:#fff;
+            cursor:pointer;
+          "
         >
+          Cancel
+        </button>
 
-          <button
-            type="button"
-            class="admin-btn"
-            id="deleteResultsCancelBtn"
-          >
-            Cancel
-          </button>
 
-          <button
-            type="button"
-            class="admin-btn"
-            id="deleteResultsConfirmBtn"
-          >
-            Confirm Delete
-          </button>
-
-        </div>
+        <button
+          type="button"
+          id="deleteResultsConfirmButton"
+          style="
+            padding:10px 18px;
+            border:none;
+            border-radius:7px;
+            background:#800020;
+            color:#fff;
+            cursor:pointer;
+          "
+        >
+          Confirm Delete
+        </button>
 
       </div>
 
@@ -11771,44 +11818,61 @@ function showDeleteResultsConfirmation(
   `;
 
 
+  /*
+   * Dark backdrop.
+   */
+  const style =
+    document.createElement(
+      "style"
+    );
+
+  style.textContent = `
+    #deleteResultsConfirmModal::backdrop {
+      background: rgba(0,0,0,0.78);
+    }
+  `;
+
+  modal.appendChild(
+    style
+  );
+
+
   document.body.appendChild(
     modal
   );
 
 
-  // ==========================================================
-  // ATTACH BUTTON ACTIONS AFTER MODAL IS CREATED
-  // ==========================================================
-
-  const cancelButton =
-    document.getElementById(
-      "deleteResultsCancelBtn"
-    );
-
-  const confirmButton =
-    document.getElementById(
-      "deleteResultsConfirmBtn"
-    );
-
-
-  if (cancelButton) {
-
-    cancelButton.addEventListener(
+  /*
+   * Cancel button.
+   */
+  document
+    .getElementById(
+      "deleteResultsConfirmCancel"
+    )
+    .addEventListener(
       "click",
       closeDeleteResultsConfirmation
     );
 
-  }
 
-
-  if (confirmButton) {
-
-    confirmButton.addEventListener(
+  /*
+   * Confirm Delete button.
+   */
+  document
+    .getElementById(
+      "deleteResultsConfirmButton"
+    )
+    .addEventListener(
       "click",
       executeDeleteResults
     );
 
-  }
+
+  /*
+   * Open confirmation dialog
+   * in the browser TOP LAYER.
+   */
+  modal.showModal();
 
 }
 
@@ -11825,6 +11889,204 @@ async function executeDeleteResults() {
     );
 
     return;
+	
+
+function showDeleteResultsConfirmation(
+  students
+) {
+
+  const existing =
+    document.getElementById(
+      "deleteResultsConfirmModal"
+    );
+
+  if (existing) {
+    existing.remove();
+  }
+
+
+  /*
+   * Use a native dialog here as well.
+   * This guarantees that the confirmation
+   * appears in the browser TOP LAYER.
+   */
+  const modal =
+    document.createElement(
+      "dialog"
+    );
+
+  modal.id =
+    "deleteResultsConfirmModal";
+
+
+  modal.style.cssText = `
+    width: 520px;
+    max-width: calc(100vw - 40px);
+    padding: 0;
+    border: none;
+    border-radius: 14px;
+    background: #ffffff;
+    color: #222222;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.45);
+    overflow: hidden;
+  `;
+
+
+  modal.innerHTML = `
+
+    <div
+      style="
+        padding:24px;
+        font-family:Arial,sans-serif;
+      "
+    >
+
+      <h3
+        style="
+          margin:0 0 18px 0;
+          color:#800020;
+          font-size:20px;
+        "
+      >
+        ⚠️ Confirm Delete
+      </h3>
+
+
+      <p>
+        You are about to remove result links for
+        <strong>
+          ${students.length}
+        </strong>
+        student${students.length === 1 ? "" : "s"}.
+      </p>
+
+
+      <p>
+        <strong>
+          Student records will NOT be deleted.
+        </strong>
+      </p>
+
+
+      <p>
+        Only the
+        <strong>
+          result_url
+        </strong>
+        will be cleared from Supabase.
+      </p>
+
+
+      <p>
+        Do you want to continue?
+      </p>
+
+
+      <div
+        style="
+          display:flex;
+          justify-content:flex-end;
+          gap:10px;
+          margin-top:24px;
+        "
+      >
+
+        <button
+          type="button"
+          id="deleteResultsConfirmCancel"
+          style="
+            padding:10px 18px;
+            border:none;
+            border-radius:7px;
+            background:#777;
+            color:#fff;
+            cursor:pointer;
+          "
+        >
+          Cancel
+        </button>
+
+
+        <button
+          type="button"
+          id="deleteResultsConfirmButton"
+          style="
+            padding:10px 18px;
+            border:none;
+            border-radius:7px;
+            background:#800020;
+            color:#fff;
+            cursor:pointer;
+          "
+        >
+          Confirm Delete
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  /*
+   * Dark backdrop.
+   */
+  const style =
+    document.createElement(
+      "style"
+    );
+
+  style.textContent = `
+    #deleteResultsConfirmModal::backdrop {
+      background: rgba(0,0,0,0.78);
+    }
+  `;
+
+  modal.appendChild(
+    style
+  );
+
+
+  document.body.appendChild(
+    modal
+  );
+
+
+  /*
+   * Cancel button.
+   */
+  document
+    .getElementById(
+      "deleteResultsConfirmCancel"
+    )
+    .addEventListener(
+      "click",
+      closeDeleteResultsConfirmation
+    );
+
+
+  /*
+   * Confirm Delete button.
+   */
+  document
+    .getElementById(
+      "deleteResultsConfirmButton"
+    )
+    .addEventListener(
+      "click",
+      executeDeleteResults
+    );
+
+
+  /*
+   * Open confirmation dialog
+   * in the browser TOP LAYER.
+   */
+  modal.showModal();
+
+}
+
 
   }
 
