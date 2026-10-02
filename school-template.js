@@ -11600,6 +11600,7 @@ function updateDeleteResultSelectedCount() {
 
 }
 
+
 function prepareDeleteResults() {
 
   const selected =
@@ -11655,11 +11656,27 @@ function prepareDeleteResults() {
   window.pendingDeleteResultStudents =
     withResults;
 
+
+  /*
+   * IMPORTANT:
+   * Close the native student-selection dialog
+   * before showing the confirmation modal.
+   *
+   * The selection dialog uses showModal(),
+   * which places it in the browser TOP LAYER.
+   * The confirmation modal is a normal DIV.
+   * Closing the selection dialog allows the
+   * confirmation modal to appear properly.
+   */
+  closeDeleteResultsModal();
+
+
   showDeleteResultsConfirmation(
     withResults
   );
 
 }
+
 
 
 function showDeleteResultsConfirmation(
