@@ -10255,14 +10255,14 @@ async function syncStudentsFromSheet() {
       "refreshStudentsBtn"
     );
 
+  const originalText =
+    refreshBtn
+      ? refreshBtn.textContent
+      : "Refresh";
+
   if (refreshBtn) {
-
-    refreshBtn.disabled = true;
-
-    await new Promise(
-      resolve => setTimeout(resolve, 0)
-    );
-
+    refreshBtn.textContent =
+      "Processing...";
   }
 
   try {
@@ -10338,7 +10338,8 @@ async function syncStudentsFromSheet() {
   } finally {
 
     if (refreshBtn) {
-      refreshBtn.disabled = false;
+      refreshBtn.textContent =
+        originalText;
     }
 
   }
