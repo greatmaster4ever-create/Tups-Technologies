@@ -10256,7 +10256,13 @@ async function syncStudentsFromSheet() {
     );
 
   if (refreshBtn) {
+
     refreshBtn.disabled = true;
+
+    await new Promise(
+      resolve => setTimeout(resolve, 0)
+    );
+
   }
 
   try {
