@@ -10303,49 +10303,72 @@ async function syncStudentsFromSheet() {
     department
   );
 
-  const response =
-  await fetch(
-    "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
-    {
-      method: "POST",
-      body: formData
+  try {
+
+    const response =
+      await fetch(
+        "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
+        {
+          method: "POST",
+          body: formData,
+          redirect: "follow"
+        }
+      );
+
+    if (!response.ok) {
+
+      throw new Error(
+        `Sync request failed: HTTP ${response.status}`
+      );
+
     }
-  );
 
-  const result =
-    await response.json();
+    const result =
+      await response.json();
 
-  console.log(
-    "SYNC RESPONSE:",
-    result
-  );
+    console.log(
+      "SYNC RESPONSE:",
+      result
+    );
 
-  if (!result.success) {
+    if (!result.success) {
+
+      alert(
+        result.error
+      );
+
+      return;
+
+    }
+
+    alert(
+      `${result.synced} students synced`
+    );
+
+    loadStudentsTable(
+      department
+    );
+
+  }
+  catch (error) {
+
+    console.error(
+      "STUDENT SYNC ERROR:",
+      error
+    );
+
+    alert(
+      "Student sync failed. Please try again."
+    );
+
+  }
+  finally {
 
     if (refreshBtn) {
       refreshBtn.textContent =
         originalText;
     }
 
-    alert(
-      result.error
-    );
-
-    return;
-
-  }
-
-  alert(
-    `${result.synced} students synced`
-  );
-
-  loadStudentsTable(
-    department
-  );
-
-  if (refreshBtn) {
-    refreshBtn.textContent =
-      originalText;
   }
 
 }
