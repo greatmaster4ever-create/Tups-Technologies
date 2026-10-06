@@ -10250,72 +10250,92 @@ async function toggleAdvertisementStatus(
 
 async function syncStudentsFromSheet() {
 
-  const department =
+  const refreshBtn =
     document.getElementById(
-      "studentDepartment"
-    ).value;
-
-  if (!department) {
-
-    alert(
-      "Select department first"
+      "refreshStudentsBtn"
     );
 
-    return;
-
+  if (refreshBtn) {
+    refreshBtn.disabled = true;
   }
 
-  const formData =
-    new URLSearchParams();
+  try {
 
-  formData.append(
-    "action",
-    "syncStudents"
-  );
+    const department =
+      document.getElementById(
+        "studentDepartment"
+      ).value;
 
-  formData.append(
-    "schoolCode",
-    schoolCode
-  );
+    if (!department) {
 
-  formData.append(
-    "department",
-    department
-  );
+      alert(
+        "Select department first"
+      );
 
-  const response =
-  await fetch(
-    "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
-    {
-      method: "POST",
-      body: formData
+      return;
+
     }
-  );
 
-  const result =
-    await response.json();
-  console.log(
-  "SYNC RESPONSE:",
-  result
-);
+    const formData =
+      new URLSearchParams();
 
-  if (!result.success) {
-
-    alert(
-      result.error
+    formData.append(
+      "action",
+      "syncStudents"
     );
 
-    return;
+    formData.append(
+      "schoolCode",
+      schoolCode
+    );
+
+    formData.append(
+      "department",
+      department
+    );
+
+    const response =
+    await fetch(
+      "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
+
+    const result =
+      await response.json();
+
+    console.log(
+      "SYNC RESPONSE:",
+      result
+    );
+
+    if (!result.success) {
+
+      alert(
+        result.error
+      );
+
+      return;
+
+    }
+
+    alert(
+      `${result.synced} students synced`
+    );
+
+    loadStudentsTable(
+      department
+    );
+
+  } finally {
+
+    if (refreshBtn) {
+      refreshBtn.disabled = false;
+    }
 
   }
-
-  alert(
-    `${result.synced} students synced`
-  );
-
-  loadStudentsTable(
-    department
-  );
 
 }
 
