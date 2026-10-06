@@ -10265,83 +10265,87 @@ async function syncStudentsFromSheet() {
       "Processing...";
   }
 
-  try {
+  const department =
+    document.getElementById(
+      "studentDepartment"
+    ).value;
 
-    const department =
-      document.getElementById(
-        "studentDepartment"
-      ).value;
-
-    if (!department) {
-
-      alert(
-        "Select department first"
-      );
-
-      return;
-
-    }
-
-    const formData =
-      new URLSearchParams();
-
-    formData.append(
-      "action",
-      "syncStudents"
-    );
-
-    formData.append(
-      "schoolCode",
-      schoolCode
-    );
-
-    formData.append(
-      "department",
-      department
-    );
-
-    const response =
-    await fetch(
-      "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
-      {
-        method: "POST",
-        body: formData
-      }
-    );
-
-    const result =
-      await response.json();
-
-    console.log(
-      "SYNC RESPONSE:",
-      result
-    );
-
-    if (!result.success) {
-
-      alert(
-        result.error
-      );
-
-      return;
-
-    }
-
-    alert(
-      `${result.synced} students synced`
-    );
-
-    loadStudentsTable(
-      department
-    );
-
-  } finally {
+  if (!department) {
 
     if (refreshBtn) {
       refreshBtn.textContent =
         originalText;
     }
 
+    alert(
+      "Select department first"
+    );
+
+    return;
+
+  }
+
+  const formData =
+    new URLSearchParams();
+
+  formData.append(
+    "action",
+    "syncStudents"
+  );
+
+  formData.append(
+    "schoolCode",
+    schoolCode
+  );
+
+  formData.append(
+    "department",
+    department
+  );
+
+  const response =
+  await fetch(
+    "https://script.google.com/macros/s/AKfycbzRotvo9tm_FHSkGKqzdgyEjKYQix0YgI1Db4viY3eJ0V3dvXdT_I5Jgy39P5Zt8zjxaA/exec",
+    {
+      method: "POST",
+      body: formData
+    }
+  );
+
+  const result =
+    await response.json();
+
+  console.log(
+    "SYNC RESPONSE:",
+    result
+  );
+
+  if (!result.success) {
+
+    if (refreshBtn) {
+      refreshBtn.textContent =
+        originalText;
+    }
+
+    alert(
+      result.error
+    );
+
+    return;
+
+  }
+
+  alert(
+    `${result.synced} students synced`
+  );
+
+  loadStudentsTable(
+    department
+  );
+
+  if (refreshBtn) {
+    refreshBtn.textContent =
+      originalText;
   }
 
 }
