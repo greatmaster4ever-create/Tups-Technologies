@@ -12200,162 +12200,320 @@ function closeDeleteResultsConfirmation() {
 
 }
 
-async function loadStudentsTable(
-  department
+
+const STUDENT_RESULT_ACCESS_URL =
+  "https://sgdrncpiqingjwxmkqij.supabase.co/functions/v1/student-result-access";
+
+
+async function getUnpaidResultAccess(regNo) {
+
+  const response = await fetch(
+    STUDENT_RESULT_ACCESS_URL,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "get",
+        school_code: schoolCode,
+        reg_no: regNo
+      })
+    }
+  );
+
+  const result = await response.json();
+
+  if (!response.ok || result.error) {
+    throw new Error(
+      result.error || "Could not load the result-access setting."
+    );
+  }
+
+  return result.allow_unpaid_results === true;
+}
+
+
+async function toggleUnpaidResultAccess(
+  encodedRegNo,
+  currentValue
 ) {
 
-  console.log(
-    "LOAD STUDENTS FUNCTION RUNNING"
+  const regNo = decodeURIComponent(encodedRegNo);
+
+  const newValue = currentValue !== true;
+
+  const password = prompt(
+    "Enter the Admin Password to " +
+    (newValue ? "ALLOW" : "BLOCK") +
+    " result viewing for students with incomplete fees:"
   );
 
-  console.log(
-    "Department Selected:",
-    department
-  );
+  if (password === null || !password.trim()) {
+    return;
+  }
 
-  const {
-    data,
-    error
-  } = await supabaseClient
-    .from("students")
-    .select(`
-      id,
-      student_name,
-      class,
-      reg_no,
-      department,
-      result_url
-    `)
-    .eq(
-      "school_code",
-      schoolCode
-    )
-    .eq(
-      "department",
-      department
+  try {
+
+    const response = await fetch(
+      STUDENT_RESULT_ACCESS_URL,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "set",
+          school_code: schoolCode,
+          reg_no: regNo,
+          allow_unpaid_results: newValue,
+          admin_password: password.trim()
+        })
+      }
     );
 
-  console.log(
-    "FILTERED STUDENTS:",
-    data
-  );
+    const result = await response.json();
 
-  console.log(
-    "TOTAL STUDENTS:",
-    data?.length
-  );
+    if (!response.ok || result.error) {
+      throw new Error(
+        result.error || "Could not save the result-access setting."
+      );
+    }
 
-  console.log(
-    "Department:",
-    department
-  );
-
-  console.log(
-    "School Code:",
-    schoolCode
-  );
-
-  console.log(
-    "Query Error:",
-    error
-  );
-
-  if (error) {
+    if (result.success !== true) {
+      throw new Error("The setting was not confirmed as saved.");
+    }
 
     alert(
+      newValue
+        ? "Unpaid-result access has been enabled for this student."
+        : "Unpaid-result access has been disabled for this student."
+    );
+
+    const departmentSelect =
+      document.getElementById("studentDepartment");
+
+    if (departmentSelect) {
+      await loadStudentsTable(departmentSelect.value);
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Student result-access update failed:",
       error.message
     );
 
-    return;
+    alert(
+      "Could not update the setting. " +
+      error.message
+    );
 
   }
+}
 
-  let html = `
 
-    <table class="students-table">
 
-      <tr>
 
-        <th>
-          Student Name
-        </th>
+async function loadStudentsTable(department) {
 
-        <th>
-          Class
-        </th>
+  const container = document.getElementById(
+    "studentsTableContainer"
+  );
 
-        <th>
-          Actions
-        </th>
+  if (!container) return;
 
-      </tr>
+  container.innerHTML = "Loading students...";
 
-  `;
+  try {
 
-  data.forEach(student => {
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("students")
+      .select(`
+        id,
+        student_name,
+        class,
+        reg_no,
+        department,
+        result_url
+      `)
+      .eq("school_code", schoolCode)
+      .eq("department", department);
 
-    html += `
+    if (error) {
+      throw error;
+    }
 
-      <tr>
+    const students = data || [];
 
-        <td>
-          ${student.student_name || ""}
-        </td>
+    // Load access settings with a maximum of six
+    // simultaneous requests to the Edge Function.
+    const accessStates = new Array(
+      students.length
+    ).fill(null);
 
-        <td>
-          ${student.class || ""}
-        </td>
+    let nextStudentIndex = 0;
 
-        <td>
+    const workerCount = Math.min(
+      6,
+      students.length
+    );
 
-          <div class="action-buttons">
+    await Promise.all(
+      Array.from(
+        { length: workerCount },
+        async () => {
 
-            <button
-              onclick="
-                viewStudentInfo(
-                  '${student.id}'
-                )
-              "
-            >
-              Info
-            </button>
+          while (true) {
 
-            <button
-              onclick="
-                deleteStudent(
-                  '${student.id}'
-                )
-              "
-            >
-              Delete
-            </button>
+            const index = nextStudentIndex++;
 
-            <button
-              onclick="
-                openTermReport(
-                  '${student.id}'
-                )
-              "
-            >
-              Result
-            </button>
+            if (index >= students.length) {
+              return;
+            }
 
-          </div>
+            const student = students[index];
 
-        </td>
+            if (!student.reg_no) {
+              accessStates[index] = null;
+              continue;
+            }
 
-      </tr>
+            try {
 
+              accessStates[index] =
+                await getUnpaidResultAccess(
+                  String(student.reg_no)
+                );
+
+            } catch (error) {
+
+              console.error(
+                "Could not load access setting for student:",
+                student.reg_no,
+                error.message
+              );
+
+              accessStates[index] = null;
+            }
+          }
+        }
+      )
+    );
+
+    let html = `
+      <table class="students-table">
+        <tr>
+          <th>Student Name</th>
+          <th>Class</th>
+          <th>Unpaid Result Access</th>
+          <th>Actions</th>
+        </tr>
     `;
 
-  });
+    students.forEach((student, index) => {
 
-  html += "</table>";
+      const accessState = accessStates[index];
 
-  document.getElementById(
-    "studentsTableContainer"
-  ).innerHTML = html;
+      const encodedRegNo = encodeURIComponent(
+        String(student.reg_no || "")
+      ).replace(/'/g, "%27");
 
+      let accessControl = "";
+
+      if (!student.reg_no) {
+
+        accessControl = `
+          <span>Missing Reg No.</span>
+        `;
+
+      } else if (accessState === null) {
+
+        accessControl = `
+          <span>Could not load setting.</span>
+          <button
+            type="button"
+            onclick="loadStudentsTable(
+              document.getElementById('studentDepartment').value
+            )"
+          >
+            Retry
+          </button>
+        `;
+
+      } else {
+
+        accessControl = `
+          <button
+            type="button"
+            onclick="toggleUnpaidResultAccess(
+              '${encodedRegNo}',
+              ${accessState}
+            )"
+          >
+            ${accessState ? "ON" : "OFF"}
+          </button>
+
+          <div>
+            ${
+              accessState
+                ? "Incomplete-fee access allowed"
+                : "Incomplete-fee access blocked"
+            }
+          </div>
+        `;
+      }
+
+      html += `
+        <tr>
+          <td>${student.student_name || ""}</td>
+          <td>${student.class || ""}</td>
+          <td>${accessControl}</td>
+
+          <td>
+            <div class="action-buttons">
+
+              <button
+                onclick="viewStudentInfo('${student.id}')"
+              >
+                Info
+              </button>
+
+              <button
+                onclick="deleteStudent('${student.id}')"
+              >
+                Delete
+              </button>
+
+              <button
+                onclick="openTermReport('${student.id}')"
+              >
+                Result
+              </button>
+
+            </div>
+          </td>
+        </tr>
+      `;
+    });
+
+    html += "</table>";
+
+    container.innerHTML = html;
+
+  } catch (error) {
+
+    console.error(
+      "Could not load students table:",
+      error.message
+    );
+
+    container.textContent =
+      "Could not load students: " + error.message;
+  }
 }
 
 

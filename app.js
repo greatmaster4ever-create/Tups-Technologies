@@ -96,137 +96,153 @@ function downloadResult(fileUrl) {
 }
 
 async function checkStudentResult() {
+  const schoolCode = document
+    .getElementById("resultSchoolCode")
+    .value.trim();
 
-  const schoolCode =
-    document.getElementById(
-      "resultSchoolCode"
-    ).value.trim();
+  const regNo = document
+    .getElementById("resultRegNo")
+    .value.trim();
 
-  const regNo =
-    document.getElementById(
-      "resultRegNo"
-    ).value.trim();
+  const resultCard = document.getElementById("resultCard");
+  const resultViewer = document.getElementById("resultViewer");
 
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
+  resultCard.classList.add("show-result");
+  resultViewer.innerHTML = `
+    <p style="font-weight:bold;">Checking student details and fee status...</p>
+  `;
+
+  try {
+    // 1. Find the student.
+    const { data, error } = await supabaseClient
       .from("students")
       .select("*")
-      .eq(
-        "school_code",
-        schoolCode
-      )
-      .eq(
-        "reg_no",
-        regNo
-      )
+      .eq("school_code", schoolCode)
+      .eq("reg_no", regNo)
       .single();
 
-  if (error || !data) {
+    if (error || !data) {
+      resultViewer.innerHTML = `
+        <p style="color:red;font-weight:bold;">
+          Student not found. Please check the School Code and Admission Number.
+        </p>
+      `;
+      return;
+    }
 
-    alert(
-      "Student not found."
-    );
-
-    return;
-
-  }
-
-  const {
-    data: fee
-  } =
-    await supabaseClient
+    // 2. Retrieve the applicable class fee.
+    const { data: fee, error: feeError } = await supabaseClient
       .from("class_fees")
       .select("term_fee")
-      .eq(
-        "school_code",
-        schoolCode
-      )
-      .eq(
-        "class_name",
-        data.class
-      )
+      .eq("school_code", schoolCode)
+      .eq("class_name", data.class)
       .single();
 
-  const expected =
-    Number(
-      fee?.term_fee
-    ) || 0;
+    if (feeError && feeError.code !== "PGRST116") {
+      resultViewer.innerHTML = `
+        <p style="color:red;font-weight:bold;">
+          Unable to verify the student's fees. Please try again later.
+        </p>
+      `;
+      return;
+    }
 
-  const paid =
-    Number(
-      data.total_fees_paid
-    ) || 0;
+    // Preserve the existing rule: no matching fee record means expected fee is 0.
+    const expected = Number(fee?.term_fee) || 0;
+    const paid = Number(data.total_fees_paid) || 0;
+    const fullyPaid = paid >= expected;
 
-  if (paid < expected) {
-	  
-	document
-.getElementById("resultCard")
-.classList.add("show-result");
+    // 3. Ask the Edge Function to check the student's exception.
+    // This also lets the function reset the exception when fees are fully paid.
+    let allowUnpaidResults = false;
+    let accessCheckSucceeded = false;
 
-    document.getElementById(
-      "resultViewer"
-    ).innerHTML = `
+    try {
+      const accessResponse = await fetch(
+        `${supabaseUrl}/functions/v1/student-result-access`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": supabaseKey
+          },
+          body: JSON.stringify({
+            action: "get",
+            school_code: schoolCode,
+            reg_no: regNo
+          })
+        }
+      );
 
-      <p style="
-        color:red;
-        font-weight:bold;
-      ">
-        Result unavailable.
-        Please contact the school administrator/accounts.
-      </p>
+      if (accessResponse.ok) {
+        const accessData = await accessResponse.json();
 
+        if (typeof accessData.allow_unpaid_results === "boolean") {
+          allowUnpaidResults = accessData.allow_unpaid_results;
+          accessCheckSucceeded = true;
+        }
+      }
+    } catch (accessError) {
+      console.error("Student result access check failed:", accessError);
+    }
+
+    // 4. Fully paid students can view results automatically.
+    // The Edge Function has also been asked to reset their exception.
+    if (!fullyPaid) {
+      // If the access service fails, do not grant an unpaid-result exception.
+      if (!accessCheckSucceeded || !allowUnpaidResults) {
+        resultViewer.innerHTML = `
+          <p style="color:red;font-weight:bold;">
+            Result unavailable. Please contact the school administrator/accounts.
+          </p>
+        `;
+        return;
+      }
+    }
+
+    // 5. Check that a result has actually been published.
+    if (
+      typeof data.result_url !== "string" ||
+      !data.result_url.trim()
+    ) {
+      resultViewer.innerHTML = `
+        <p style="font-weight:bold;">
+          No result has been published yet. Please contact the school.
+        </p>
+      `;
+      return;
+    }
+
+    // 6. Display the result and preserve the existing download feature.
+    const previewUrl = data.result_url.replace("/view", "/preview");
+
+    resultViewer.innerHTML = `
+      <iframe
+        src="${previewUrl}"
+        style="width:100%;height:65vh;border:none;"
+      ></iframe>
+
+      <br><br>
+
+      <button type="button" id="downloadBtn">
+        Download Result
+      </button>
     `;
 
-    return;
+    document.getElementById("downloadBtn").addEventListener("click", function (e) {
+      e.preventDefault();
+      downloadResult(data.result_url);
+    });
 
+  } catch (error) {
+    console.error("Result checker error:", error);
+
+    resultViewer.innerHTML = `
+      <p style="color:red;font-weight:bold;">
+        Something went wrong while checking the result. Please try again.
+      </p>
+    `;
   }
-
-console.log(data.result_url);
-const previewUrl =
-  data.result_url.replace(
-    "/view",
-    "/preview"
-  );
-
-document.getElementById(
-  "resultViewer"
-).innerHTML = `
-  <iframe
-    src="${previewUrl}"
-    style="
-width:100%;
-height:65vh;
-border:none;
-"
-  ></iframe>
-
-  <br><br>
-
-  <button
-    type="button"
-    id="downloadBtn"
-  >
-    Download Result
-  </button>
-`;
-
-document.getElementById(
-  "downloadBtn"
-).addEventListener(
-  "click",
-  function (e) {
-
-    e.preventDefault();
-
-    downloadResult(
-      data.result_url
-    );
-
-  }
-);
 }
 
 /* =====================================================
