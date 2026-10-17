@@ -12315,6 +12315,7 @@ async function toggleUnpaidResultAccess(
 
 
 
+
 async function loadStudentsTable(department) {
 
   const container = document.getElementById(
@@ -12343,65 +12344,49 @@ async function loadStudentsTable(department) {
       .eq("school_code", schoolCode)
       .eq("department", department);
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     const students = data || [];
-
-    // Load access settings with a maximum of six
-    // simultaneous requests to the Edge Function.
-    const accessStates = new Array(
-      students.length
-    ).fill(null);
-
+    const accessStates = new Array(students.length).fill(null);
     let nextStudentIndex = 0;
 
-    const workerCount = Math.min(
-      6,
-      students.length
-    );
+    const workerCount = Math.min(6, students.length);
 
     await Promise.all(
-      Array.from(
-        { length: workerCount },
-        async () => {
+      Array.from({ length: workerCount }, async () => {
 
-          while (true) {
+        while (true) {
 
-            const index = nextStudentIndex++;
+          const index = nextStudentIndex++;
 
-            if (index >= students.length) {
-              return;
-            }
+          if (index >= students.length) return;
 
-            const student = students[index];
+          const student = students[index];
 
-            if (!student.reg_no) {
-              accessStates[index] = null;
-              continue;
-            }
+          if (!student.reg_no) {
+            accessStates[index] = null;
+            continue;
+          }
 
-            try {
+          try {
 
-              accessStates[index] =
-                await getUnpaidResultAccess(
-                  String(student.reg_no)
-                );
-
-            } catch (error) {
-
-              console.error(
-                "Could not load access setting for student:",
-                student.reg_no,
-                error.message
+            accessStates[index] =
+              await getUnpaidResultAccess(
+                String(student.reg_no)
               );
 
-              accessStates[index] = null;
-            }
+          } catch (error) {
+
+            console.error(
+              "Could not load access setting for student:",
+              student.reg_no,
+              error.message
+            );
+
+            accessStates[index] = null;
           }
         }
-      )
+      })
     );
 
     let html = `
@@ -12426,14 +12411,12 @@ async function loadStudentsTable(department) {
 
       if (!student.reg_no) {
 
-        accessControl = `
-          <span>Missing Reg No.</span>
-        `;
+        accessControl = `<span>Missing Reg No.</span>`;
 
       } else if (accessState === null) {
 
         accessControl = `
-          <span>Could not load setting.</span>
+          <span>Unavailable</span>
           <button
             type="button"
             onclick="loadStudentsTable(
@@ -12446,23 +12429,41 @@ async function loadStudentsTable(department) {
 
       } else {
 
-        accessControl = `
-          <button
-            type="button"
-            onclick="toggleUnpaidResultAccess(
-              '${encodedRegNo}',
-              ${accessState}
-            )"
-          >
-            ${accessState ? "ON" : "OFF"}
-          </button>
+        const buttonColor = accessState
+          ? "#198754"
+          : "#dc3545";
 
-          <div>
-            ${
-              accessState
-                ? "Incomplete-fee access allowed"
-                : "Incomplete-fee access blocked"
-            }
+        const statusText = accessState
+          ? "Permitted"
+          : "Restricted";
+
+        accessControl = `
+          <div style="
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+          ">
+            <button
+              type="button"
+              style="
+                background-color: ${buttonColor};
+                color: #ffffff;
+                border: none;
+                padding: 7px 16px;
+                border-radius: 5px;
+                font-weight: bold;
+                cursor: pointer;
+              "
+              onclick="toggleUnpaidResultAccess(
+                '${encodedRegNo}',
+                ${accessState}
+              )"
+            >
+              ${accessState ? "ON" : "OFF"}
+            </button>
+
+            <span>${statusText}</span>
           </div>
         `;
       }
@@ -12475,7 +12476,6 @@ async function loadStudentsTable(department) {
 
           <td>
             <div class="action-buttons">
-
               <button
                 onclick="viewStudentInfo('${student.id}')"
               >
@@ -12493,7 +12493,6 @@ async function loadStudentsTable(department) {
               >
                 Result
               </button>
-
             </div>
           </td>
         </tr>
@@ -12501,7 +12500,6 @@ async function loadStudentsTable(department) {
     });
 
     html += "</table>";
-
     container.innerHTML = html;
 
   } catch (error) {
